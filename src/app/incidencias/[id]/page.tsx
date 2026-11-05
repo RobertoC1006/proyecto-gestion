@@ -1,0 +1,8 @@
+import { ArrowLeft, CheckCircle2 } from "lucide-react";
+import { tickets, timeline } from "../../../data/mock";
+import { PriorityBadge } from "../../../components/PriorityBadge";
+
+export default function IncidenciaDetailPage() {
+  const ticket = tickets[0];
+  return <section><div className="page-intro"><div><a className="back-link" href="/incidencias"><ArrowLeft size={15} />Volver a mis incidencias</a><h2>Detalle de incidencia</h2><p>Consulta el progreso y la actividad de tu reporte.</p></div></div><div className="detail-grid"><article className="page-card"><div className="detail-header"><div><span className="ticket-id">{ticket.id}</span><h2>{ticket.title}</h2><div className="detail-tags"><PriorityBadge priority={ticket.priority} /><span className="category-tag">{ticket.category}</span></div></div><span className="status status-resuelto">{ticket.status}</span></div><p className="detail-description">{ticket.description}</p><div className="detail-info"><dl><dt>Registrada</dt><dd>{ticket.createdAt}</dd></dl><dl><dt>Última actualización</dt><dd>{ticket.updatedAt}</dd></dl><dl><dt>Ubicación</dt><dd>{ticket.location}</dd></dl></div></article><aside><div className="page-card timeline-card"><h3>Línea de tiempo</h3>{timeline.map((item) => <div className="timeline-item" key={`${item.time}-${item.label}`}><span className="timeline-time">{item.time}</span><span className="timeline-marker" /><div><strong>{item.label}</strong><p>{item.detail}</p></div></div>)}</div><div className="success-box"><CheckCircle2 size={16} /> Tu incidencia fue resuelta. Ya puedes solicitar tu constancia de atención.</div></aside></div></section>;
+}
