@@ -4,6 +4,8 @@
 
 `calendario-academico`, desde `196a2144aae253ca672eeeaf721c62204516245a`.
 Roberto pidió conservarlo fuera de main hasta su autorización expresa.
+Código verificado: `a41073e19eee32a049d97def5fd3dd982046df16`;
+[PR #2 en borrador](https://github.com/RobertoC1006/proyecto-gestion/pull/2).
 GitHub no tenía ramas de módulos de compañeros; Roberto confirmó que aún no las
 crearon y autorizó empezar los componentes de su calendario siguiendo los mockups,
 sin tomar la vista provisional como diseño final.

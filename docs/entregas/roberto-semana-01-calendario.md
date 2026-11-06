@@ -3,7 +3,9 @@
 Fecha: 6 de noviembre de 2026. Rama: `calendario-academico`.
 Base utilizada: `196a2144aae253ca672eeeaf721c62204516245a` de `origin/main`.
 **No integrado en main. Roberto debe autorizar expresamente esa integración.**
-Commit de código/PR: se registra al guardar el avance de esta rama.
+Commit de código: `a41073e19eee32a049d97def5fd3dd982046df16`.
+PR: [#2, en borrador](https://github.com/RobertoC1006/proyecto-gestion/pull/2),
+sin autorización de integración en main.
 
 ## Terminado en esta rama
 
@@ -73,8 +75,12 @@ afirma una conexión institucional.
 - Cinco pruebas Playwright correctas: semana/detalle/fuente/navegación, formulario
   inválido/UTC, edición/conflicto/eliminación, 401 real y móvil sin desbordamiento.
 - Dependencias bloqueadas: revisión npm sin alertas para API y web.
-- Modo desarrollo y contratos de cuerpo/filtros: resultado de cierre registrado
-  con la comprobación final. La recarga usa TypeScript con metadatos de NestJS.
+- Modo desarrollo correcto en `campusitsm-calendar-dev`, puerto 18084; contratos
+  de cuerpo y filtros conservados. La recarga usa TypeScript con metadatos de
+  NestJS. Contenedores de esa prueba retirados, conservando volúmenes.
+- Clon limpio del commit anterior: construcción web y verificación completa API/
+  PostgreSQL/persistencia correctas en `campusitsm-calendar-check-clean-20261106`,
+  sin archivos del host ni cambios sin versionar. Contenedores de prueba retirados.
 
 ## Capturas y comparación visual
 
