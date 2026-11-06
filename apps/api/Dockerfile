@@ -24,3 +24,7 @@ COPY --from=build /app/dist ./dist
 RUN mkdir -p /data/files && chown -R node:node /data
 USER node
 CMD ["node", "dist/main.js"]
+
+FROM build AS test
+COPY apps/api/test ./test
+CMD ["npm", "run", "test:academic"]

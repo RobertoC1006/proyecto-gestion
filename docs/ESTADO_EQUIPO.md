@@ -1,5 +1,26 @@
 # Estado del equipo
 
+## Avance en rama, sin integrar
+
+`calendario-academico`, desde `196a2144aae253ca672eeeaf721c62204516245a`.
+Roberto pidió conservarlo fuera de main hasta su autorización expresa.
+GitHub no tenía ramas de módulos de compañeros; Roberto confirmó que aún no las
+crearon y autorizó empezar los componentes de su calendario siguiendo los mockups,
+sin tomar la vista provisional como diseño final.
+
+Incluye dominio, migración, contrato y pantallas P17/P18. Reutiliza/modifica los
+mismos Sidebar/AppHeader y controles; añade un único diálogo compartido. Cambios
+de navegación/cabecera y contrato deberán revisarse con Johan/Jasmine al integrar
+sus módulos. Sin servicios de identidad/tickets implementados en su nombre.
+Detalle de alcance, pruebas y límites: `docs/entregas/roberto-semana-01-calendario.md`.
+
+La aplicación normal deniega acceso académico mientras no se conecten sesión,
+protección de escritura y directorio de usuarios. Las pruebas inyectan identidad
+solo dentro del ejecutable de prueba. No existe acceso de administrador por
+cabeceras, selector de roles ni credenciales de demostración en la aplicación.
+
+## Base publicada anteriormente
+
 Fecha: 6 de noviembre de 2026. Responsable: Roberto. Módulo: base Docker.
 Rama: `base-proyecto`. Base GitHub verificada:
 `1501f5aaec13a77f3ebb79da52bf50d66e4e6678` (`origin/main`).

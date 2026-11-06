@@ -1,5 +1,9 @@
 # Contratos compartidos — base v1
 
+Avance exclusivo de la rama `calendario-academico`: contrato del calendario manual
+en [CONTRATO_CALENDARIO.md](CONTRATO_CALENDARIO.md). No integrado en main ni abierto
+sin sesión; los adaptadores de identidad/directorio siguen pendientes de Jasmine.
+
 ## Disponible
 
 Origen único del navegador: `http://localhost:8080`, prefijo `/api/v1`.

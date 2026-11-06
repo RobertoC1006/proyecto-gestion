@@ -1,5 +1,52 @@
 # CampusITSM
 
+## Calendario manual en revisión
+
+Este apartado corresponde exclusivamente a `calendario-academico`, pendiente de
+autorización de Roberto para integrar en main. Ver contrato en
+`docs/CONTRATO_CALENDARIO.md` y entrega en
+`docs/entregas/roberto-semana-01-calendario.md`.
+
+P17 `/admin/calendario`; P18 `/admin/calendario/nuevo`. La interfaz sigue los
+mockups finales. Las rutas académicas responden 401 y la escritura permanece
+deshabilitada hasta integrar la sesión/permisos de Jasmine. No usar el login
+provisional para probar privilegios. CSV y factores/SLA no están en esta entrega.
+
+Para revisar esta rama separada de los volúmenes de la base anterior:
+
+```powershell
+$env:WEB_PORT = '18083'
+docker compose -p campusitsm-calendar-review up --build
+```
+
+Abrir [calendario en revisión](http://localhost:18083/admin/calendario).
+No usar `docker compose up` sin proyecto explícito si se desea conservar la base
+anterior sin aplicar esta migración. El comando anterior usa otros volúmenes.
+Las migraciones de esta rama no se aplicaron en la base habitual.
+
+Prueba real PostgreSQL y persistencia aislada:
+
+```powershell
+./scripts/verify-calendar.ps1
+```
+
+Pruebas de interfaz (requieren revisión funcionando en 18083; las escenas con datos
+usan respuestas de prueba, separadas de las pruebas reales de PostgreSQL):
+
+```powershell
+cd apps/web
+npm ci
+$env:PLAYWRIGHT_BROWSERS_PATH = "$PWD/../../.local/browsers"
+npx playwright install chromium --only-shell
+npm run test:e2e
+```
+
+Contrato OpenAPI versionado: `docs/api/openapi.json`. Tras actualizar el backend,
+exportar de `/api/openapi.json` y ejecutar `npm run api:types` en `apps/web`.
+Los tipos de calendario se generan desde ese contrato, no desde modelos Prisma.
+
+## Base Docker
+
 Base local de la mesa de ayuda universitaria. Requiere Docker Desktop iniciado
 con contenedores Linux y Docker Compose v2. Cada integrante puede construirla sin
 instalar Node, Python ni PostgreSQL en su computadora.

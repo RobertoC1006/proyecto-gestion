@@ -5,10 +5,11 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "start": "node dist/main.js",
-    "dev": "tsx watch src/main.ts",
+    "dev": "node --watch --require ts-node/register src/main.ts",
     "prisma:generate": "prisma generate",
     "db:deploy": "prisma migrate deploy",
-    "db:seed": "node prisma/seed.cjs"
+    "db:seed": "node prisma/seed.cjs",
+    "test:academic": "node --test test/academic.test.cjs"
   },
   "dependencies": {
     "@nestjs/common": "11.2.8",
@@ -22,8 +23,9 @@
   "devDependencies": {
     "@types/node": "22.15.30",
     "prisma": "6.19.3",
-    "tsx": "4.20.6",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "@nestjs/testing": "11.2.8",
+    "ts-node": "10.9.2"
   },
   "overrides": {
     "multer": "2.5.0",

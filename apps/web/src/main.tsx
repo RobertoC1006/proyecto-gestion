@@ -10,6 +10,13 @@ import ConstanciasPage from "./app/constancias/page";
 import VerifyCertificatePage from "./app/verificar/[codigo]/page";
 import TiQueuePage from "./app/ti/cola/page";
 import TiTicketDetailPage from "./app/ti/tickets/[id]/page";
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import CalendarPage from './features/academic/CalendarPage';
+import EventForm from './features/academic/EventForm';
+import './features/academic/academic.css';
+
+const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false, refetchOnWindowFocus: false } } });
 
 function ViewRouter() {
   const path = window.location.pathname;
@@ -26,9 +33,9 @@ function ViewRouter() {
 }
 
 function App() {
-  return <RootLayout><ViewRouter /></RootLayout>;
+  return <RootLayout><Routes><Route path="/admin/calendario" element={<CalendarPage />} /><Route path="/admin/calendario/nuevo" element={<EventForm />} /><Route path="/admin/calendario/:id/editar" element={<EventForm />} /><Route path="*" element={<ViewRouter />} /></Routes></RootLayout>;
 }
 
 createRoot(document.getElementById("root")!).render(
-  <StrictMode><App /></StrictMode>,
+  <StrictMode><QueryClientProvider client={queryClient}><BrowserRouter><App /></BrowserRouter></QueryClientProvider></StrictMode>,
 );
