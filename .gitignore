@@ -21,3 +21,10 @@ npm-debug.log*
 .idea/
 Thumbs.db
 .DS_Store
+
+# Verificación local y secretos
+.local/
+__pycache__/
+.venv/
+*.pem
+*.key

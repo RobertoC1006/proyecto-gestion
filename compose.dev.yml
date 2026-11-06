@@ -1,0 +1,22 @@
+# Uso: docker compose -f compose.yml -f compose.dev.yml up --build
+services:
+  api:
+    image: campusitsm-api:dev
+    build:
+      target: development
+    environment:
+      NODE_ENV: development
+    volumes:
+      - ./apps/api/src:/app/src:ro
+      - ./apps/api/tsconfig.json:/app/tsconfig.json:ro
+    # Prisma sigue generado en la imagen; cambios de esquema requieren reconstruir.
+  web:
+    image: campusitsm-web:dev
+    build:
+      target: development
+    volumes:
+      - ./apps/web/src:/app/src:ro
+      - ./apps/web/index.html:/app/index.html:ro
+      - ./apps/web/vite.config.ts:/app/vite.config.ts:ro
+    healthcheck:
+      test: [CMD, node, -e, "fetch('http://127.0.0.1:8080/').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
