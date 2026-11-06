@@ -1,0 +1,2 @@
+# Esta base utiliza únicamente la biblioteca estándar de Python.
+# pandas/statsmodels se fijarán al implementar el módulo de predicción (semana 3).

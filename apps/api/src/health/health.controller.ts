@@ -3,10 +3,10 @@ import { ApiOkResponse, ApiProperty, ApiServiceUnavailableResponse, ApiTags } fr
 import { PrismaService } from '../database/prisma.service';
 
 class HealthResponse {
-  @ApiProperty({ example: 'ok', enum: ['ok'] }) status!: string;
-  @ApiProperty({ example: 'campusitsm-api' }) service!: string;
-  @ApiProperty({ example: 'ok', enum: ['ok'] }) database!: string;
-  @ApiProperty({ example: 'ok', enum: ['ok'] }) predictions!: string;
+  @ApiProperty({ type: String, example: 'ok', enum: ['ok'] }) status!: string;
+  @ApiProperty({ type: String, example: 'campusitsm-api' }) service!: string;
+  @ApiProperty({ type: String, example: 'ok', enum: ['ok'] }) database!: string;
+  @ApiProperty({ type: String, example: 'ok', enum: ['ok'] }) predictions!: string;
 }
 
 @ApiTags('Infraestructura')
