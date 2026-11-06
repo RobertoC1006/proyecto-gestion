@@ -1,0 +1,11 @@
+.git
+**/node_modules
+**/dist
+**/__pycache__
+.env
+.env.*
+!.env.example
+diseno
+planes
+docs
+.local

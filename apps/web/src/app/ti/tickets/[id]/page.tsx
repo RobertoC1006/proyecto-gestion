@@ -1,0 +1,14 @@
+import { ArrowLeft, CheckCircle2, Clock3, History, ShieldAlert } from "lucide-react";
+import { tickets } from "../../../../data/mock";
+import { PriorityBadge } from "../../../../components/PriorityBadge";
+
+export default function TiTicketDetailPage() {
+  const ticket = tickets[0];
+  return <section>
+    <div className="page-intro"><div><a className="back-link" href="/ti/cola"><ArrowLeft size={15} />Volver a la cola</a><span className="eyebrow">TICKET {ticket.id}</span><h2>Detalle técnico</h2><p>Revisa el contexto, puntaje y SLA de la incidencia.</p></div><button className="primary-button" type="button"><CheckCircle2 size={16} />Resolver ticket</button></div>
+    <div className="detail-grid ti-detail-grid"><div>
+      <article className="page-card"><div className="detail-header"><div><h2>{ticket.title}</h2><div className="detail-tags"><PriorityBadge priority={ticket.priority} /><span className="category-tag">{ticket.category}</span></div></div><span className="status status-atencion">En atención</span></div><p className="detail-description">{ticket.description}</p><div className="detail-info"><dl><dt>Reportado por</dt><dd>{ticket.owner}</dd></dl><dl><dt>Ubicación</dt><dd>{ticket.location}</dd></dl><dl><dt>Recibido</dt><dd>{ticket.createdAt}</dd></dl></div></article>
+      <div className="page-card scoring-card"><div className="section-heading"><div><h3>Desglose de prioridad</h3><p>El puntaje se calcula con el contexto académico.</p></div><ShieldAlert size={20} color="#dc2626" /></div><div className="score-formula"><span>U <small>Urgencia</small><strong>{ticket.urgency}</strong></span><b>×</b><span>I <small>Impacto</small><strong>{ticket.impact}</strong></span><b>×</b><span>Factor <small>Examen &lt; 24 h</small><strong>{ticket.factor.toFixed(1)}</strong></span><b>=</b><strong className="score-total">{ticket.score}</strong></div><div className="score-result"><PriorityBadge priority={ticket.priority} /><span>Prioridad crítica por actividad académica inminente</span></div></div>
+    </div><aside><div className="page-card side-card"><h3>SLA de atención</h3><div className="sla-clock"><Clock3 size={23} /><strong>00:14:32</strong><small>Tiempo restante</small></div><div className="sla-progress"><span /></div><dl><div className="side-row"><dt>Objetivo P1</dt><dd>30 minutos</dd></div><div className="side-row"><dt>Inicio</dt><dd>10:02 a. m.</dd></div><div className="side-row"><dt>Agente asignado</dt><dd>Andrés Pérez</dd></div></dl></div><div className="page-card side-card"><h3><History size={17} /> Historial</h3><p className="history-item"><strong>10:04 a. m.</strong> Asignado a Andrés Pérez</p><p className="history-item"><strong>10:16 a. m.</strong> Falla confirmada</p></div></aside></div>
+  </section>;
+}
