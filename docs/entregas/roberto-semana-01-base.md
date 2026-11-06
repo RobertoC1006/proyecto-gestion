@@ -27,8 +27,19 @@ volúmenes, persistencia de DB/archivos/modelos, migraciones al día y HTTP 503 
 detener Python seguido de recuperación. Contenedores de prueba retirados y
 volúmenes de prueba conservados; instalación habitual sigue independiente.
 
-Modo desarrollo y construcción desde copia limpia: verificación final pendiente
-en este commit de preparación. No considerar completada la publicación todavía.
+Modo desarrollo: cuatro servicios saludables en proyecto aislado, API 200 y
+ruta SPA 200 en puerto 18081; contenedores retirados conservando sus volúmenes.
+Se verificó la compatibilidad del contrato OpenAPI con la recarga de TypeScript.
+
+Clon limpio local del commit `aeeebbd1ac0e8b67e48d8f8288ab35a8782c3edf`:
+construcción y prueba completa correctas (`campusitsm-check-clean-final-20261106`,
+puerto 18082), sin `.env`, dependencias del host ni archivos sin versionar.
+También pasó persistencia/semilla/restricciones y fallo/recuperación de Python.
+Contenedores retirados; volúmenes de prueba conservados.
+
+Los overrides bloqueados de multer, deepmerge-ts y effect corrigen alertas de
+dependencias transitivas manteniendo las líneas NestJS 11 y Prisma 6. Se probaron
+generación Prisma, migración, semilla, OpenAPI y ambos modos de ejecución.
 
 ## Git y coordinación
 
@@ -36,7 +47,12 @@ Origen `main`: `1501f5aaec13a77f3ebb79da52bf50d66e4e6678`.
 Fuente integrada: `a4896261f92507155f5f153f7476fd29d99d631b` (`front-vistas`).
 Ramas remotas revisadas: `main` y `front-vistas`; no otras ramas de módulos.
 Se conserva `front-vistas` por no haberse confirmado que no sea trabajo activo.
-Commit utilizable, PR e integración remota: pendientes de cierre de verificaciones.
+Commit de código utilizable y verificado:
+`aeeebbd1ac0e8b67e48d8f8288ab35a8782c3edf`.
+PR de integración: [#1 — Base Docker compartida](https://github.com/RobertoC1006/proyecto-gestion/pull/1).
+La integración usa merge conservando el historial del frontend. El commit de
+código anterior identifica exactamente la base probada; los commits siguientes
+de este módulo registran únicamente los resultados/documentación de cierre.
 
 No hubo contacto con compañeros ni se acordaron contratos de identidad/tickets
 en su nombre. `docs/CONTRATOS.md` reserva propuestas y detalla lo ya disponible.

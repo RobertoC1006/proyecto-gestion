@@ -6,8 +6,12 @@ Rama: `base-proyecto`. Base GitHub verificada:
 Frontend integrado preservando historia desde
 `a4896261f92507155f5f153f7476fd29d99d631b` (`origin/front-vistas`), movido a `apps/web`.
 
-Commit utilizable y resultados: `docs/entregas/roberto-semana-01-base.md`.
-No considerar publicada hasta que esa entrega confirme referencia remota y pruebas.
+Base utilizable verificada: `aeeebbd1ac0e8b67e48d8f8288ab35a8782c3edf`.
+Integración: [PR #1](https://github.com/RobertoC1006/proyecto-gestion/pull/1),
+conservando historia. Resultados completos en `docs/entregas/roberto-semana-01-base.md`:
+construcción desde clon limpio, modo desarrollo, salud, migraciones, semilla,
+restricciones, persistencia y recuperación ante fallo de Python correctos.
+Los compañeros deben obtener `main` después de la integración de esa PR.
 No se enviaron mensajes externos al equipo.
 
 | Persona | Siguiente trabajo | Dependencias |
