@@ -23,6 +23,10 @@ adaptados a la estructura y funciones de los mockups de CampusITSM. Ver
 
 Docker incluye PostgreSQL, backend/API, Python y frontend. Solo web publica
 puerto local y reenvía `/api/` al backend. DB y Python quedan en red interna.
+Cada computadora usa una sola instalación de trabajo `campusitsm`, en 8080.
+Los avances de la rama activa se revisan reconstruyendo esa instalación con sus
+volúmenes existentes; no se crea otra aplicación Compose por módulo/revisión.
+Las ramas Git se integran en main únicamente cuando Roberto lo autorice.
 Imágenes oficiales fijadas por digest; dependencias Node bloqueadas con archivos
 `package-lock.json` y `npm ci`. Python usa solo biblioteca estándar en esta base.
 pg-boss se incorporará con tareas persistentes; no añadir Redis.

@@ -34,6 +34,15 @@ En cada sesión revisar `AGENTS.md`, este plan, `PROYECTO.md`, `docs/ESTADO_EQUI
 y, al consumir calendario, `docs/CONTRATO_CALENDARIO.md`.
 La fotografía histórica de MEMORIA_PROYECTO.md no reemplaza el código/estado vigente.
 
+**Una sola instalación Docker de trabajo por computadora:** `campusitsm`, en
+`http://localhost:8080`. Revisar los cambios de tu rama activa con
+`docker compose up --build -d --wait`, reutilizando los volúmenes existentes.
+No crear otra aplicación Compose por módulo o revisión. Las ramas Git siguen
+separadas hasta que Roberto autorice integrar en main. Las pruebas con datos
+descartables se aíslan de la base de trabajo y no dejan otra aplicación de
+revisión encendida.
+
+
 ## Contexto completo y alcance acordado
 
 CampusITSM es una mesa de ayuda para la Universidad Privada Tallán, institución ficticia del caso académico. Tiene tres casos de uso:

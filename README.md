@@ -12,17 +12,19 @@ mockups finales. Las rutas académicas responden 401 y la escritura permanece
 deshabilitada hasta que Roberto integre Supabase Auth y roles/permisos. No usar el login
 provisional para probar privilegios. CSV y factores/SLA no están en esta entrega.
 
-El arranque habitual desde main usa el puerto 8080 según la guía de abajo. Para
-mantener una instalación de revisión separada de los volúmenes habituales:
+Se usa una sola instalación de trabajo, `campusitsm`, en el puerto 8080. Para
+revisar avances de cualquier módulo, reconstruir esa misma instalación desde
+la rama activa:
 
 ```powershell
-$env:WEB_PORT = '18083'
-docker compose -p campusitsm-calendar-review up --build
+docker compose up --build -d --wait
 ```
 
-Abrir [calendario en revisión](http://localhost:18083/admin/calendario).
-El comando anterior usa otros volúmenes. La migración académica se aplica con el
-arranque habitual de la nueva base; es aditiva y no reinicia ni borra datos existentes.
+Abrir [calendario](http://localhost:8080/admin/calendario). No crear proyectos
+Compose ni puertos adicionales para revisar cada módulo. Las ramas Git conservan
+los cambios separados hasta autorizar su integración en main; revisar una rama
+en Docker no la integra. Se reutilizan los mismos volúmenes y se aplican las
+migraciones versionadas, conservando los datos de trabajo.
 
 Prueba real PostgreSQL y persistencia aislada:
 
@@ -30,7 +32,7 @@ Prueba real PostgreSQL y persistencia aislada:
 ./scripts/verify-calendar.ps1
 ```
 
-Pruebas de interfaz (requieren revisión funcionando en 18083; las escenas con datos
+Pruebas de interfaz (requieren la instalación principal funcionando en 8080; las escenas con datos
 usan respuestas de prueba, separadas de las pruebas reales de PostgreSQL):
 
 ```powershell

@@ -14,7 +14,7 @@ Actualizada el 6 de noviembre de 2026 por solicitud expresa de Roberto. Este arc
 ## Estado vigente y decisiones expresas
 
 - Base Docker publicada mediante PR #1, main `196a2144aae253ca672eeeaf721c62204516245a`: web, NestJS, PostgreSQL/Prisma, Python interno, salud, migraciones y volúmenes verificados. La historia de `front-vistas@a4896261f92507155f5f153f7476fd29d99d631b` quedó preservada al mover el frontend a `apps/web`.
-- Calendario manual y pantallas P17/P18 en la entrega [PR #2](https://github.com/RobertoC1006/proyecto-gestion/pull/2). Código visual aprobado: `047d1a2e0fd4f71bb189ff301cacb6e1f21019cf`. Roberto autorizó expresamente integrarlo en main; verificar integración y commit actual antes de consumirlo.
+- Calendario manual y pantallas P17/P18 integrados mediante [PR #2](https://github.com/RobertoC1006/proyecto-gestion/pull/2), main `f519466850d28f2ab28d2b69cfc4146c60149717`. Código visual aprobado: `047d1a2e0fd4f71bb189ff301cacb6e1f21019cf`. Verificar el commit actual antes de consumirlo.
 - La base visual usa componentes reales de `RobertoC1006/casos-gestion`, adaptados a las pantallas del mockup. Guía vigente: `docs/DISENO_COMPONENTES.md`. Las demás vistas provisionales aún necesitan adaptación por sus responsables.
 - Roberto asume P01, Supabase Auth y la base de roles/permisos. Jasmine conserva administración de usuarios/permisos sobre esa base, consentimiento, auditoría, constancias y reportes. Ver `docs/CONTRATO_IDENTIDAD.md`.
 - Supabase todavía no está implementado ni configurado. El calendario real deniega acceso sin identidad; las pruebas con fixtures no acreditan login ni un recorrido autorizado. No crear un acceso de administrador ficticio.
@@ -57,6 +57,8 @@ Roberto, Johan y Jasmine trabajan por **módulos completos: frontend, backend y 
 ## Docker primero y colaboración
 
 Roberto ya recuperó el frontend, preservó su historia y publicó Docker Compose, salud, volúmenes, configuración sin secretos, migraciones y contratos. Johan/Jasmine construirán la misma base de main en su propio Docker, con datos y volúmenes locales; no necesitan conectarse a la computadora de Roberto.
+
+Decisión expresa de Roberto: una sola instalación de trabajo `campusitsm` por computadora, en `http://localhost:8080`. Los avances se revisan reconstruyendo la misma instalación desde la rama activa, con sus volúmenes conservados. No crear otra aplicación Compose por módulo/revisión ni otro puerto para mostrarla. Esto no integra la rama en main: la integración sigue requiriendo su autorización. La instalación adicional `campusitsm-calendar-review` se cerró conservando sus volúmenes; no volver a levantarla para revisiones. Las pruebas automatizadas con datos descartables se mantienen aisladas de la base de trabajo y no dejan otra aplicación encendida.
 
 `PROYECTO.md`, `docs/CONTRATOS.md` y `docs/ESTADO_EQUIPO.md` describen la base existente. Distinguir contratos funcionales de propuestas pendientes; no inventar otra infraestructura o identidad por falta temporal de contratos.
 

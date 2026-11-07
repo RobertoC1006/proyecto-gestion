@@ -71,6 +71,8 @@ presentan datos ilustrativos como información autenticada.
 
 ## Revisar
 
-`http://localhost:18083/admin/calendario` y `/admin/calendario/nuevo`.
-Reproducir: levantar `campusitsm-calendar-review` en 18083 como indica README y
-ejecutar `npm run test:e2e` desde `apps/web`. Tras integrar PR #2, main permite reproducir la misma entrega en el puerto habitual 8080.
+`http://localhost:8080/admin/calendario` y `/admin/calendario/nuevo`.
+Reproducir: actualizar la instalación principal con `docker compose up --build -d --wait`
+y ejecutar `npm run test:e2e` desde `apps/web`. Por indicación de Roberto, las
+revisiones reutilizan `campusitsm`; se retiró la instalación de revisión separada
+conservando sus volúmenes.
