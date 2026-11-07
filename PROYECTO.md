@@ -5,6 +5,14 @@ Equipo: Roberto, Johan y Jasmine. Cada integrante hace frontend, backend y prueb
 Los acuerdos están en `MEMORIA_PROYECTO.md` y `planes/`; la memoria es una fotografía
 histórica. El avance actual se consulta en `docs/ESTADO_EQUIPO.md` y las entregas.
 
+Acuerdo vigente del 7 de noviembre: una misma base de desarrollo PostgreSQL en
+Supabase para Roberto/Johan/Jasmine, con sus frontend/backend/Python en Docker y
+colaboradores con acceso revisado. La conexión común todavía no se habilitó:
+el Compose actual conserva PostgreSQL local y migraciones automáticas al arrancar.
+Leer [COORDINACION_SUPABASE.md](docs/COORDINACION_SUPABASE.md) antes de modificar
+conexiones o esquema. Los tres escriben migraciones de sus módulos; Roberto
+coordina aplicación y compatibilidad. PostgreSQL local queda para pruebas aisladas.
+
 ## Estructura y stack único
 
 Diseño compartido aprobado por Roberto y entregado mediante PR #2: componentes,
@@ -22,12 +30,15 @@ adaptados a la estructura y funciones de los mockups de CampusITSM. Ver
 - `services/predictions`: Python interno, por ahora solo salud, sin modelo.
 - `diseno/campusitsm`: mockups finales; `planes`: responsabilidades y semanas.
 
-Docker incluye PostgreSQL, backend/API, Python y frontend. Solo web publica
+El código actual de Docker incluye PostgreSQL, backend/API, Python y frontend. Solo web publica
 puerto local y reenvía `/api/` al backend. DB y Python quedan en red interna.
 Cada computadora usa una sola instalación de trabajo `campusitsm`, en 8080.
 Los avances de la rama activa se revisan reconstruyendo esa instalación con sus
 volúmenes existentes; no se crea otra aplicación Compose por módulo/revisión.
 Las ramas Git se integran en main únicamente cuando Roberto lo autorice.
+La transición pendiente retirará PostgreSQL del arranque de trabajo compartido,
+sin borrar sus volúmenes, y separará las migraciones remotas del arranque normal.
+Una rama Git no aísla Supabase: los cambios allí aplicados afectan al equipo.
 Imágenes oficiales fijadas por digest; dependencias Node bloqueadas con archivos
 `package-lock.json` y `npm ci`. Python usa solo biblioteca estándar en esta base.
 pg-boss se incorporará con tareas persistentes; no añadir Redis.
@@ -77,5 +88,8 @@ main todavía. Ver `docs/CONTRATO_IDENTIDAD.md` y `docs/ESTADO_EQUIPO.md`.
 Ver `README.md`. Migraciones con `prisma migrate deploy`; nunca editar una aplicada
 ni usar `db push` como entrega. Esquema de institución/equipo y módulo académico.
 Contratos disponibles y propuestas por coordinar: `docs/CONTRATOS.md`.
+Registrar cambios comunes en `docs/REGISTRO_CAMBIOS_BD.md`. Se pueden aplicar
+migraciones pequeñas autorizadas antes de integrar el módulo completo para
+desbloquear al equipo; conservar archivo/commit exactos y comprobar consumidores.
 Primera versión local, una institución/equipo; sin publicación pública,
 conexión institucional, correo ni firma digital certificada.

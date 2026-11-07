@@ -3,7 +3,16 @@
 Rama `identidad-supabase`, iniciada desde main `02d10f557fdf81af81fdeef1ecf7fb7d210aaeed`.
 Esta guía describe el código de la rama; no acredita que ya esté integrado en main.
 
-## Qué se comparte
+## Acuerdo nuevo y alcance de esta guía
+
+Roberto decidió compartir también la base de negocio y dar acceso de colaboradores
+a Johan/Jasmine. Esa transición todavía no se ejecutó. Seguir
+[COORDINACION_SUPABASE.md](COORDINACION_SUPABASE.md) antes de configurar conexiones.
+Las instrucciones siguientes describen el código actual de identidad con negocio
+local, no la futura conexión remota. No basta cambiar DATABASE_URL ni apuntar su
+migración automática al proyecto común.
+
+## Qué se comparte hoy, antes de la transición
 
 Supabase alojado: proyecto CampusITSM de la organización RobertoC1006, región
 São Paulo, plan gratuito al crearlo el 7 de noviembre de 2026. Panel:
@@ -20,13 +29,14 @@ completar allí su primer login. Ese perfil usa su UUID de Supabase como ID can�
 No se copian permisos de otra computadora ni metadata del navegador/proveedor.
 Las cuentas reales ya creadas no requieren volver a registrarse en otro Docker.
 
-## Preparar una computadora
+## Preparar identidad con el código local actual
 
 1. Obtener la rama/entrega aprobada y ejecutar `scripts/prepare-auth.ps1`.
    Prepara `.env` y genera una clave local de cifrado de 32 bytes sin mostrarla.
 2. Completar SUPABASE_URL y SUPABASE_PUBLISHABLE_KEY en el `.env` privado.
    Son la URL del proyecto y una clave publishable activa (también admite anon antigua).
-   No se necesita service_role, clave secret ni contraseña del PostgreSQL remoto.
+   No se necesita service_role, clave secret ni contraseña del PostgreSQL remoto
+   para Auth; la futura conexión de negocio requiere configuración separada.
 3. Mantener APP_ORIGIN=`http://localhost:8080` y AUTH_INSTITUTION_CODE=`UPT-DEMO`.
    La URL del navegador debe coincidir exactamente; no alternar localhost y 127.0.0.1.
 4. Ejecutar `docker compose up --build -d --wait` y, una vez, la semilla explícita:
@@ -70,7 +80,7 @@ Roberto. No resolverlo añadiéndolos como administradores de Supabase ni desact
 la confirmación. No se seleccionó ni contrató proveedor de correo.
 [Condiciones del correo de Supabase](https://supabase.com/docs/guides/auth/auth-smtp).
 
-## Primer administrador de cada Docker
+## Primer administrador con negocio local, antes de compartir la base
 
 No se convierte automáticamente al primer visitante en administrador. Un operador
 local debe elegir explícitamente una cuenta real que ya completó su primer login.
@@ -82,6 +92,11 @@ No acepta perfiles inexistentes ni funciona si ya hay un administrador activo.
 El cambio registra IdentityChange e incrementa la versión de acceso; volver a iniciar
 sesión para usar el nuevo rol. Los cambios posteriores son responsabilidad de P20/P21
 de Jasmine, a través de IdentityDirectory.changeAccess. No crear otra autenticación.
+
+Cuando el negocio esté en una sola base común, el administrador se inicializa una
+sola vez en esa base; cada Docker no debe repetirlo. Perfiles/roles ya serán comunes.
+La transición debe conservar los usuarios y UUID existentes y fijar el alcance de
+sesiones cifradas entre instancias. No copiar claves de cifrado por improvisación.
 
 ## Pruebas y dependencias
 

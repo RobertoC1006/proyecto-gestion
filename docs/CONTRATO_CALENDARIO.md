@@ -6,23 +6,19 @@ factores/SLA y cálculo del factor corresponden a semana 2.
 
 ## Identidad y auditoría: dependencias explícitas
 
-En main previo a identidad-supabase todavía no había identidad. En la rama de
-identidad actual, `AcademicIdentity` y `AcademicDirectory` ya se conectan a la
-sesión y perfiles canónicos reales de NestJS/Supabase. Ver el contrato actualizado
-de identidad y su entrega; no mezclar esa rama con la fotografía histórica siguiente.
-`AcademicIdentity` es el único punto de integración:
-Roberto debe proporcionar `resolve(request)` mediante su integración Supabase Auth y devolver
-`{id,institutionId,role,csrfVerified}`. `csrfVerified` solo es true tras validar la
-protección de escritura en el servidor. El adaptador predeterminado devuelve null:
-todas las rutas académicas responden 401. No acepta roles, usuarios ni permisos
-desde cabeceras, cookies inventadas o cuerpo del navegador.
+La rama identidad-supabase conecta `AcademicIdentity` y `AcademicDirectory` a la
+sesión y perfiles canónicos reales de NestJS/Supabase. Esa entrega todavía no está
+integrada en main; comprobar el código base autorizado. `resolve(request)` devuelve
+`{id,institutionId,role,csrfVerified}` y solo valida CSRF desde la protección del
+servidor. Sin sesión responde 401; no acepta identidad o permisos inventados en
+cabeceras/cookies/cuerpo del cliente. No añadir otro adaptador de administrador.
 
 Administración: rol administrador; otras cuentas solo consultan sus propios
 eventos con `/academic/me/events`. Identificadores UUID; institución del principal,
-nunca del cuerpo. Contrato de integración para Roberto/Supabase Auth, no identidad
-implementada todavía. Ver `CONTRATO_IDENTIDAD.md`. Los sujetos de asociaciones se validan
-mediante `AcademicDirectory`; por defecto no disponible (503). No se crean tablas
-de usuarios ni cuentas ficticias. El directorio debe verificar usuario/institución.
+nunca del cuerpo. Ver `CONTRATO_IDENTIDAD.md`. Las asociaciones se validan contra
+AppUser activo de la misma institución mediante el directorio común; no se crean
+usuarios paralelos. El destino acordado es una base Supabase de desarrollo común,
+pendiente de trasladar/conectar según [COORDINACION_SUPABASE.md](COORDINACION_SUPABASE.md).
 
 Cada escritura guarda actor, fecha, origen manual, motivo y antes/después en
 `AcademicChange`, en la misma transacción. Es un registro pendiente de entrega al

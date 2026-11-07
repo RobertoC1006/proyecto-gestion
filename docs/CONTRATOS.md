@@ -1,15 +1,20 @@
 # Contratos compartidos — base v1
 
+Coordinación vigente: base de desarrollo común Supabase acordada, conexión y
+traslado pendientes. Leer [COORDINACION_SUPABASE.md](COORDINACION_SUPABASE.md).
+El contrato/servicio se coordina con su responsable antes de crear tablas paralelas;
+los cambios remotos autorizados se anotan en REGISTRO_CAMBIOS_BD y se comparten con
+su archivo/commit, aunque el módulo completo siga en su rama.
+
 Actualización de rama del 7 de noviembre: identidad-supabase implementa el acceso,
 registro y recuperación por enlace, sesión opaca y autorización común, con proyecto
 real configurado. Los detalles vigentes están en [CONTRATO_IDENTIDAD.md](CONTRATO_IDENTIDAD.md).
-Las propuestas y el estado sin identidad descritos debajo corresponden al main
-anterior a esa rama; no acreditar su integración hasta que Roberto la autorice.
+No acreditar su integración en main hasta que Roberto la autorice.
 
-La entrega aprobada de calendario/base visual se integra por PR #2. Su contrato
+La entrega aprobada de calendario/base visual se integró por PR #2. Su contrato
 está en [CONTRATO_CALENDARIO.md](CONTRATO_CALENDARIO.md). Las rutas académicas
-siguen cerradas sin sesión. Roberto implementará identidad/directorio/roles con
-Supabase Auth según [CONTRATO_IDENTIDAD.md](CONTRATO_IDENTIDAD.md), aún pendiente.
+siguen cerradas sin sesión. La rama de identidad implementa sesión/directorio/roles
+según [CONTRATO_IDENTIDAD.md](CONTRATO_IDENTIDAD.md), con integración en main pendiente.
 
 ## Disponible
 
@@ -38,8 +43,9 @@ No hay rutas de pronóstico. Rutas API desconocidas responden 404.
   No crea usuarios, concede permisos ni expone endpoints de esas tablas.
 
 El esquema académico ya amplía esta base con cursos, secciones, asociaciones,
-eventos y AcademicChange. Identidad/tickets no están implementados. Roberto coordina
-el UUID canónico y las migraciones de Supabase/perfiles antes de sus consumidores.
+eventos y AcademicChange. Identidad añade AppUser, sesiones, flujos y cambios de
+acceso en su rama; tickets siguen pendientes. El UUID canónico ya es el sujeto de
+Supabase. Roberto coordina la transición de estas tablas a la base común sin duplicarlas.
 
 ## Propuestas pendientes de coordinación, no implementadas
 

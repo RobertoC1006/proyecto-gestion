@@ -1,5 +1,17 @@
 # CampusITSM
 
+## Coordinación vigente del equipo
+
+Roberto, Johan y Jasmine acordaron usar una misma base de desarrollo en Supabase,
+con la aplicación Docker de cada integrante. Traslado, conexión y colaboradores
+todavía pendientes: las órdenes de arranque de este README describen el código
+actual con PostgreSQL local. No apuntar su migración automática a Supabase.
+Leer [COORDINACION_SUPABASE.md](docs/COORDINACION_SUPABASE.md),
+[ESTADO_EQUIPO.md](docs/ESTADO_EQUIPO.md) y el plan personal antes de empezar.
+Cambios compartidos: migración en Git, validación, coordinación/autorización concreta
+de Roberto y registro de aplicación/verificación. No esperar a fusionar todo un
+módulo para entregar una dependencia común autorizada; no duplicar tablas o login.
+
 ## Identidad y calendario en la rama de trabajo
 
 `identidad-supabase` añade acceso real, registro propio, confirmación/recuperación

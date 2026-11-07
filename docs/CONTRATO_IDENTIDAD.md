@@ -21,7 +21,9 @@ La administración P20/P21 y el consentimiento/auditoría global siguen a cargo 
 | Johan | Autorización de tickets/adjuntos usando el usuario y las políticas comunes; sin otro login, almacén de contraseñas ni motor de roles |
 
 Supabase Auth gestionará credenciales e identidad. Los datos de negocio siguen
-en PostgreSQL/Prisma de Docker. No se ha aprobado migrar toda la base a Supabase.
+en PostgreSQL/Prisma de Docker en el código actual. Roberto acordó trasladarlos a
+una misma base de desarrollo en Supabase para los tres backend; esa transición
+todavía no se ejecutó. Ver [COORDINACION_SUPABASE.md](COORDINACION_SUPABASE.md).
 Modalidad elegida: servicio alojado; Roberto pidió que cada persona pueda registrarse.
 Registro con contraseña y confirmación por enlace; recuperación también por enlace.
 Los accesos y la validación/renovación de sesiones dependen del servicio externo.
@@ -47,7 +49,9 @@ Consultar [la guía de desarrollo](AUTH_DESARROLLO.md).
   en React, repositorio, planes, paquetes de compañeros ni registros de errores.
 - UUID canónico de AppUser = subject de Supabase. El primer login confirmado
   crea el perfil local como estudiante; nunca toma rol/institución/equipo del cliente.
-  Los perfiles existentes conservan estado y asignaciones. Cada Docker es independiente.
+  Los perfiles existentes conservan estado y asignaciones. Actualmente cada base
+  local es independiente; al habilitar la base común, perfiles/roles serán los mismos
+  para los tres. La transición conserva UUID y define sesiones cifradas entre instancias.
 - Login/logout, protección de escrituras, renovación simultánea y revocación de
   sesión deben probarse explícitamente. No dar por revocado un JWT vigente solo
   por borrar datos del navegador. No seleccionar un plan de pago ni enviar correo

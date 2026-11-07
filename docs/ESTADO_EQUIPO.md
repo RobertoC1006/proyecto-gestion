@@ -1,5 +1,21 @@
 # Estado del equipo — 7 de noviembre de 2026
 
+## Acuerdo vigente: desarrollo compartido en Supabase, transición pendiente
+
+Roberto decidió que los tres backend consulten una misma base de desarrollo en
+Supabase y que Johan/Jasmine participen como colaboradores. Cada integrante
+mantiene frontend/backend/Python en su Docker; las ramas siguen separando el código.
+Los datos y cambios de estructura remotos serán comunes después de habilitarlo.
+Guía obligatoria: [COORDINACION_SUPABASE.md](COORDINACION_SUPABASE.md).
+Cambios de esquema: [REGISTRO_CAMBIOS_BD.md](REGISTRO_CAMBIOS_BD.md).
+
+Estado técnico: el Compose actual sigue apuntando a PostgreSQL local con migración
+automática al arrancar. No se trasladó negocio, adaptó esa conexión ni invitó a
+colaboradores en esta actualización documental. Roberto debe preparar/verificar
+esa entrega antes de que los compañeros apunten al destino remoto. No borrar
+volúmenes ni interpretar esta guía como habilitación o autorización de migraciones.
+La edición actual solo cambia planes/contexto y regenera sus paquetes.
+
 ## Avance de identidad en rama, todavía sin integrar
 
 Roberto inició `identidad-supabase` desde main `02d10f5` tras verificar GitHub.
@@ -10,9 +26,8 @@ Roles y permisos viven en PostgreSQL local; no se migró la base de negocio.
 Ver [contrato operativo](CONTRATO_IDENTIDAD.md), [configuración del equipo](AUTH_DESARROLLO.md)
 y [entrega de identidad](entregas/roberto-semana-01-identidad.md).
 
-Las observaciones anteriores sobre identidad no implementada, conservadas debajo
-como contexto de main/base, se refieren a la entrega previa. Esta rama aún no está
-publicada/integrada. Consumo de compañeros: esperar autorización de integración.
+La rama aún no está publicada/integrada. Los compañeros reciben el código base
+autorizado por Roberto y comprueban su commit antes de consumirlo como main.
 Pendiente: SMTP propio para registro con correos fuera del equipo Supabase,
 consentimiento y auditoría global de Jasmine. Sus P20/P21 usan el servicio de acceso
 común; no deben crear otro login. Semana 1 no se da por cerrada por esta entrega.
@@ -41,28 +56,29 @@ siendo provisionales y cada responsable debe adaptarlas a esa misma base.
 
 | Persona | Siguiente módulo previsto | Dependencias y límites |
 | --- | --- | --- |
-| Roberto | `identidad-supabase`: P01, Supabase Auth, sesión y roles/permisos comunes | Definir modalidad/proyecto al iniciar. Implementar los puertos del calendario y publicar contratos; no trasladar la base de negocio a Supabase por esta decisión |
+| Roberto | Identidad implementada en rama; siguiente entrega de infraestructura: base de desarrollo compartida | Preparar traslado, conexión/arranque sin migración remota automática, sesiones, configuración privada y colaboradores. Pendiente de ejecutar; conservar el login y contratos existentes |
 | Johan | `gestion-incidencias`: P02–P08, frontend/backend/pruebas | Reutilizar componentes existentes; identidad y contexto académico de Roberto, auditoría de Jasmine. No crear otro login o motor de permisos |
 | Jasmine | `administracion-usuarios`: P20, consentimiento y auditoría; P21 según su semana | Usar identidad/autorización de Roberto para perfiles/estado/equipo y asignaciones autorizadas; conserva constancias, privacidad y reportes. P01 ya no le corresponde |
 
 Los tres planes reflejan esta división: Roberto 8 pantallas, Johan 7, Jasmine 9.
 La reasignación aumenta la carga de Roberto; revisar el ritmo antes de prometer
 fechas de semanas posteriores. Cada integrante hace frontend, backend y pruebas.
-No se iniciaron ramas ni se enviaron mensajes a los compañeros por actualizar planes.
+La actualización documental no modifica aplicaciones ni Supabase ni envía mensajes
+a los compañeros. El mensaje preparado está en [MENSAJE_COORDINACION_EQUIPO.md](MENSAJE_COORDINACION_EQUIPO.md).
 
 ## Funcional frente a pendiente
 
-- Funcional: base Docker; dominio y API académica; P17/P18 y componentes visuales.
-- Sin identidad real, el calendario devuelve 401. El directorio predeterminado
-  tampoco acepta usuarios inventados. Las pruebas inyectan identidad únicamente
-  dentro del ejecutable de prueba y usan fixtures visuales identificados.
-- Pendiente: Supabase Auth, login/sesión reales, autorización común y recorrido
-  autenticado; conexión de AcademicChange a auditoría de Jasmine. Ver
-  [CONTRATO_IDENTIDAD.md](CONTRATO_IDENTIDAD.md).
+- Publicado en main: base Docker; dominio/API académica; P17/P18 y componentes.
+- Implementado en rama: Supabase Auth, sesión, autorización común y directorio
+  canónico; registro/login/administrador comprobados por Roberto. Sin sesión se
+  conserva 401; no acepta usuarios o permisos inventados por el cliente.
+- Pendiente: transición de base compartida y colaboradores, SMTP para correos
+  externos y consentimiento/auditoría global de Jasmine. AcademicChange e
+  IdentityChange conservan cambios atómicos pendientes de su integración.
 - `/academic/me/events` existe; `/academic/context`, cálculo del factor y SLA
   siguen pendientes. CSV es semana 2. No hay tickets, PDF, IA ni pronóstico real.
-- No se eligió proveedor de IA, no se creó proyecto Supabase ni se configuraron
-  claves. Integrar la entrega aprobada no inicia automáticamente el módulo Auth.
+- Proyecto Auth CampusITSM creado y configurado. No se eligió proveedor de IA ni
+  se implementaron sus módulos al actualizar los planes.
 
 ## Comprobaciones y colaboración
 
@@ -82,8 +98,11 @@ Playwright, incluyendo edición/conflicto/eliminación, bloqueo real sin sesión
 móvil y menú. Informes en `docs/entregas/` con sus límites y capturas.
 
 Los ZIP se regeneran con `python scripts/prepare-plan-packages.py`; son contexto
-y referencias. El código se obtiene de main y cada compañero levanta su propio
-Docker con datos locales, sin conectarse a la computadora de Roberto.
+y referencias. Cada compañero obtiene el código autorizado y conserva su Docker;
+el destino acordado es la misma base Supabase, no las bases independientes del
+estado previo. Una migración común validada/autorizada puede aplicarse antes de
+fusionar todo un módulo; se registra archivo/commit, ejecutor y verificación. Ninguna
+prueba destructiva usa esa base. La habilitación todavía está pendiente.
 
 Antes de implementar: leer AGENTS, memoria, plan propio, estado, contratos y guía
 visual; revisar ramas remotas y cambios sin confirmar. No recrear la base ni

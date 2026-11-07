@@ -1,6 +1,6 @@
 # Memoria de CampusITSM
 
-Actualizada el 6 de noviembre de 2026 por solicitud expresa de Roberto. Este archivo conserva acuerdos y puntos de reanudación; el código y las ramas deben revisarse de nuevo antes de implementar.
+Actualizada el 7 de noviembre de 2026 al solicitar Roberto editar los planes e indicaciones de coordinación. Este archivo conserva acuerdos y puntos de reanudación; el código y las ramas deben revisarse de nuevo antes de implementar.
 
 ## Proyecto y fuentes de trabajo
 
@@ -17,7 +17,8 @@ Actualizada el 6 de noviembre de 2026 por solicitud expresa de Roberto. Este arc
 - Calendario manual y pantallas P17/P18 integrados mediante [PR #2](https://github.com/RobertoC1006/proyecto-gestion/pull/2), main `f519466850d28f2ab28d2b69cfc4146c60149717`. Código visual aprobado: `047d1a2e0fd4f71bb189ff301cacb6e1f21019cf`. Verificar el commit actual antes de consumirlo.
 - La base visual usa componentes reales de `RobertoC1006/casos-gestion`, adaptados a las pantallas del mockup. Guía vigente: `docs/DISENO_COMPONENTES.md`. Las demás vistas provisionales aún necesitan adaptación por sus responsables.
 - Roberto asume P01, Supabase Auth y la base de roles/permisos. Jasmine conserva administración de usuarios/permisos sobre esa base, consentimiento, auditoría, constancias y reportes. Ver `docs/CONTRATO_IDENTIDAD.md`.
-- Supabase todavía no está implementado ni configurado. El calendario real deniega acceso sin identidad; las pruebas con fixtures no acreditan login ni un recorrido autorizado. No crear un acceso de administrador ficticio.
+- Supabase Auth alojado implementado/configurado en la rama local `identidad-supabase`, commit `8b02d6f`, sin integrar/publicar en main al revisar GitHub. Roberto completó registro, confirmación, login y acceso al formulario académico como administrador, tras autorizar esa asignación. No crear otro login ni accesos ficticios. Ver `docs/CONTRATO_IDENTIDAD.md`.
+- Roberto decidió una misma base de desarrollo PostgreSQL en Supabase para los tres backend, cada uno ejecutado en su propio Docker, y acceso de colaboradores para Johan/Jasmine. El traslado de negocio, adaptación del arranque, configuración de sesiones y colaboradores todavía no se ejecutaron. El Compose actual sigue usando PostgreSQL local y migraciones automáticas. La edición de planes no autoriza ejecutar la transición. Ver [coordinación](docs/COORDINACION_SUPABASE.md).
 - No hay tickets, constancias, IA ni pronósticos reales implementados. CSV y factores/SLA siguen siendo semana 2.
 - Los tres planes se sincronizan con esta entrega. Regenerar sus ZIP al modificarlos. Verificar siempre Git, ramas ajenas y `docs/ESTADO_EQUIPO.md`; esta memoria no prueba el estado remoto futuro.
 
@@ -25,9 +26,9 @@ Actualizada el 6 de noviembre de 2026 por solicitud expresa de Roberto. Este arc
 
 Tres casos de uso amplios: CU01 registrar/priorizar/atender incidencias; CU02 emitir y verificar constancias; CU03 anticipar demanda y administrar operación, permisos y datos.
 
-Stack decidido por Roberto: React con Vite y TypeScript, NestJS, PostgreSQL con Prisma, Docker Compose. Se aceptó un contenedor auxiliar Python para entrenamiento y predicción. Una sola API modular, una base de negocio por instalación, contratos OpenAPI; React Router, TanStack Query, Phosphor y DM Sans/Manrope. Recharts y pg-boss sobre PostgreSQL se incorporarán al implementar sus módulos.
+Stack decidido por Roberto: React con Vite y TypeScript, NestJS, PostgreSQL con Prisma, Docker Compose. Se aceptó un contenedor auxiliar Python para entrenamiento y predicción. Una sola API modular y un único esquema/migraciones Prisma. Destino acordado: una misma base de desarrollo en Supabase para el equipo; PostgreSQL local para pruebas aisladas. Contratos OpenAPI; React Router, TanStack Query, Phosphor y DM Sans/Manrope. Recharts y pg-boss se incorporarán al implementar sus módulos.
 
-Primera versión: negocio en Docker, acceso con Supabase Auth, calendario manual/CSV, una institución/equipo, constancias PDF reales verificables y notificaciones internas. La modalidad de Auth (alojado o local) y creación/recuperación de cuentas se definirán al iniciar ese módulo; no se aprobó trasladar la base de negocio a Supabase. Quedan fuera conexión institucional externa, correo, firma digital certificada, multiinstitución y despliegue público.
+Primera versión acordada: frontend/backend y Python en Docker, base de negocio compartida en Supabase tras habilitar la transición, Supabase Auth alojado, calendario manual/CSV, una institución/equipo, constancias PDF reales verificables y notificaciones internas. Roberto eligió registro propio y recuperación por enlace; SMTP para confirmaciones externas pendiente. Quedan fuera conexión institucional externa, correo de notificaciones generales, firma digital certificada, multiinstitución y despliegue público de la aplicación. La base remota no comparte automáticamente los archivos/modelos de volúmenes locales.
 
 La IA clasificadora interpreta el texto y propone categoría y valores técnicos. El pronóstico de demanda es otro modelo, ejecutado en Python. **Preguntar a Roberto cuando llegue el módulo de IA para elegir un proveedor con opción gratuita vigente; no elegirlo ni contratarlo de antemano.** Consideró Gemini, Grok u otros como posibilidades, sin escoger uno.
 
@@ -47,20 +48,20 @@ Roberto, Johan y Jasmine trabajan por **módulos completos: frontend, backend y 
 | Johan | Componentes compartidos; incidencias, prioridad, seguimiento, atención y clasificación IA | P02–P08 |
 | Jasmine | Administración de usuarios/permisos sobre la base de Roberto; consentimiento, constancias, privacidad, auditoría y reportes | P09–P12, P15, P20–P23 |
 
-1. Semana 1: base Docker y calendario manual ya entregados; Roberto continúa con identidad Supabase cuando se solicite. Johan reutiliza componentes para registro/listado; Jasmine prepara administración, consentimiento y auditoría usando los contratos comunes. La nueva carga de identidad debe revisarse antes de comprometer plazos posteriores.
+1. Semana 1: base Docker/calendario entregados; identidad implementada en rama. Siguiente avance de infraestructura acordado: habilitar Supabase de desarrollo compartido y coordinación de cambios, todavía pendiente de ejecutar. Johan reutiliza componentes para registro/listado; Jasmine prepara administración/consentimiento/auditoría con los contratos comunes. Revisar esta carga antes de comprometer plazos posteriores.
 2. Semana 2: calendario CSV/configuración; atención y prioridad manual completas; constancias verificables.
 3. Semana 3: elección e integración de IA, predicciones/alertas y administración/reportes restantes.
 4. Semana 4: integración, fidelidad visual, permisos, fallos, persistencia, respaldo/restauración, carga, manuales y demostración.
 
-**Avanzar solo la etapa indicada.** El siguiente módulo previsto de Roberto es `identidad-supabase`, todavía pendiente de inicio. Actualizar planes o integrar la entrega aprobada no autoriza implementarlo ahora ni avanzar automáticamente a otra semana.
+**Avanzar solo la etapa indicada.** No recrear identidad por su estado anterior en main. Actualizar estos planes no inicia el traslado, invita colaboradores ni aplica migraciones remotas; esperar la solicitud concreta de Roberto para ejecutar la transición. Tampoco inicia otras semanas.
 
 ## Docker primero y colaboración
 
-Roberto ya recuperó el frontend, preservó su historia y publicó Docker Compose, salud, volúmenes, configuración sin secretos, migraciones y contratos. Johan/Jasmine construirán la misma base de main en su propio Docker, con datos y volúmenes locales; no necesitan conectarse a la computadora de Roberto.
+Roberto ya recuperó el frontend, preservó su historia y publicó Docker Compose, salud, volúmenes, configuración sin secretos, migraciones y contratos. Los tres conservarán su aplicación Docker local y se conectarán al mismo Supabase cuando se habilite; no dependerán de la computadora de Roberto. El código actual todavía mantiene bases locales independientes, condición previa a la transición que no debe confundirse con el destino acordado.
 
 Decisión expresa de Roberto: una sola instalación de trabajo `campusitsm` por computadora, en `http://localhost:8080`. Los avances se revisan reconstruyendo la misma instalación desde la rama activa, con sus volúmenes conservados. No crear otra aplicación Compose por módulo/revisión ni otro puerto para mostrarla. Esto no integra la rama en main: la integración sigue requiriendo su autorización. La instalación adicional `campusitsm-calendar-review` se cerró conservando sus volúmenes; no volver a levantarla para revisiones. Las pruebas automatizadas con datos descartables se mantienen aisladas de la base de trabajo y no dejan otra aplicación encendida.
 
-`PROYECTO.md`, `docs/CONTRATOS.md` y `docs/ESTADO_EQUIPO.md` describen la base existente. Distinguir contratos funcionales de propuestas pendientes; no inventar otra infraestructura o identidad por falta temporal de contratos.
+`PROYECTO.md`, `docs/CONTRATOS.md`, `docs/ESTADO_EQUIPO.md` y `docs/COORDINACION_SUPABASE.md` distinguen código existente, destino acordado y habilitación pendiente. No apuntar el arranque actual con migraciones automáticas a la base compartida. No inventar otra infraestructura o identidad por falta temporal de contratos.
 
 Antes de cada avance: revisar cambios sin confirmar, referencias remotas, diferencias con `main`, ramas activas de compañeros, contratos y dependencias. Inspeccionar una rama ajena no autoriza a modificarla, fusionarla o borrarla. No descartar cambios para sincronizarse. Si no hay red, declarar que el estado remoto no fue verificado.
 
@@ -71,6 +72,7 @@ Antes de cada avance: revisar cambios sin confirmar, referencias remotas, difere
 - Un módulo puede durar más de una semana. `base-proyecto` ya se integró; `calendario-academico` corresponde a PR #2. Siguientes ramas previstas de Roberto: `identidad-supabase`, una rama de continuación de calendario al retomar CSV/configuración, `prediccion-demanda`, `alertas-notificaciones`, `integracion-final`. Las de compañeros se detallan en sus planes.
 - Reutilizar los componentes existentes y una sola familia compartida de controles, tablas, estados y layouts. No duplicar catálogos, lógica, servicios o esquemas para avanzar en paralelo.
 - Roberto coordina esquema/migraciones/configuración/contratos e identidad/autorización; Johan componentes/navegación/prioridad; Jasmine administración/consentimiento/auditoría. Cambios compartidos se coordinan con su responsable.
+- Cada integrante escribe sus migraciones de módulo. Un cambio común puede validarse y aplicarse al desarrollo compartido antes de fusionar el módulo completo, con autorización concreta de Roberto y registro de archivo/commit, ejecutor y verificación en `docs/REGISTRO_CAMBIOS_BD.md`. Una rama Git no aísla la base; conservar las migraciones exactas aplicadas y compartir dependencias de código. No repetir una aprobación existente ni interpretar ser colaborador como permiso ilimitado. Pruebas destructivas solo en bases aisladas.
 - Las reglas de negocio y autorización viven en NestJS; React muestra resultados. No almacenar datos de negocio en localStorage. No duplicar cálculo de prioridad en Python.
 
 ## Mockups finales que ya están disponibles
@@ -88,8 +90,8 @@ Los mockups siguen definiendo pantallas, estructura y funciones. Roberto pidió 
 
 Cada lámina tiene cuatro vistas en orden arriba izquierda, arriba derecha, abajo izquierda, abajo derecha. Usar las versiones `_v2` indicadas, no bocetos anteriores. Los planes tienen enlaces relativos e imágenes incorporadas y especifican cada posición.
 
-Paquetes para compartir: `outputs/planes_para_compartir/PAQUETE_ROBERTO.zip` y equivalentes Johan/Jasmine; se generan con `python scripts/prepare-plan-packages.py`. Incluyen planes, contexto, contratos, guía visual y mockups, sin secretos ni dependencias. Los compañeros obtienen el código de main. Se mantienen también las copias compartidas en `C:\Users\ROBERTO CARLOS\.codex\visualizations\2026\11\06\01a1b1fa-27da-7331-b96e-56b6c923d4c6\planes_para_compartir\`. Si cambia un plan, regenerar su paquete para que coincida.
+Paquetes vigentes: `outputs/planes_para_compartir/PAQUETE_ROBERTO.zip` y equivalentes Johan/Jasmine; se generan con `python scripts/prepare-plan-packages.py`. Incluyen planes, coordinación Supabase, registro de cambios, contratos, guía visual y mockups, sin secretos ni dependencias. Los compañeros obtienen el código base autorizado por Roberto; un ZIP no prueba integración en main ni habilitación remota. Las copias compartidas del 6 de noviembre son históricas y no se actualizaron por esta edición. Si cambia un plan, regenerar sus paquetes.
 
 ## Punto de reanudación en otro chat
 
-Abrir esta misma carpeta. Leer esta memoria y el plan de la persona, comprobar Git y los archivos reales. No recrear Docker ni el diseño compartido. El siguiente módulo previsto de Roberto es identidad Supabase y P01; esperar su solicitud para iniciarlo y concretar entonces modalidad/proyecto/configuración. Los planes y mockups ya existen; no pedir que se vuelvan a subir ni desarrollar módulos ajenos por esta sincronización.
+Abrir esta misma carpeta. Leer esta memoria, el plan personal, COORDINACION_SUPABASE y ESTADO_EQUIPO; comprobar Git y configuración real. Identidad tiene entrega en rama y el siguiente avance acordado de Roberto es habilitar la base común, no ejecutado todavía. No recrear Docker/diseño/login, no conectar unilateralmente ramas a Supabase ni aplicar migraciones por leer los planes. Los mockups ya existen. No desarrollar módulos ajenos ni avanzar de semana por esta coordinación documental.
