@@ -14,3 +14,5 @@ Reglas expresas: React/Vite + NestJS + PostgreSQL/Prisma + Docker, Python auxili
 Los tres integrantes hacen frontend y backend de sus módulos. Roberto coordina y publica primero la base compartida. Consultar a Roberto al llegar a la selección de proveedor de IA. No implementar las cuatro semanas de golpe ni elegir un proveedor anticipadamente.
 
 Reparto vigente: Roberto asume P01, Supabase Auth y la base de roles/permisos. Jasmine administra usuarios/permisos a través de esa base y conserva consentimiento/auditoría/constancias/reportes; no crea otro login. El diseño compartido y sus componentes están descritos en `docs/DISENO_COMPONENTES.md` y se reutilizan en las pantallas del mockup.
+
+Docker de trabajo: una sola instalación `campusitsm` por computadora, en `http://localhost:8080`. Revisar los avances de la rama activa reconstruyendo esa misma instalación y conservando sus volúmenes. No crear otra aplicación Compose por módulo o revisión. Las ramas Git siguen separadas y se integran en main cuando Roberto lo autorice. Las pruebas automatizadas que requieran datos descartables se aíslan de los datos de trabajo y no dejan otra aplicación de revisión encendida.

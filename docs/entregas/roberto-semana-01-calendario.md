@@ -118,14 +118,15 @@ previa muestra la fecha en español y la zona de Lima.
 
 ## Reproducir y siguiente paso
 
-En esta rama, para la revisión separada de main:
+Instrucción vigente de Roberto: revisar en la instalación principal `campusitsm`,
+desde la rama activa, conservando sus volúmenes. Esto sustituye el flujo anterior
+de una instalación separada y no integra la rama Git en main.
 
 ```powershell
-$env:WEB_PORT = '18083'
-docker compose -p campusitsm-calendar-review up --build
+docker compose up --build -d --wait
 ```
 
-Abrir `http://localhost:18083/admin/calendario` y `/admin/calendario/nuevo`.
+Abrir `http://localhost:8080/admin/calendario` y `/admin/calendario/nuevo`.
 Es normal recibir aviso de sesión requerida; no usar el login provisional como
 prueba de autorización. Pruebas reproducibles en `scripts/verify-calendar.ps1`
 y `apps/web/test/academic.spec.cjs`, con instrucciones en README.

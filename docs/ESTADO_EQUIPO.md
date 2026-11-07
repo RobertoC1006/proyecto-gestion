@@ -49,6 +49,14 @@ No se iniciaron ramas ni se enviaron mensajes a los compañeros por actualizar p
 
 ## Comprobaciones y colaboración
 
+La revisión manual usa únicamente `campusitsm`, en `http://localhost:8080`.
+Roberto indicó reutilizar esa instalación para todos los módulos: reconstruir
+desde la rama activa, conservar volúmenes y mantener la autorización separada
+para integrar Git en main. Se cerró `campusitsm-calendar-review` conservando sus
+datos; no debe recrearse como flujo de revisión. Las pruebas con datos
+descartables permanecen aisladas de los datos de trabajo, sin otra aplicación
+de revisión encendida.
+
 La entrega base se construyó desde clon limpio y se verificaron salud,
 migraciones, semilla, restricciones, persistencia y fallo/recuperación de Python.
 Calendario: siete escenarios de integración PostgreSQL y persistencia después de
