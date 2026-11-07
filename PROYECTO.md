@@ -7,6 +7,11 @@ histórica. El avance actual se consulta en `docs/ESTADO_EQUIPO.md` y las entreg
 
 ## Estructura y stack único
 
+Diseño vigente en `calendario-academico`, por indicación de Roberto: componentes,
+fuentes DM Sans/Manrope e iconos Phosphor portados de `RobertoC1006/casos-gestion`,
+adaptados a la estructura y funciones de los mockups de CampusITSM. Ver
+`docs/DISENO_COMPONENTES.md`. No añadir una segunda familia de controles.
+
 - `apps/web`: React/Vite/TypeScript, vistas recuperadas de `front-vistas`, incluidos
   `AppHeader`, `Sidebar`, `PriorityBadge` y ejemplos. Siguen siendo demostrativas:
   no son autenticación, tickets ni constancias reales.

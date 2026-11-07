@@ -1,4 +1,4 @@
-import { AlertCircle, ArrowDown, ArrowUp, Minus } from "lucide-react";
+import { WarningCircle as AlertCircle, ArrowDown, ArrowUp, Minus } from '@phosphor-icons/react';
 import type { TicketPriority } from "../data/mock";
 
 const priorityConfig = {

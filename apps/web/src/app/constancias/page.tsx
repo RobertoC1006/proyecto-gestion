@@ -1,4 +1,4 @@
-import { CheckCircle2, Download, ExternalLink, FileCheck2, QrCode } from "lucide-react";
+import { CheckCircle as CheckCircle2, DownloadSimple as Download, ArrowSquareOut as ExternalLink, FileText as FileCheck2, QrCode } from '@phosphor-icons/react';
 import { tickets } from "../../data/mock";
 import { PriorityBadge } from "../../components/PriorityBadge";
 

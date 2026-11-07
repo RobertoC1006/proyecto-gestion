@@ -1,4 +1,4 @@
-import { ArrowRight, CheckCircle2, Clock3, Plus } from "lucide-react";
+import { ArrowRight, CheckCircle as CheckCircle2, Clock as Clock3, Plus } from '@phosphor-icons/react';
 import { tickets } from "../data/mock";
 import { PriorityBadge } from "../components/PriorityBadge";
 

@@ -1,5 +1,10 @@
 # Roberto — semana 1, calendario manual en revisión
 
+Actualización visual posterior solicitada por Roberto: la referencia vigente del
+acabado y componentes es `casos-gestion`. Ver
+[adaptación y capturas nuevas](roberto-calendario-diseno-casos-gestion.md).
+Las capturas de esta entrega conservan la revisión visual anterior.
+
 Fecha: 6 de noviembre de 2026. Rama: `calendario-academico`.
 Base utilizada: `196a2144aae253ca672eeeaf721c62204516245a` de `origin/main`.
 **No integrado en main. Roberto debe autorizar expresamente esa integración.**

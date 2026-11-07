@@ -2,6 +2,11 @@
 
 ## Avance en rama, sin integrar
 
+Actualización visual: Roberto pidió reutilizar diseño y componentes reales de
+`RobertoC1006/casos-gestion`, adaptándolos a P17/P18. Esa referencia sustituye el
+acabado visual inicial, conservando estructura/funciones del mockup. Consultar
+`docs/DISENO_COMPONENTES.md` y la entrega `roberto-calendario-diseno-casos-gestion.md`.
+
 `calendario-academico`, desde `196a2144aae253ca672eeeaf721c62204516245a`.
 Roberto pidió conservarlo fuera de main hasta su autorización expresa.
 Código verificado: `a41073e19eee32a049d97def5fd3dd982046df16`;

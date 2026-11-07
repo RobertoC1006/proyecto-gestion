@@ -1,4 +1,4 @@
-import { ArrowRight, Filter, Plus } from "lucide-react";
+import { ArrowRight, Funnel as Filter, Plus } from '@phosphor-icons/react';
 import { tickets } from "../../data/mock";
 import { PriorityBadge } from "../../components/PriorityBadge";
 

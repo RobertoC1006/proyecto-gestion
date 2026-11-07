@@ -46,6 +46,14 @@ async function fillForm(page) {
 async function noOverflow(page) {
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBeTruthy();
 }
+async function capture(page, filename) {
+  await page.evaluate(() => {
+    if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+    window.scrollTo(0, 0);
+  });
+  await expect(page.getByRole('heading', { level: 1 })).toBeInViewport();
+  await page.screenshot({ path: path.join(screenshots, filename), fullPage: true });
+}
 
 test('P17: semana, detalle, filtros, navegación y captura de escritorio', async ({ page }) => {
   await fixtures(page);
@@ -55,7 +63,7 @@ test('P17: semana, detalle, filtros, navegación y captura de escritorio', async
   await expect(page.getByRole('heading', { name: 'Detalle del evento' })).toBeVisible();
   await expect(page.locator('.academic-event-detail')).toContainText('Usuarios asociados a la sección');
   await noOverflow(page);
-  await page.screenshot({ path: path.join(screenshots, 'p17-escritorio-fixture.png') });
+  await capture(page, 'p17-casos-escritorio-fixture.png');
   await page.getByLabel('Carga manual').uncheck();
   await expect(page.getByRole('button', { name: /Redes I · Parcial,/ })).toHaveCount(0);
   await page.getByLabel('Carga manual').check();
@@ -71,7 +79,7 @@ test('P18: error de fin anterior, vista previa y guardar UTC', async ({ page }) 
   await expect(page.locator('#error-endsAt')).toHaveText('El fin debe ser posterior al inicio.');
   expect(state.writes).toHaveLength(0);
   await page.getByLabel('Fecha y hora de fin').fill('2026-11-06T12:00');
-  await page.screenshot({ path: path.join(screenshots, 'p18-escritorio-fixture.png') });
+  await capture(page, 'p18-casos-escritorio-fixture.png');
   await noOverflow(page);
   await page.getByRole('button', { name: 'Validar y guardar' }).click();
   await expect(page).toHaveURL(/calendario\?date=2026-11-06/);
@@ -103,15 +111,28 @@ test('Sin sesión: no revela eventos ni permite guardar', async ({ page }) => {
   await expect(page.locator('.calendar-event')).toHaveCount(0);
   await page.goto('/admin/calendario/nuevo');
   await expect(page.getByRole('button', { name: 'Validar y guardar' })).toBeDisabled();
-  await page.screenshot({ path: path.join(screenshots, 'p18-acceso-real-pendiente.png') });
+  await capture(page, 'p18-casos-acceso-real.png');
 });
 test('P17/P18 móvil 390 × 844: agenda sin desbordamiento y formulario', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await fixtures(page); await page.goto('/admin/calendario?date=2026-11-06');
   await page.getByRole('button', { name: '10:30 Redes I · Parcial Examen' }).click();
   await noOverflow(page);
-  await page.screenshot({ path: path.join(screenshots, 'p17-movil-fixture.png'), fullPage: true });
+  await capture(page, 'p17-casos-movil-fixture.png');
   await page.getByRole('link', { name: 'Nuevo evento' }).click(); await fillForm(page);
   await noOverflow(page);
-  await page.screenshot({ path: path.join(screenshots, 'p18-movil-fixture.png'), fullPage: true });
+  await capture(page, 'p18-casos-movil-fixture.png');
+});
+
+test('Menú móvil de la referencia: abre, navega, cierra y admite Escape', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await fixtures(page);
+  await page.goto('/admin/calendario/nuevo');
+  await page.getByRole('button', { name: 'Abrir menú' }).click();
+  await expect(page.getByRole('navigation', { name: 'Navegación principal' })).toBeVisible();
+  await page.getByRole('link', { name: 'Calendario académico', exact: true }).first().click();
+  await expect(page.getByRole('button', { name: 'Abrir menú' })).toHaveAttribute('aria-expanded', 'false');
+  await page.getByRole('button', { name: 'Abrir menú' }).click();
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('button', { name: 'Abrir menú' })).toHaveAttribute('aria-expanded', 'false');
 });

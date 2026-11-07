@@ -1,4 +1,4 @@
-import { ArrowRight, ArrowUpDown, Clock3, Filter, Users } from "lucide-react";
+import { ArrowRight, ArrowsDownUp as ArrowUpDown, Clock as Clock3, Funnel as Filter, Users } from '@phosphor-icons/react';
 import { tickets } from "../../../data/mock";
 import { PriorityBadge } from "../../../components/PriorityBadge";
 
