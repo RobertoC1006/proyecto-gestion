@@ -7,8 +7,8 @@ histórica. El avance actual se consulta en `docs/ESTADO_EQUIPO.md` y las entreg
 
 Acuerdo vigente del 7 de noviembre: una misma base de desarrollo PostgreSQL en
 Supabase para Roberto/Johan/Jasmine, con sus frontend/backend/Python en Docker y
-colaboradores con acceso revisado. La conexión común todavía no se habilitó:
-el Compose actual conserva PostgreSQL local y migraciones automáticas al arrancar.
+colaboradores con acceso revisado. La estructura y datos ya están en el esquema campusitsm; Roberto está conectado.
+El Compose normal no inicia PostgreSQL ni aplica migraciones. Accesos de compañeros pendientes.
 Leer [COORDINACION_SUPABASE.md](docs/COORDINACION_SUPABASE.md) antes de modificar
 conexiones o esquema. Los tres escriben migraciones de sus módulos; Roberto
 coordina aplicación y compatibilidad. PostgreSQL local queda para pruebas aisladas.
@@ -30,14 +30,14 @@ adaptados a la estructura y funciones de los mockups de CampusITSM. Ver
 - `services/predictions`: Python interno, por ahora solo salud, sin modelo.
 - `diseno/campusitsm`: mockups finales; `planes`: responsabilidades y semanas.
 
-El código actual de Docker incluye PostgreSQL, backend/API, Python y frontend. Solo web publica
-puerto local y reenvía `/api/` al backend. DB y Python quedan en red interna.
+Docker ejecuta backend/API, Python y frontend; PostgreSQL de trabajo está en Supabase. Solo web publica
+puerto local y reenvía `/api/` al backend. Python y PostgreSQL opcional de pruebas quedan internos.
 Cada computadora usa una sola instalación de trabajo `campusitsm`, en 8080.
 Los avances de la rama activa se revisan reconstruyendo esa instalación con sus
 volúmenes existentes; no se crea otra aplicación Compose por módulo/revisión.
 Las ramas Git se integran en main únicamente cuando Roberto lo autorice.
-La transición pendiente retirará PostgreSQL del arranque de trabajo compartido,
-sin borrar sus volúmenes, y separará las migraciones remotas del arranque normal.
+La transición retiró PostgreSQL del arranque de trabajo, conservó sus volúmenes
+y separó las migraciones del arranque. Ver docs/OPERACION_SUPABASE.md.
 Una rama Git no aísla Supabase: los cambios allí aplicados afectan al equipo.
 Imágenes oficiales fijadas por digest; dependencias Node bloqueadas con archivos
 `package-lock.json` y `npm ci`. Python usa solo biblioteca estándar en esta base.

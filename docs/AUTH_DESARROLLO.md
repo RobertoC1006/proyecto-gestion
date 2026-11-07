@@ -3,57 +3,30 @@
 Rama `identidad-supabase`, iniciada desde main `02d10f557fdf81af81fdeef1ecf7fb7d210aaeed`.
 Esta guía describe el código de la rama; no acredita que ya esté integrado en main.
 
-## Acuerdo nuevo y alcance de esta guía
+## Base compartida ya conectada
 
-Roberto decidió compartir también la base de negocio y dar acceso de colaboradores
-a Johan/Jasmine. Esa transición todavía no se ejecutó. Seguir
-[COORDINACION_SUPABASE.md](COORDINACION_SUPABASE.md) antes de configurar conexiones.
-Las instrucciones siguientes describen el código actual de identidad con negocio
-local, no la futura conexión remota. No basta cambiar DATABASE_URL ni apuntar su
-migración automática al proyecto común.
+La rama base-compartida-supabase conserva esta identidad y trasladó negocio a
+Supabase, esquema campusitsm, con UUID/perfiles/roles comunes. La instalación de
+Roberto ya está conectada; no está integrada en main. Ver
+[OPERACION_SUPABASE.md](OPERACION_SUPABASE.md) para preparar cada computadora,
+conexiones privadas, comando manual de migración y claves de cifrado propias.
 
-## Qué se comparte hoy, antes de la transición
+No copiar el .env completo de otro integrante. Ejecutar prepare-auth.ps1 para
+generar la clave local; los instanceId de sesiones/PKCE impiden que otra
+instalación los descifre o borre al cerrar su sesión. El perfil canónico compartido
+se crea tras el primer login confirmado como estudiante. Permisos/asociaciones
+se consultan en la misma base. La administración de Roberto ya fue conservada;
+no repetir seed/bootstrap-admin en cada clon.
 
-Supabase alojado: proyecto CampusITSM de la organización RobertoC1006, región
-São Paulo, plan gratuito al crearlo el 7 de noviembre de 2026. Panel:
-[CampusITSM](https://supabase.com/dashboard/project/npjibnlxepiwfermtcmo).
-Solo se utiliza Auth. No se migraron las tablas de negocio a su PostgreSQL.
-
-Cada integrante levanta su única instalación Docker `campusitsm` en
-`http://localhost:8080`. Compartir Supabase comparte identidades de acceso,
-no los perfiles, permisos, asociaciones o tickets de cada base local.
-GitHub comparte código y migraciones, no las cuentas ni los datos de Docker.
-
-Un mismo usuario confirmado recibe un perfil estudiante en cada instalación al
-completar allí su primer login. Ese perfil usa su UUID de Supabase como ID canónico.
-No se copian permisos de otra computadora ni metadata del navegador/proveedor.
-Las cuentas reales ya creadas no requieren volver a registrarse en otro Docker.
-
-## Preparar identidad con el código local actual
-
-1. Obtener la rama/entrega aprobada y ejecutar `scripts/prepare-auth.ps1`.
-   Prepara `.env` y genera una clave local de cifrado de 32 bytes sin mostrarla.
-2. Completar SUPABASE_URL y SUPABASE_PUBLISHABLE_KEY en el `.env` privado.
-   Son la URL del proyecto y una clave publishable activa (también admite anon antigua).
-   No se necesita service_role, clave secret ni contraseña del PostgreSQL remoto
-   para Auth; la futura conexión de negocio requiere configuración separada.
-3. Mantener APP_ORIGIN=`http://localhost:8080` y AUTH_INSTITUTION_CODE=`UPT-DEMO`.
-   La URL del navegador debe coincidir exactamente; no alternar localhost y 127.0.0.1.
-4. Ejecutar `docker compose up --build -d --wait` y, una vez, la semilla explícita:
-   `docker compose --profile tools run --rm seed`. Conserva registros existentes.
-5. Abrir `/login`. Las migraciones se aplican antes de que arranque la API.
-
-La configuración privada no se versiona ni se incluye en ZIP de planes. Cada
-computadora genera su propia AUTH_ENCRYPTION_KEY. Conservarla para poder leer las
-sesiones tras reiniciar; cambiarla invalida material cifrado existente. No la copiar
-en chats ni registros. PostgreSQL y Python mantienen red interna; únicamente API
-tiene salida adicional hacia Auth. No se publicaron nuevos puertos.
+Johan/Jasmine recibirán acceso/configuración cuando estén disponibles sus correos;
+no bloquear otras tareas por las invitaciones. Cada Docker conserva sus archivos.
+Solo NestJS conecta a PostgreSQL y Auth; el navegador recibe cookies opacas.
 
 ## Registro, confirmación y recuperación
 
 Roberto eligió registro propio. Nuevas cuentas: correo/contraseña/nombre; sin selector
 de rol, equipo o institución. Contraseña nueva de 10 a 128 caracteres.
-Supabase gestiona la credencial. El perfil local se crea solo tras login confirmado.
+Supabase gestiona la credencial. El perfil compartido se crea solo tras login confirmado.
 
 Supabase envía un enlace. Debe abrirse en el mismo navegador y computadora donde se
 solicitó, porque el verificador PKCE queda cifrado en el servidor y vinculado a una
@@ -70,7 +43,7 @@ Configuración del proyecto ya aplicada:
 Recuperación: «Olvidé mi contraseña», correo, enlace, formulario de nueva contraseña.
 El acceso de recuperación dura diez minutos y solo permite cambiar esa contraseña;
 no crea una sesión general de CampusITSM. Requiere Origin/CSRF. Al finalizar se
-invalidan las sesiones locales de la cuenta. Supabase también recibe cierre global.
+invalidan las sesiones de aplicación de la cuenta en todas las instalaciones. Supabase también recibe cierre global.
 Un solo flujo de correo activo por navegador; solicitar otro reemplaza el anterior.
 
 **Límite vigente:** el correo incluido de Supabase solo admite destinatarios miembros
@@ -80,23 +53,13 @@ Roberto. No resolverlo añadiéndolos como administradores de Supabase ni desact
 la confirmación. No se seleccionó ni contrató proveedor de correo.
 [Condiciones del correo de Supabase](https://supabase.com/docs/guides/auth/auth-smtp).
 
-## Primer administrador con negocio local, antes de compartir la base
+## Administración de cuentas
 
-No se convierte automáticamente al primer visitante en administrador. Un operador
-local debe elegir explícitamente una cuenta real que ya completó su primer login.
-Configurar temporalmente BOOTSTRAP_USER_ID con ese UUID y ejecutar:
-`docker compose --profile tools run --rm bootstrap-admin`.
-También puede pasarse como variable únicamente al contenedor de la herramienta.
-No acepta perfiles inexistentes ni funciona si ya hay un administrador activo.
-
-El cambio registra IdentityChange e incrementa la versión de acceso; volver a iniciar
-sesión para usar el nuevo rol. Los cambios posteriores son responsabilidad de P20/P21
-de Jasmine, a través de IdentityDirectory.changeAccess. No crear otra autenticación.
-
-Cuando el negocio esté en una sola base común, el administrador se inicializa una
-sola vez en esa base; cada Docker no debe repetirlo. Perfiles/roles ya serán comunes.
-La transición debe conservar los usuarios y UUID existentes y fijar el alcance de
-sesiones cifradas entre instancias. No copiar claves de cifrado por improvisación.
+El administrador inicial ya existe en la base común, con asignación expresamente
+autorizada y registrada en IdentityChange. El arranque no crea administradores.
+Los cambios posteriores corresponden a P20/P21 de Jasmine usando
+IdentityDirectory.changeAccess; no crear otro login ni otro motor de permisos.
+La herramienta bootstrap-admin queda solo para una instalación vacía autorizada.
 
 ## Pruebas y dependencias
 
@@ -113,3 +76,5 @@ Jasmine conserva consentimiento y auditoría global. No se inventó una polític
 aceptación sin su versión real. AcademicChange/IdentityChange quedan guardados de forma
 atómica, pendientes de su integración; no se implementaron sus pantallas ni reportes.
 No se iniciaron CSV, SLA, IA, pronósticos ni otras semanas.
+
+Entrega histórica de identidad: [resultado y capturas](entregas/roberto-semana-01-identidad.md).

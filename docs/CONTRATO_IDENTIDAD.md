@@ -8,7 +8,7 @@ reportes, consumiendo la identidad y autorización comunes.
 **7 de noviembre de 2026: implementado en la rama de trabajo, sin integrar en main.**
 Proyecto alojado CampusITSM creado por solicitud de Roberto en su organización,
 plan gratuito. Roberto completó registro, confirmación de correo y login reales.
-También autorizó asignar su cuenta como primer administrador local.
+También autorizó asignar su cuenta como primer administrador, conservado al trasladar la base a Supabase.
 Pruebas automáticas y límites de aceptación en la entrega de identidad.
 La administración P20/P21 y el consentimiento/auditoría global siguen a cargo de Jasmine.
 
@@ -20,10 +20,10 @@ La administración P20/P21 y el consentimiento/auditoría global siguen a cargo 
 | Jasmine | Administración P20/P21 y sus servicios de aplicación, perfiles/estado/equipo y consentimiento/auditoría; cambios sensibles de identidad o rol mediante servicios comunes de Roberto |
 | Johan | Autorización de tickets/adjuntos usando el usuario y las políticas comunes; sin otro login, almacén de contraseñas ni motor de roles |
 
-Supabase Auth gestionará credenciales e identidad. Los datos de negocio siguen
-en PostgreSQL/Prisma de Docker en el código actual. Roberto acordó trasladarlos a
-una misma base de desarrollo en Supabase para los tres backend; esa transición
-todavía no se ejecutó. Ver [COORDINACION_SUPABASE.md](COORDINACION_SUPABASE.md).
+Supabase Auth gestiona credenciales e identidad. Negocio/perfiles/roles están en
+el esquema privado campusitsm del mismo proyecto; Roberto ya está conectado.
+La rama base-compartida-supabase separa arranque/migración y sesiones por instalación.
+Accesos y configuración privada de Johan/Jasmine siguen pendientes. Ver [COORDINACION_SUPABASE.md](COORDINACION_SUPABASE.md).
 Modalidad elegida: servicio alojado; Roberto pidió que cada persona pueda registrarse.
 Registro con contraseña y confirmación por enlace; recuperación también por enlace.
 Los accesos y la validación/renovación de sesiones dependen del servicio externo.
@@ -48,10 +48,10 @@ Consultar [la guía de desarrollo](AUTH_DESARROLLO.md).
 - Claves secretas/administrativas solo en servidor y configuración privada, nunca
   en React, repositorio, planes, paquetes de compañeros ni registros de errores.
 - UUID canónico de AppUser = subject de Supabase. El primer login confirmado
-  crea el perfil local como estudiante; nunca toma rol/institución/equipo del cliente.
-  Los perfiles existentes conservan estado y asignaciones. Actualmente cada base
-  local es independiente; al habilitar la base común, perfiles/roles serán los mismos
-  para los tres. La transición conserva UUID y define sesiones cifradas entre instancias.
+  crea el perfil compartido como estudiante; nunca toma rol/institución/equipo del cliente.
+  Los perfiles existentes conservan estado y asignaciones. La base común conserva UUID, perfiles y roles para los tres. Las sesiones
+  llevan instanceId, derivado de la clave propia; una instalación no usa flujos
+  ni sesiones de otra. Cambios de acceso invalidan globalmente cuando corresponde.
 - Login/logout, protección de escrituras, renovación simultánea y revocación de
   sesión deben probarse explícitamente. No dar por revocado un JWT vigente solo
   por borrar datos del navegador. No seleccionar un plan de pago ni enviar correo

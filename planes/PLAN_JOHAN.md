@@ -1,7 +1,7 @@
 ---
 responsable: Johan
 revision: 2026-11-07
-estado: transicion_supabase_compartido_acordada_pendiente
+estado: base_supabase_conectada_accesos_equipo_pendientes
 pantallas_asignadas: [P02, P03, P04, P05, P06, P07, P08]
 ---
 
@@ -11,39 +11,36 @@ Este plan está dirigido exclusivamente a Johan y su agente. Eres responsable de
 
 ## Estado vigente y punto de partida — 7 de noviembre de 2026
 
-Roberto acordó trabajar con una sola base de desarrollo compartida en Supabase:
-cada integrante conserva su frontend/backend en Docker, conectados a esa misma
-base cuando se habilite la transición. Leer obligatoriamente
-[COORDINACION_SUPABASE.md](../docs/COORDINACION_SUPABASE.md) y
+La base de negocio ya está trasladada a Supabase y la instalación de Roberto
+está conectada, en la rama `base-compartida-supabase` (todavía sin integrar en main).
+Cada persona ejecuta su aplicación Docker; al recibir la conexión privada usará
+los mismos usuarios, roles, eventos y datos autorizados. Leer
+[OPERACION_SUPABASE.md](../docs/OPERACION_SUPABASE.md),
+[COORDINACION_SUPABASE.md](../docs/COORDINACION_SUPABASE.md),
+[ESTADO_EQUIPO.md](../docs/ESTADO_EQUIPO.md) y
 [REGISTRO_CAMBIOS_BD.md](../docs/REGISTRO_CAMBIOS_BD.md).
 
-**Estado comprobado, distinto del destino acordado:**
-
-| Área | Situación |
+| Área | Situación comprobada |
 | --- | --- |
-| Main y base visual/calendario | origin/main `02d10f5`, PR #1/#2 integradas; componentes/P17/P18 disponibles |
-| Identidad real | Rama `identidad-supabase`, commit `8b02d6f`, todavía sin integrar/publicar en main. Registro, confirmación, login y administrador probados por Roberto; ver entrega de identidad |
-| Negocio en Supabase | Traslado y conexión compartida pendientes. El Compose actual todavía usa PostgreSQL local y aplica migraciones al arrancar |
-| Colaboradores | Acceso acordado para Johan/Jasmine; invitaciones y alcance de permisos todavía por configurar |
-| Correo | SMTP propio para destinatarios externos pendiente; compartir la base no resuelve esa restricción |
-| Módulos | Johan conserva P02–P08; Jasmine P09–P12/P15/P20–P23; Roberto sus pantallas e infraestructura común |
+| Main | origin/main `02d10f5`; base visual/calendario integrados, identidad/transición aún en ramas locales |
+| Supabase | CampusITSM, esquema campusitsm: estructura y datos trasladados, UUID conservados y contenido comparado |
+| Docker | web/api/predictions en localhost:8080; PostgreSQL local detenido con volumen conservado |
+| Migraciones | Manuales y separadas del arranque; un historial Prisma. La API verifica las migraciones requeridas sin aplicarlas |
+| Sesiones | Cifradas por instalación con claves propias; usuarios/permisos compartidos |
+| Johan/Jasmine | Invitaciones aplazadas hasta que Roberto reciba sus correos; conexión privada y alcance de acceso aún por entregar |
+| Correo externo | SMTP propio pendiente; no desactivar confirmación ni duplicar Auth |
+| Alcance | Mismos módulos/pantallas/semanas; no se iniciaron tickets, CSV, IA o predicción |
 
-La revisión de GitHub para actualizar estos planes encontró `main`, la rama
-remota `front-vistas` conservada y la rama local de identidad. Revisar de nuevo
-el estado real antes de implementar; esta fotografía no prueba el estado futuro.
+Obtener el código autorizado por Roberto; no presentar esta rama como main.
+Una sola instalación de trabajo campusitsm por computadora. No copiar claves de
+cifrado ajenas ni respaldos privados; generar la propia. Los archivos/modelos
+siguen siendo locales. No ejecutar semillas masivas o pruebas destructivas en
+Supabase. Una rama Git no aísla sus datos.
 
-**Punto de inicio para tu agente:** leer AGENTS, memoria, este plan,
-COORDINACION_SUPABASE, ESTADO_EQUIPO, contratos y DISENO_COMPONENTES. Obtener el
-código base autorizado por Roberto; no presentar la rama de identidad como main.
-No recrear Docker, catálogos, identidad o componentes por una dependencia pendiente.
-
-Una sola instalación Docker `campusitsm` por computadora, en localhost:8080.
-Una rama Git no aísla la base: cuando la conexión común esté habilitada, todas
-las escrituras remotas afectarán a los tres. Hasta entonces avanzar en código,
-contratos y pruebas aisladas de la semana solicitada. No conectar por cuenta
-propia una rama al destino remoto ni aplicar sus migraciones al arrancar.
-Las instrucciones de arranque se actualizarán en la entrega de transición;
-no ejecutar pruebas destructivas o semillas masivas sobre la base compartida.
+Dentro del módulo asignado, las tablas/columnas/índices compatibles se validan,
+versionan, aplican con el comando manual y registran/avisan sin permiso por tabla.
+Consultar antes cambios comunes, de otros módulos o incompatibles. No borrar
+tablas/datos ni editar migraciones aplicadas. No crear otro login o catálogo.
 
 ## Contexto completo y alcance acordado
 
@@ -57,7 +54,7 @@ El equipo es Roberto, Johan y Jasmine. Cada integrante hace frontend, backend y 
 
 Este plan y su paquete incluyen el contexto necesario para comenzar sin otra conversación; los documentos compartidos y el código vigente se revisan en cada sesión. Los [casos de uso y catálogo](../diseno/campusitsm/CASOS_DE_USO_Y_PANTALLAS.md) son material complementario; las instrucciones actuales acordadas aquí actualizan las decisiones abiertas de ese catálogo.
 
-**Primera versión acordada:** frontend/backend y Python en Docker de cada integrante, una misma base de negocio PostgreSQL de desarrollo en Supabase y Supabase Auth alojado para una institución/equipo; calendario manual/CSV, PDF verificable y notificaciones internas. La transición compartida todavía debe prepararse y verificarse. Registro propio elegido por Roberto; envío de confirmaciones externas pendiente de SMTP. No se incluyen inicio institucional externo, integración académica real, correo de notificaciones generales, firma digital certificada, reapertura/cierre adicional, multiinstitución ni publicación pública de frontend/backend.
+**Primera versión acordada:** frontend/backend y Python en Docker de cada integrante, una misma base de negocio PostgreSQL de desarrollo en Supabase y Supabase Auth alojado para una institución/equipo; calendario manual/CSV, PDF verificable y notificaciones internas. La transición está verificada para Roberto; faltan accesos/configuración privada de compañeros. Registro propio elegido por Roberto; envío de confirmaciones externas pendiente de SMTP. No se incluyen inicio institucional externo, integración académica real, correo de notificaciones generales, firma digital certificada, reapertura/cierre adicional, multiinstitución ni publicación pública de frontend/backend.
 
 La clasificación por IA y el pronóstico son componentes distintos. El proveedor con opción gratuita de clasificación se elegirá con Roberto cuando llegue ese módulo; no asumir que un proveedor sigue siendo gratuito ni contratarlo unilateralmente. El pronóstico se ejecutará localmente en Python.
 
@@ -69,10 +66,10 @@ La clasificación por IA y el pronóstico son componentes distintos. El proveedo
 | Diseño | Base visual compartida de casos-gestion; DM Sans/Manrope, Phosphor y CSS con tokens; Recharts al implementar gráficos |
 | Backend | Una API NestJS modular en TypeScript, prefijo `/api/v1`, contratos OpenAPI |
 | Identidad | Supabase Auth alojado y autorización NestJS implementados en rama de Roberto, pendientes de integración en main |
-| Persistencia | Una base de desarrollo compartida en Supabase, Prisma y migraciones versionadas; transición pendiente; PostgreSQL aislado para pruebas |
+| Persistencia | Una base de desarrollo compartida en Supabase, Prisma y migraciones versionadas; conexión verificada; PostgreSQL aislado para pruebas |
 | Predicciones | Python con pandas y statsmodels, expuesto solo al backend mediante servicio interno |
 | Tareas | pg-boss sobre PostgreSQL; tareas persistentes sin añadir Redis en esta versión |
-| Ejecución | Docker de cada integrante para web/api/predictions; conexión PostgreSQL remota compartida tras transición. db local solo para pruebas; migración remota separada del arranque |
+| Ejecución | Docker de cada integrante para web/api/predictions; conexión PostgreSQL remota compartida. db local solo para pruebas; migración remota separada del arranque |
 | Actualizaciones | Eventos del servidor para tickets/notificaciones; al reconectar se vuelve a consultar estado actual |
 | Pruebas | Pruebas unitarias de dominio, integración con PostgreSQL, recorridos Playwright y comprobación visual |
 

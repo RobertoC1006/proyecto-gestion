@@ -12,11 +12,15 @@ conectan a **la misma base PostgreSQL de desarrollo en Supabase CampusITSM**.
 Usuarios, perfiles, roles, calendario y datos de módulos integrados serán comunes,
 respetando permisos. PostgreSQL local queda como opción para pruebas aisladas.
 
-**Todavía pendiente:** traslado de estructura/datos de negocio, adaptación de
-conexión y arranque, configuración de colaboradores y habilitación para los tres.
-El código actual todavía conecta la base de negocio a PostgreSQL en Docker y
-ejecuta migraciones al arrancar. No basta con cambiar una URL en un `.env`.
-Esta actualización de planes no realiza esas acciones ni autoriza ejecutarlas.
+**Transición ejecutada:** estructura y datos de negocio ya están en el esquema
+campusitsm; Roberto está conectado. Docker normal ya no inicia db ni migrate y
+las sesiones se separan por instalación. PostgreSQL local está detenido con su
+volumen conservado. Ver [OPERACION_SUPABASE.md](OPERACION_SUPABASE.md) y
+[entrega](entregas/roberto-semana-01-base-compartida.md).
+
+**Pendiente:** publicar/integrar el código con autorización de Roberto y entregar
+configuración privada/accesos de Johan/Jasmine. Las invitaciones se aplazan por
+indicación de Roberto hasta disponer de sus correos; no bloquean esta transición.
 
 Auth alojado sí está implementado en `identidad-supabase`, commit `8b02d6f`,
 todavía sin integrar en main al revisar GitHub para esta actualización.
@@ -29,7 +33,7 @@ del equipo Supabase sigue requiriendo un SMTP propio autorizado.
 | Elemento | Acuerdo |
 | --- | --- |
 | Supabase Auth | Un mismo proyecto de identidad; credenciales allí, no en nuevas tablas de contraseñas |
-| Base de negocio | Una sola base de desarrollo compartida después de habilitar la transición |
+| Base de negocio | Una sola base de desarrollo compartida, ya conectada para Roberto |
 | Código | Un repositorio y una API modular; una rama por módulo, sin prefijo codex/ |
 | Ejecución | Cada integrante reconstruye su propia instalación Docker desde su rama |
 | Tablas, columnas e índices remotos | Los cambios aplicados afectan a los tres; una rama Git no aísla la base |
@@ -56,7 +60,7 @@ no se añade un acceso directo paralelo desde React a tablas Supabase.
 ## Antes de conectar a los compañeros
 
 Roberto coordina esta entrega de transición; los agentes de Johan/Jasmine no la
-ejecutan unilateralmente por leer un plan. La entrega debe registrar:
+ejecutan unilateralmente por leer un plan. La entrega registra los siguientes puntos; accesos reales de compañeros aún pendientes:
 
 1. Código base disponible y autorizado para consumir, con rama/commit y contratos.
 2. Inventario de esquema/datos a trasladar, respaldo comprobable y conservación
@@ -77,7 +81,7 @@ ejecutan unilateralmente por leer un plan. La entrega debe registrar:
 8. Estado de habilitación actualizado en ESTADO_EQUIPO y aviso de Roberto a los
    compañeros con la configuración por un medio privado, sin secretos en los ZIP.
 
-Hasta esa entrega pueden avanzar en código, contratos y pruebas locales de la
+Mientras reciben el código autorizado y su configuración privada pueden avanzar en código, contratos y pruebas locales de la
 semana solicitada, manteniendo cerrado lo que dependa de servicios no disponibles.
 No inventar identidades, catálogos o servicios para eludir una dependencia.
 

@@ -1,49 +1,46 @@
 ---
 responsable: Roberto
 revision: 2026-11-07
-estado: transicion_supabase_compartido_acordada_pendiente
+estado: base_supabase_conectada_accesos_equipo_pendientes
 pantallas_asignadas: [P01, P13, P14, P16, P17, P18, P19, P24]
 ---
 
 # Plan de implementación de CampusITSM para Roberto
 
-Este plan está dirigido exclusivamente a Roberto y su agente. Tu base Docker y el calendario manual ya tienen entregas verificadas. Identidad tiene una entrega en rama; el siguiente avance de infraestructura acordado es preparar la base de desarrollo compartida en Supabase, su conexión y la coordinación de colaboradores. Ejecuta solo la etapa solicitada y no implementes las cuatro semanas de golpe.
+Este plan está dirigido exclusivamente a Roberto y su agente. Tu base Docker y el calendario manual ya tienen entregas verificadas. Identidad tiene una entrega en rama; la base de negocio ya está en Supabase; falta entregar el código autorizado y configurar colaboradores cuando lleguen sus correos. Ejecuta solo la etapa solicitada y no implementes las cuatro semanas de golpe.
 
 ## Estado vigente y punto de partida — 7 de noviembre de 2026
 
-Roberto acordó trabajar con una sola base de desarrollo compartida en Supabase:
-cada integrante conserva su frontend/backend en Docker, conectados a esa misma
-base cuando se habilite la transición. Leer obligatoriamente
-[COORDINACION_SUPABASE.md](../docs/COORDINACION_SUPABASE.md) y
+La base de negocio ya está trasladada a Supabase y la instalación de Roberto
+está conectada, en la rama `base-compartida-supabase` (todavía sin integrar en main).
+Cada persona ejecuta su aplicación Docker; al recibir la conexión privada usará
+los mismos usuarios, roles, eventos y datos autorizados. Leer
+[OPERACION_SUPABASE.md](../docs/OPERACION_SUPABASE.md),
+[COORDINACION_SUPABASE.md](../docs/COORDINACION_SUPABASE.md),
+[ESTADO_EQUIPO.md](../docs/ESTADO_EQUIPO.md) y
 [REGISTRO_CAMBIOS_BD.md](../docs/REGISTRO_CAMBIOS_BD.md).
 
-**Estado comprobado, distinto del destino acordado:**
-
-| Área | Situación |
+| Área | Situación comprobada |
 | --- | --- |
-| Main y base visual/calendario | origin/main `02d10f5`, PR #1/#2 integradas; componentes/P17/P18 disponibles |
-| Identidad real | Rama `identidad-supabase`, commit `8b02d6f`, todavía sin integrar/publicar en main. Registro, confirmación, login y administrador probados por Roberto; ver entrega de identidad |
-| Negocio en Supabase | Traslado y conexión compartida pendientes. El Compose actual todavía usa PostgreSQL local y aplica migraciones al arrancar |
-| Colaboradores | Acceso acordado para Johan/Jasmine; invitaciones y alcance de permisos todavía por configurar |
-| Correo | SMTP propio para destinatarios externos pendiente; compartir la base no resuelve esa restricción |
-| Módulos | Johan conserva P02–P08; Jasmine P09–P12/P15/P20–P23; Roberto sus pantallas e infraestructura común |
+| Main | origin/main `02d10f5`; base visual/calendario integrados, identidad/transición aún en ramas locales |
+| Supabase | CampusITSM, esquema campusitsm: estructura y datos trasladados, UUID conservados y contenido comparado |
+| Docker | web/api/predictions en localhost:8080; PostgreSQL local detenido con volumen conservado |
+| Migraciones | Manuales y separadas del arranque; un historial Prisma. La API verifica las migraciones requeridas sin aplicarlas |
+| Sesiones | Cifradas por instalación con claves propias; usuarios/permisos compartidos |
+| Johan/Jasmine | Invitaciones aplazadas hasta que Roberto reciba sus correos; conexión privada y alcance de acceso aún por entregar |
+| Correo externo | SMTP propio pendiente; no desactivar confirmación ni duplicar Auth |
+| Alcance | Mismos módulos/pantallas/semanas; no se iniciaron tickets, CSV, IA o predicción |
 
-La revisión de GitHub para actualizar estos planes encontró `main`, la rama
-remota `front-vistas` conservada y la rama local de identidad. Revisar de nuevo
-el estado real antes de implementar; esta fotografía no prueba el estado futuro.
+Obtener el código autorizado por Roberto; no presentar esta rama como main.
+Una sola instalación de trabajo campusitsm por computadora. No copiar claves de
+cifrado ajenas ni respaldos privados; generar la propia. Los archivos/modelos
+siguen siendo locales. No ejecutar semillas masivas o pruebas destructivas en
+Supabase. Una rama Git no aísla sus datos.
 
-**Punto de inicio para tu agente:** leer AGENTS, memoria, este plan,
-COORDINACION_SUPABASE, ESTADO_EQUIPO, contratos y DISENO_COMPONENTES. Obtener el
-código base autorizado por Roberto; no presentar la rama de identidad como main.
-No recrear Docker, catálogos, identidad o componentes por una dependencia pendiente.
-
-Una sola instalación Docker `campusitsm` por computadora, en localhost:8080.
-Una rama Git no aísla la base: cuando la conexión común esté habilitada, todas
-las escrituras remotas afectarán a los tres. Hasta entonces avanzar en código,
-contratos y pruebas aisladas de la semana solicitada. No conectar por cuenta
-propia una rama al destino remoto ni aplicar sus migraciones al arrancar.
-Las instrucciones de arranque se actualizarán en la entrega de transición;
-no ejecutar pruebas destructivas o semillas masivas sobre la base compartida.
+Dentro del módulo asignado, las tablas/columnas/índices compatibles se validan,
+versionan, aplican con el comando manual y registran/avisan sin permiso por tabla.
+Consultar antes cambios comunes, de otros módulos o incompatibles. No borrar
+tablas/datos ni editar migraciones aplicadas. No crear otro login o catálogo.
 
 ## Contexto completo y alcance acordado
 
@@ -57,7 +54,7 @@ El equipo es Roberto, Johan y Jasmine. Cada integrante hace frontend, backend y 
 
 Este plan y su paquete incluyen el contexto necesario para comenzar sin otra conversación; los documentos compartidos y el código vigente se revisan en cada sesión. Los [casos de uso y catálogo](../diseno/campusitsm/CASOS_DE_USO_Y_PANTALLAS.md) son material complementario; las instrucciones actuales acordadas aquí actualizan las decisiones abiertas de ese catálogo.
 
-**Primera versión acordada:** frontend/backend y Python en Docker de cada integrante, una misma base de negocio PostgreSQL de desarrollo en Supabase y Supabase Auth alojado para una institución/equipo; calendario manual/CSV, PDF verificable y notificaciones internas. La transición compartida todavía debe prepararse y verificarse. Registro propio elegido por Roberto; envío de confirmaciones externas pendiente de SMTP. No se incluyen inicio institucional externo, integración académica real, correo de notificaciones generales, firma digital certificada, reapertura/cierre adicional, multiinstitución ni publicación pública de frontend/backend.
+**Primera versión acordada:** frontend/backend y Python en Docker de cada integrante, una misma base de negocio PostgreSQL de desarrollo en Supabase y Supabase Auth alojado para una institución/equipo; calendario manual/CSV, PDF verificable y notificaciones internas. La transición está verificada para Roberto; faltan accesos/configuración privada de compañeros. Registro propio elegido por Roberto; envío de confirmaciones externas pendiente de SMTP. No se incluyen inicio institucional externo, integración académica real, correo de notificaciones generales, firma digital certificada, reapertura/cierre adicional, multiinstitución ni publicación pública de frontend/backend.
 
 La clasificación por IA y el pronóstico son componentes distintos. El proveedor con opción gratuita de clasificación se elegirá con Roberto cuando llegue ese módulo; no asumir que un proveedor sigue siendo gratuito ni contratarlo unilateralmente. El pronóstico se ejecutará localmente en Python.
 
@@ -69,10 +66,10 @@ La clasificación por IA y el pronóstico son componentes distintos. El proveedo
 | Diseño | Base visual compartida de casos-gestion; DM Sans/Manrope, Phosphor y CSS con tokens; Recharts al implementar gráficos |
 | Backend | Una API NestJS modular en TypeScript, prefijo `/api/v1`, contratos OpenAPI |
 | Identidad | Supabase Auth alojado y autorización NestJS implementados en rama de Roberto, pendientes de integración en main |
-| Persistencia | Una base de desarrollo compartida en Supabase, Prisma y migraciones versionadas; transición pendiente; PostgreSQL aislado para pruebas |
+| Persistencia | Una base de desarrollo compartida en Supabase, Prisma y migraciones versionadas; conexión verificada; PostgreSQL aislado para pruebas |
 | Predicciones | Python con pandas y statsmodels, expuesto solo al backend mediante servicio interno |
 | Tareas | pg-boss sobre PostgreSQL; tareas persistentes sin añadir Redis en esta versión |
-| Ejecución | Docker de cada integrante para web/api/predictions; conexión PostgreSQL remota compartida tras transición. db local solo para pruebas; migración remota separada del arranque |
+| Ejecución | Docker de cada integrante para web/api/predictions; conexión PostgreSQL remota compartida. db local solo para pruebas; migración remota separada del arranque |
 | Actualizaciones | Eventos del servidor para tickets/notificaciones; al reconectar se vuelve a consultar estado actual |
 | Pruebas | Pruebas unitarias de dominio, integración con PostgreSQL, recorridos Playwright y comprobación visual |
 
@@ -261,29 +258,28 @@ Esta entrega ocurre al principio de Semana 1 y desbloquea el trabajo conectado. 
 9. Verificar construcción desde un clon/copia limpia del repositorio compartido, salud y persistencia tras apagar y volver a levantar sin borrar volúmenes.
 10. Integrar/publicar en `main`, registrar el commit exacto y avisar al equipo por el canal que ustedes utilicen. El agente no envía mensajes externos por su cuenta.
 
-**Condición de entrega:** Johan y Jasmine pueden obtener ese commit, configurar su entorno local y construir los mismos contenedores en su Docker. Sus bases y archivos son locales e independientes; no se conectan a tu computadora. Publicar instrucciones de acceso desde otro dispositivo solo si se va a demostrar QR por red local.
+**Condición de entrega:** Johan y Jasmine pueden obtener ese commit, configurar su entorno local y construir los mismos contenedores en su Docker. En la entrega histórica sus bases eran locales; con la transición vigente comparten Supabase y conservan archivos locales. No se conectan a tu computadora. Publicar instrucciones de acceso desde otro dispositivo solo si se va a demostrar QR por red local.
 
 La rama fuente `front-vistas` solo se retira después de preservar e integrar todo su contenido y confirmar que no pertenece a trabajo activo de un compañero. Eliminar ramas de módulos creadas por el equipo no autoriza a eliminar trabajo desconocido.
 
-## Siguiente entrega de Roberto — Habilitar la base compartida
+## Transición compartida entregada — siguientes pasos de coordinación
 
-El acuerdo ya está documentado; no se trasladó negocio ni se invitó a los compañeros
-por editar planes. Preparar esta entrega solo cuando Roberto solicite implementarla.
+Roberto solicitó ejecutarla. Inventario, respaldos restaurados, migraciones,
+traslado conservando UUID, conexión y sesiones por instalación están verificados.
+El arranque ya está separado de las migraciones. Ver OPERACION_SUPABASE y la
+[entrega](../docs/entregas/roberto-semana-01-base-compartida.md). No repetir el traslado.
 
-1. Publicar/coordinar el código base de identidad aprobado, sin fusionarlo en main
-   ni borrar ramas hasta contar con autorización de integración.
-2. Seguir el inventario, respaldo, traslado conservando UUID, configuración de
-   servidor y comprobación entre dos instalaciones descritos en COORDINACION_SUPABASE.
-3. Separar arranque de Docker y migración remota; no borrar los volúmenes existentes
-   para sustituirlos por Supabase. Conservar Prisma y un solo historial de migraciones.
-4. Revisar alcance de colaboradores y secretos, sesiones cifradas, almacenamiento
-   de archivos y tareas antes de anunciar qué recursos están realmente compartidos.
-5. Actualizar ESTADO_EQUIPO con commit/configuración disponible y resultado real;
-   entregar acceso privado y procedimiento a Johan/Jasmine. No incluir secretos en ZIP.
-6. Resolver el correo de registro externo con Roberto y recibir los contratos de
-   consentimiento/auditoría de Jasmine; no construir sus módulos como sustitución.
+1. Entregar/revisar el código de identidad y transición para su publicación e
+   integración cuando Roberto lo autorice; no presentar esta rama como main.
+2. Recibir los correos de Johan/Jasmine más adelante, por indicación de Roberto.
+   Revisar el alcance de colaboradores y entregar conexión por medio privado.
+   No compartir claves de cifrado ni datos/respaldos privados en los ZIP.
+3. Resolver el SMTP de registro externo con Roberto y recibir contratos de
+   consentimiento/auditoría de Jasmine; no implementar sus módulos como sustitución.
+4. Mantener registro/aviso de migraciones delegadas, compatibilidad y pruebas.
 
-Esta infraestructura prepara la semana vigente; no inicia CSV, IA o predicción.
+Esta infraestructura completa ese avance de la semana vigente; no inicia CSV,
+IA o predicción ni da por cerrada toda la semana 1.
 
 ## Semana 1 — Base entregada, Supabase Auth y conexión del calendario
 
@@ -291,13 +287,13 @@ Esta infraestructura prepara la semana vigente; no inicia CSV, IA o predicción.
 integración autorizada por Roberto). No repetir infraestructura ni diseño.
 **Entrega actual de identidad:** `identidad-supabase`, commit `8b02d6f`, sin integrar
 en main. El siguiente avance de infraestructura es la transición compartida descrita
-arriba, pendiente de solicitud de implementación; no volver a iniciar el login.
+arriba, implementado en base-compartida-supabase; no volver a iniciar el login.
 
 ### Punto de reanudación
 
 1. Conservar Supabase Auth alojado ya configurado, registro propio y recuperación
-   por enlace. La base de negocio compartida ahora está acordada, pero su traslado
-   no está ejecutado. Seguir la entrega de transición anterior sin recrear Auth.
+   por enlace. La base de negocio ya está trasladada y conectada para Roberto. Seguir
+   OPERACION_SUPABASE para incorporar compañeros sin recrear Auth.
 2. Conservar y verificar el contrato ya implementado de `docs/CONTRATO_IDENTIDAD.md`:
    proveedor Auth, P01, login/logout, sesión/renovación y usuario actual. Credenciales
    en Supabase y tokens cifrados en servidor; adaptar su alcance al compartir la base.
@@ -329,7 +325,7 @@ arriba, pendiente de solicitud de implementación; no volver a iniciar el login.
 - [x] P01 autentica con Supabase real configurado; Roberto completó registro/confirmación/login.
 - [x] Sesión válida/vencida, logout/renovación y protección de escrituras verificados automáticamente.
 - [x] Roles/permisos y cambios de rol/estado verificados en servidor; falta repetir la demostración conjunta tras compartir la base.
-- [ ] Calendario se puede administrar con una sesión real; usuario de otra sección no recibe su contexto.
+- [x] Calendario accesible con la sesión real de administrador tras el traslado; aislamiento por sección verificado en integración automática.
 - [ ] Consentimiento/auditoría quedan conectados con Jasmine y los contratos se entregan a Johan.
 
 Priorizar esta base de acceso antes de CSV, predicción o semanas siguientes. El

@@ -1,187 +1,92 @@
 # CampusITSM
 
-## Coordinación vigente del equipo
+Mesa de ayuda universitaria: React/Vite, NestJS, PostgreSQL/Prisma y Python auxiliar.
+La base de negocio y Auth están en [Supabase CampusITSM](https://supabase.com/dashboard/project/npjibnlxepiwfermtcmo).
+Frontend, backend y Python se ejecutan en la única instalación Docker de cada
+integrante, en [localhost:8080](http://localhost:8080).
 
-Roberto, Johan y Jasmine acordaron usar una misma base de desarrollo en Supabase,
-con la aplicación Docker de cada integrante. Traslado, conexión y colaboradores
-todavía pendientes: las órdenes de arranque de este README describen el código
-actual con PostgreSQL local. No apuntar su migración automática a Supabase.
-Leer [COORDINACION_SUPABASE.md](docs/COORDINACION_SUPABASE.md),
-[ESTADO_EQUIPO.md](docs/ESTADO_EQUIPO.md) y el plan personal antes de empezar.
-Tras habilitar el entorno, cada integrante crea/valida/aplica tablas, columnas e
-índices nuevos de su módulo dentro del plan sin permiso por cada cambio. Migración
-en Git, registro y aviso al equipo; consultar previamente partes comunes, otros
-módulos o incompatibilidades. No borrar datos/tablas existentes ni duplicar login.
-No esperar a fusionar todo el módulo para compartir una migración ordinaria delegada.
+La transición está verificada para Roberto en `base-compartida-supabase`, basada
+en `identidad-supabase`. Ambas entregas siguen sin integrar en main. Accesos de
+Johan/Jasmine pendientes de sus correos y entrega privada de configuración.
+Leer AGENTS, MEMORIA_PROYECTO, plan personal y [estado](docs/ESTADO_EQUIPO.md).
 
-## Identidad y calendario en la rama de trabajo
+## Preparación y arranque
 
-`identidad-supabase` añade acceso real, registro propio, confirmación/recuperación
-por enlace y roles comunes, con los datos de negocio en Docker. Roberto ya probó
-su cuenta confirmada y el acceso como administrador. Configuración del equipo:
-[guía de acceso](docs/AUTH_DESARROLLO.md), [contrato](docs/CONTRATO_IDENTIDAD.md) y
-[entrega](docs/entregas/roberto-semana-01-identidad.md). Esta rama todavía no está
-integrada en main; las indicaciones sin identidad de la entrega anterior se
-conservan debajo como contexto de esa base.
-
-## Base compartida y calendario manual
-
-Roberto autorizó integrar la base visual y calendario mediante PR #2. Obtener
-el main que incluya esa entrega; no empezar desde la vista provisional. Ver contrato en
-`docs/CONTRATO_CALENDARIO.md` y entrega en
-`docs/entregas/roberto-semana-01-calendario.md`.
-
-P17 `/admin/calendario`; P18 `/admin/calendario/nuevo`. La interfaz sigue los
-mockups finales. Las rutas académicas responden 401 y la escritura permanece
-deshabilitada hasta que Roberto integre Supabase Auth y roles/permisos. No usar el login
-provisional para probar privilegios. CSV y factores/SLA no están en esta entrega.
-
-Se usa una sola instalación de trabajo, `campusitsm`, en el puerto 8080. Para
-revisar avances de cualquier módulo, reconstruir esa misma instalación desde
-la rama activa:
+Requiere Docker Desktop con contenedores Linux y Docker Compose v2 reciente
+(con soporte de `!reset` para las configuraciones aisladas de pruebas).
 
 ```powershell
+# Solo la primera vez. Conservar el .env propio en siguientes arranques.
+./scripts/prepare-auth.ps1
+# Completar en privado DATABASE_URL de API, SUPABASE_URL y SUPABASE_PUBLISHABLE_KEY.
 docker compose up --build -d --wait
 ```
 
-Abrir [calendario](http://localhost:8080/admin/calendario). No crear proyectos
-Compose ni puertos adicionales para revisar cada módulo. Las ramas Git conservan
-los cambios separados hasta autorizar su integración en main; revisar una rama
-en Docker no la integra. Se reutilizan los mismos volúmenes y se aplican las
-migraciones versionadas, conservando los datos de trabajo.
+[Guía operativa](docs/OPERACION_SUPABASE.md): conexión, credenciales separadas,
+migraciones, sesiones, pruebas y respaldo. No copiar claves privadas entre equipos.
+No ejecutar seed ni bootstrap-admin en cada clon: institución y administrador ya
+existen en la base común. Abrir [login](http://localhost:8080/login),
+[calendario](http://localhost:8080/admin/calendario),
+[salud](http://localhost:8080/api/v1/health) u [OpenAPI](http://localhost:8080/api/docs).
+Registro propio con confirmación; SMTP para destinatarios externos aún pendiente.
 
-Prueba real PostgreSQL y persistencia aislada:
+| Servicio | Operación normal |
+| --- | --- |
+| web | React/Nginx, único puerto publicado 127.0.0.1:8080 |
+| api | NestJS/Prisma interno; conexión cifrada a Supabase |
+| predictions | Python interno, actualmente solo salud, sin modelo |
+| db | Opcional para pruebas; PostgreSQL local de trabajo detenido, volumen conservado |
+| migrate | Herramienta manual con credencial migradora; nunca se ejecuta al arrancar |
+| seed / bootstrap-admin | Herramientas explícitas de instalación, no de arranque diario |
+
+Cambiar de rama o reconstruir conserva datos. No usar `down -v`. Los datos remotos
+son comunes; archivos/PDF/modelos de volúmenes todavía son locales. Ver un dato
+nuevo requiere actualizar la consulta/pantalla, sin reconstruir Docker. Una tabla
+nueva no crea endpoints o pantallas: quien la consuma actualiza modelo/código.
+
+## Migraciones y coordinación
+
+Un único esquema Prisma e historial en apps/api/prisma. Cada persona desarrolla
+frontend, backend y pruebas de su módulo. Cambios compatibles nuevos de ese módulo
+pueden validarse/aplicarse sin permiso por tabla, registrando y avisando al equipo.
+Consultar antes cambios comunes, de otro módulo o incompatibles. No borrar tablas
+o datos existentes ni modificar migraciones aplicadas. Una rama Git no aísla la base.
+
+Preparar/validar SQL en PostgreSQL descartable. Nunca `migrate dev`, `db push`,
+`reset` ni pruebas destructivas contra Supabase. Paso remoto explícito:
 
 ```powershell
+docker compose --env-file .local/supabase/migrate.env --profile tools build migrate
+docker compose --env-file .local/supabase/migrate.env --profile tools run --rm migrate
+docker compose up --build -d --wait
+```
+
+El archivo privado contiene MIGRATION_DATABASE_URL. La API normal usa otra
+credencial y verifica su historial sin modificarlo. Para pruebas se incorpora
+compose.local.yml, que sobrescribe las URL remotas y activa PostgreSQL local.
+
+```powershell
+./scripts/verify-auth.ps1
 ./scripts/verify-calendar.ps1
+./scripts/verify-base.ps1
 ```
 
-Pruebas de interfaz (requieren la instalación principal funcionando en 8080; las escenas con datos
-usan respuestas de prueba, separadas de las pruebas reales de PostgreSQL):
+Las pruebas se aíslan de la instalación de trabajo y cierran sus contenedores.
+Para recarga durante desarrollo: `docker compose -f compose.yml -f compose.dev.yml up --build`.
+Usa la misma instalación y la misma base compartida; no aplica migraciones.
 
-```powershell
-cd apps/web
-npm ci
-$env:PLAYWRIGHT_BROWSERS_PATH = "$PWD/../../.local/browsers"
-npx playwright install chromium --only-shell
-npm run test:e2e
-```
+## Entregas y contratos
 
-Contrato OpenAPI versionado: `docs/api/openapi.json`. Tras actualizar el backend,
-exportar de `/api/openapi.json` y ejecutar `npm run api:types` en `apps/web`.
-Los tipos de calendario se generan desde ese contrato, no desde modelos Prisma.
+P01 conecta Auth real; P17/P18 consultan y administran calendario con permisos.
+Tickets, constancias y otras vistas provisionales pertenecen a sus responsables.
+CSV/factor/SLA, clasificación IA y pronóstico aún no están implementados.
 
-Los tres planes están actualizados en `planes/`. Roberto hará P01/Supabase Auth y
-autorización; Jasmine administración/consentimiento/auditoría; Johan incidencias
-y evolución de componentes. Consultar `docs/CONTRATO_IDENTIDAD.md` antes de crear
-otro acceso. Los paquetes de documentación se regeneran con
-`python scripts/prepare-plan-packages.py` y quedan en `outputs/planes_para_compartir/`.
+[Coordinación](docs/COORDINACION_SUPABASE.md), [registro BD](docs/REGISTRO_CAMBIOS_BD.md),
+[identidad](docs/CONTRATO_IDENTIDAD.md), [diseño compartido](docs/DISENO_COMPONENTES.md)
+y [entrega de transición](docs/entregas/roberto-semana-01-base-compartida.md).
+Contrato versionado: docs/api/openapi.json. Cambios públicos de API se exportan
+con `npm run api:export` en apps/api; `npm run api:types` en apps/web genera tipos.
+Esta transición no cambió DTO ni rutas públicas.
 
-## Base Docker
-
-Base local de la mesa de ayuda universitaria. Requiere Docker Desktop iniciado
-con contenedores Linux y Docker Compose v2. Cada integrante puede construirla sin
-instalar Node, Python ni PostgreSQL en su computadora.
-
-## Arranque
-
-Desde la raíz del repositorio:
-
-```powershell
-Copy-Item .env.example .env
-docker compose up --build
-```
-
-En Linux/macOS usar `cp .env.example .env`. Copiar solo la primera vez; conservar
-la configuración propia en siguientes arranques. También se aceptan los valores
-locales ficticios predeterminados sin `.env`.
-
-Abrir [aplicación](http://localhost:8080),
-[salud API](http://localhost:8080/api/v1/health),
-[OpenAPI](http://localhost:8080/api/docs) o
-[contrato JSON](http://localhost:8080/api/openapi.json).
-Las vistas recuperadas siguen usando ejemplos; no hay cuentas reales de acceso.
-
-| Servicio | Función | Acceso |
-| --- | --- | --- |
-| web | React construido + Nginx, proxy `/api/` | localhost:8080 |
-| api | Backend NestJS y Prisma | interno, api:3000 |
-| db | PostgreSQL | interno, db:5432 |
-| predictions | Esqueleto Python, solo `/health` | interno, predictions:8000 |
-| migrate | Aplica migraciones y termina con código 0 | previo a abrir API |
-| seed | Semilla explícita idempotente | perfil tools |
-
-DB debe estar saludable, las migraciones deben terminar y Python/API responder
-antes de abrir web. `migrate` terminado con código 0 es normal. Una migración
-fallida impide abrir API. Diagnóstico: `docker compose ps -a` y
-`docker compose logs api migrate predictions`.
-
-## Semilla y persistencia
-
-Con la base arrancada, ejecutar explícitamente:
-
-```powershell
-docker compose --profile tools run --rm seed
-```
-
-Crea una institución ficticia y su equipo. No crea cuentas, claves ni tickets.
-Repetirla no duplica ni actualiza registros existentes. No corre automáticamente.
-
-```powershell
-docker compose down
-docker compose up --build
-```
-
-Estos comandos conservan los volúmenes `postgres_data`, `files_data` y `models_data`.
-`down -v` los borra; no usarlo para reiniciar. Cambiar `.env` después de inicializar
-el volumen no modifica las credenciales ya guardadas por PostgreSQL. Cada clon
-tiene DB y archivos locales propios; no se conecta a la computadora de Roberto.
-
-## Desarrollo dentro de Docker
-
-Detener el modo de entrega y levantar con recarga:
-
-```powershell
-docker compose down
-docker compose -f compose.yml -f compose.dev.yml up --build
-```
-
-Mismo punto de entrada y base local, con Vite y recarga de NestJS. Los fuentes se
-montan desde `apps/`; las dependencias permanecen en las imágenes. Reconstruir al
-cambiar dependencias o esquema. Para volver a entrega, detener con ambos archivos
-y ejecutar el comando habitual.
-
-## Migraciones
-
-Roberto coordina `apps/api/prisma/schema.prisma`. Para preparar una migración nueva
-solo en una base descartable de desarrollo:
-
-```powershell
-docker compose run --rm --user root --volume "${PWD}/apps/api/prisma:/app/prisma" api npx prisma migrate dev --name cambio --create-only
-```
-
-El montaje permite leer el esquema editado y guardar la migración en el repositorio.
-Revisar/versionar el SQL y reconstruir para aplicar con `migrate deploy`.
-`migrate dev` puede solicitar
-reset ante divergencias; no usar con datos que se deban conservar. Nunca editar
-migraciones aplicadas ni generar cambios del esquema en paralelo sin coordinar.
-
-## Comprobaciones
-
-```powershell
-docker compose ps -a
-Invoke-RestMethod http://localhost:8080/api/v1/health
-docker compose exec api npx prisma migrate status
-```
-
-`scripts/verify-base.ps1` comprueba semilla, restricciones, reinicio, persistencia
-y fallos de dependencias sobre un proyecto Compose/volúmenes propios de prueba.
-No modifica los volúmenes habituales. Resultados: `docs/entregas/roberto-semana-01-base.md`.
-
-Solo se publica `127.0.0.1`; acceso desde otros dispositivos y QR por red local
-no se habilitan en esta entrega. Las claves futuras de IA son solo del servidor.
-Ver [contexto](PROYECTO.md), [contratos](docs/CONTRATOS.md),
-[estado](docs/ESTADO_EQUIPO.md) y [plan](planes/PLAN_ROBERTO.md).
-
-Referencias: [arranque en Docker Compose](https://docs.docker.com/compose/how-tos/startup-order/)
-y [migraciones de Prisma 6](https://www.prisma.io/docs/orm/v6/prisma-client/deployment/deploy-migrations-from-a-local-environment).
+Planes en planes/. Regenerar ZIP sin secretos con `python scripts/prepare-plan-packages.py`.
+La integración en main sigue requiriendo autorización de Roberto.

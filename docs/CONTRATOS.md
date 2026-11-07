@@ -1,7 +1,7 @@
 # Contratos compartidos — base v1
 
-Coordinación vigente: base de desarrollo común Supabase acordada, conexión y
-traslado pendientes. Leer [COORDINACION_SUPABASE.md](COORDINACION_SUPABASE.md).
+Coordinación vigente: base de desarrollo común Supabase, traslado y
+conexión de Roberto verificados, accesos de compañeros pendientes. Leer [COORDINACION_SUPABASE.md](COORDINACION_SUPABASE.md).
 El contrato/servicio se coordina con su responsable antes de crear tablas paralelas;
 las creaciones nuevas de cada módulo quedan delegadas sin permiso por tabla,
 con validación, migración en Git, registro en REGISTRO_CAMBIOS_BD y aviso al equipo.
@@ -47,7 +47,7 @@ No hay rutas de pronóstico. Rutas API desconocidas responden 404.
 El esquema académico ya amplía esta base con cursos, secciones, asociaciones,
 eventos y AcademicChange. Identidad añade AppUser, sesiones, flujos y cambios de
 acceso en su rama; tickets siguen pendientes. El UUID canónico ya es el sujeto de
-Supabase. Roberto coordina la transición de estas tablas a la base común sin duplicarlas.
+Supabase. Estas tablas ya están en el esquema común campusitsm; no duplicarlas.
 
 ## Propuestas pendientes de coordinación, no implementadas
 

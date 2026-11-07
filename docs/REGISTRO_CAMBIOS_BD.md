@@ -4,13 +4,20 @@ Registro del equipo, no sustituto del historial de migraciones Prisma ni de la
 auditoría de aplicación. Aplicar el procedimiento de
 [COORDINACION_SUPABASE.md](COORDINACION_SUPABASE.md).
 
-Al 7 de noviembre de 2026 el traslado de negocio y la habilitación compartida
-siguen pendientes. No se registran como remotas aplicadas las migraciones que
-solo se ejecutaron en PostgreSQL local o en pruebas. Consultar destino e historial
-reales antes de aplicar una migración.
+Transición ejecutada por solicitud de Roberto el 7 de noviembre de 2026.
+Destino: CampusITSM / npjibnlxepiwfermtcmo / esquema campusitsm.
+Código de la entrega: `base-compartida-supabase@864413a`; aún sin main.
+Respaldo final privado restaurado; traslado atómico con conteos/SHA256 de las
+12 tablas. Sin sobrescribir auth/storage ni datos remotos preexistentes.
 
 | Fecha | Responsable / módulo | Rama y commit | Archivo de migración | Tablas / índice / contratos afectados | Entorno de destino | Alcance delegado o acuerdo común / ejecutor | Estado y verificación |
 | --- | --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-07 | Roberto / infraestructura común | base-compartida-supabase / 864413a | 20261106000100_installation/migration.sql | Institution/SupportTeam | Supabase CampusITSM / campusitsm | Transición solicitada por Roberto / agente de Roberto | Aplicado y verificado con Prisma; seis migraciones finalizadas, pruebas aisladas y contenido trasladado comprobado |
+| 2026-11-07 | Roberto / infraestructura común | base-compartida-supabase / 864413a | 20261106000200_academic_calendar/migration.sql | Cursos/secciones/asociaciones/eventos y AcademicChange | Supabase CampusITSM / campusitsm | Transición solicitada por Roberto / agente de Roberto | Aplicado y verificado con Prisma; seis migraciones finalizadas, pruebas aisladas y contenido trasladado comprobado |
+| 2026-11-07 | Roberto / infraestructura común | base-compartida-supabase / 864413a | 20261107000100_identity/migration.sql | AppUser/roles/sesiones/throttle y IdentityChange | Supabase CampusITSM / campusitsm | Transición solicitada por Roberto / agente de Roberto | Aplicado y verificado con Prisma; seis migraciones finalizadas, pruebas aisladas y contenido trasladado comprobado |
+| 2026-11-07 | Roberto / infraestructura común | base-compartida-supabase / 864413a | 20261107000200_auth_email_flow/migration.sql | AuthFlow | Supabase CampusITSM / campusitsm | Transición solicitada por Roberto / agente de Roberto | Aplicado y verificado con Prisma; seis migraciones finalizadas, pruebas aisladas y contenido trasladado comprobado |
+| 2026-11-07 | Roberto / infraestructura común | base-compartida-supabase / 864413a | 20261107000300_shared_instances/migration.sql | instanceId e índices de AuthSession/AuthFlow; conserva sesiones antiguas | Supabase CampusITSM / campusitsm | Transición solicitada por Roberto / agente de Roberto | Aplicado y verificado con Prisma; seis migraciones finalizadas, pruebas aisladas y contenido trasladado comprobado |
+| 2026-11-07 | Roberto / infraestructura común | base-compartida-supabase / 864413a | 20261107000400_server_only_access/migration.sql | RLS para las 12 tablas de negocio; política solo para API servidor | Supabase CampusITSM / campusitsm | Transición solicitada por Roberto / agente de Roberto | Aplicado y verificado con Prisma; seis migraciones finalizadas, pruebas aisladas y contenido trasladado comprobado |
 
 Estados: anunciado, validado localmente, acordado cuando afecte partes comunes, aplicado, verificado o requiere
 corrección. Cada entrada debe explicar brevemente la compatibilidad con los otros
@@ -25,3 +32,26 @@ los cambios sobre otros módulos, identidad/permisos comunes o incompatibles.
 No completar una fila como aplicado/verificado por el hecho de aprobar un plan
 o crear un archivo SQL. Si una migración ya se aplicó, conservar su archivo exacto;
 un cambio posterior requiere otra migración y otra entrada.
+
+## Preparación de infraestructura y datos
+
+- Migración de infraestructura MCP `20261107202641_campusitsm_private_schema_roles`:
+  esquema privado y roles campusitsm_api/campusitsm_migrator, sin superusuario,
+  CREATEDB, CREATEROLE o BYPASSRLS. Contraseñas generadas y conservadas solo en
+  configuración privada ignorada. El historial de negocio sigue siendo Prisma.
+- Se negó uso del esquema a anon/authenticated/PUBLIC. La API tiene CRUD,
+  sin CREATE en campusitsm/public ni acceso a auth.users. El migrador posee solo
+  el esquema de negocio; privilegios por defecto para nuevas tablas del servidor.
+- El comando de despliegue revoca INSERT/UPDATE/DELETE de la API sobre
+  _prisma_migrations; conserva SELECT para verificar compatibilidad al arrancar.
+- Transferencia única con destino vacío comprobado, transacción y comparación
+  de las 12 tablas: UUID/rol/fechas/auditoría conservados; sesiones/PKCE existentes
+  vinculados a la instalación poseedora de su clave. No crear perfiles duplicados.
+- La aplicación de Roberto pasó a Supabase; se detuvo PostgreSQL local conservando
+  su volumen. Invitaciones y entrega privada a Johan/Jasmine aplazadas hasta correos.
+
+Cifrado obligatorio activado en Database Settings → Enforce SSL on incoming
+connections; reinicio de Supabase completado. Comprobación desde la conexión real
+de API: rol campusitsm_api, esquema campusitsm, pg_stat_ssl.ssl=true y seis
+migraciones finalizadas. Salud y sesión real recuperadas después del reinicio.
+La URL Prisma exige TLS y verifica el certificado con la CA oficial incluida.

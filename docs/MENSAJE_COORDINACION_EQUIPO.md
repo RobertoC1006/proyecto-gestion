@@ -2,12 +2,14 @@
 
 Johan y Jasmine, actualicé sus planes para que trabajemos sobre una misma base de
 desarrollo en Supabase. Cada uno seguirá haciendo el frontend y backend de sus
-módulos en su Docker, pero, cuando habilitemos la conexión compartida, veremos los
+módulos en su Docker, conectados al mismo Supabase cuando reciban la configuración privada. Veremos los
 mismos usuarios, roles, eventos y datos autorizados.
 
 Les voy a dar acceso como colaboradores, revisando los permisos para CampusITSM.
-El traslado y esas invitaciones todavía están pendientes: les avisaré cuando esté
-lista la conexión y les compartiré la configuración por un medio privado.
+La base ya está trasladada y mi aplicación está conectada. Sus invitaciones quedan
+pendientes hasta tener sus correos; también les entregaré el código autorizado y
+la configuración por un medio privado. Generen su propia clave de cifrado: no copien
+mi .env completo. Leer docs/OPERACION_SUPABASE.md para el arranque actual.
 
 Mantendremos una rama por módulo. Pueden crear las tablas, columnas e índices
 nuevos de su módulo, dentro del plan y sin afectar otros módulos, sin pedirme
