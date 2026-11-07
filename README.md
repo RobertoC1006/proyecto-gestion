@@ -8,9 +8,11 @@ todavía pendientes: las órdenes de arranque de este README describen el códig
 actual con PostgreSQL local. No apuntar su migración automática a Supabase.
 Leer [COORDINACION_SUPABASE.md](docs/COORDINACION_SUPABASE.md),
 [ESTADO_EQUIPO.md](docs/ESTADO_EQUIPO.md) y el plan personal antes de empezar.
-Cambios compartidos: migración en Git, validación, coordinación/autorización concreta
-de Roberto y registro de aplicación/verificación. No esperar a fusionar todo un
-módulo para entregar una dependencia común autorizada; no duplicar tablas o login.
+Tras habilitar el entorno, cada integrante crea/valida/aplica tablas, columnas e
+índices nuevos de su módulo dentro del plan sin permiso por cada cambio. Migración
+en Git, registro y aviso al equipo; consultar previamente partes comunes, otros
+módulos o incompatibilidades. No borrar datos/tablas existentes ni duplicar login.
+No esperar a fusionar todo el módulo para compartir una migración ordinaria delegada.
 
 ## Identidad y calendario en la rama de trabajo
 

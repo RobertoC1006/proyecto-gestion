@@ -90,11 +90,14 @@ colaboradores todavía pendientes: este ZIP no los ejecuta ni acredita habilitac
 El Compose actual sigue siendo local y ejecuta migraciones al arrancar; no apuntarlo
 unilateralmente a Supabase. PostgreSQL local queda para pruebas aisladas.
 
-Una rama Git no aísla la base común. Cada integrante escribe sus migraciones y
-coordina cambios concretos con Roberto. Un cambio común validado/autorizado puede
-aplicarse antes de fusionar el módulo completo; registrar archivo/commit, ejecutor
-y verificación y compartir la dependencia. No duplicar tablas/login ni hacer pruebas
-destructivas en la base común. Configuración privada fuera de Git/ZIP/mensajes.
+Una rama Git no aísla la base común. Tras habilitar el entorno, cada integrante puede
+crear tablas, columnas e índices nuevos de su módulo dentro del plan, compatibles
+y validados, sin permiso por cada cambio. Migración en Git, registro y aviso; consultar
+antes cambios comunes, otros módulos o incompatibilidades. No borrar tablas/datos.
+Puede aplicarse una migración ordinaria delegada antes de fusionar todo el módulo.
+Ver tablas/datos en el panel no requiere reconstruir Docker; solo quien programe
+funciones sobre un modelo nuevo actualiza su aplicación. Configuración privada
+fuera de Git/ZIP/mensajes; pruebas destructivas únicamente en bases aisladas.
 
 MANIFIESTO.json identifica el contenido por SHA-256. El generador toma los archivos
 del directorio de trabajo; el commit de origen por sí solo no acredita que todos

@@ -88,8 +88,9 @@ main todavía. Ver `docs/CONTRATO_IDENTIDAD.md` y `docs/ESTADO_EQUIPO.md`.
 Ver `README.md`. Migraciones con `prisma migrate deploy`; nunca editar una aplicada
 ni usar `db push` como entrega. Esquema de institución/equipo y módulo académico.
 Contratos disponibles y propuestas por coordinar: `docs/CONTRATOS.md`.
-Registrar cambios comunes en `docs/REGISTRO_CAMBIOS_BD.md`. Se pueden aplicar
-migraciones pequeñas autorizadas antes de integrar el módulo completo para
-desbloquear al equipo; conservar archivo/commit exactos y comprobar consumidores.
+Registrar cambios en `docs/REGISTRO_CAMBIOS_BD.md`. Las creaciones nuevas de cada
+módulo, compatibles y validadas, están delegadas sin permiso por tabla tras habilitar
+el entorno; consultar cambios comunes o incompatibles. Pueden aplicarse antes de
+integrar el módulo completo; conservar archivo/commit exactos y avisar al equipo.
 Primera versión local, una institución/equipo; sin publicación pública,
 conexión institucional, correo ni firma digital certificada.

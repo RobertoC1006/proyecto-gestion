@@ -3,8 +3,10 @@
 Coordinación vigente: base de desarrollo común Supabase acordada, conexión y
 traslado pendientes. Leer [COORDINACION_SUPABASE.md](COORDINACION_SUPABASE.md).
 El contrato/servicio se coordina con su responsable antes de crear tablas paralelas;
-los cambios remotos autorizados se anotan en REGISTRO_CAMBIOS_BD y se comparten con
-su archivo/commit, aunque el módulo completo siga en su rama.
+las creaciones nuevas de cada módulo quedan delegadas sin permiso por tabla,
+con validación, migración en Git, registro en REGISTRO_CAMBIOS_BD y aviso al equipo.
+Cambios comunes o incompatibles se acuerdan antes; no borrar tablas/datos existentes.
+No hace falta fusionar todo el módulo antes de aplicar una migración ordinaria delegada.
 
 Actualización de rama del 7 de noviembre: identidad-supabase implementa el acceso,
 registro y recuperación por enlace, sesión opaca y autorización común, con proyecto

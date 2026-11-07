@@ -37,10 +37,17 @@ del equipo Supabase sigue requiriendo un SMTP propio autorizado.
 | Archivos y modelos | Los volúmenes Docker siguen siendo locales; mover PostgreSQL no comparte adjuntos, PDFs ni modelos |
 
 Un evento guardado en la base común se ve al consultar/actualizar la pantalla
-con permisos. No se promete actualización automática en vivo si el módulo no
-la implementa. Una tabla puede verse en el panel, pero para usarla desde Prisma
-los compañeros también deben recibir el cambio de esquema/código y reconstruir
-el cliente generado. GitHub no sincroniza registros entre bases distintas.
+con permisos; no requiere reconstruir Docker. No se promete actualización
+automática en vivo si el módulo no la implementa.
+
+Una tabla o índice creado en Supabase es visible para los colaboradores al
+actualizar el panel, sin actualizar código ni reconstruir sus aplicaciones.
+Crear esa tabla no crea automáticamente rutas del backend ni pantallas. Solo
+quien programe una función que use la tabla nueva necesita recibir/actualizar
+el modelo Prisma y el código, generar el cliente y reconstruir la imagen de su
+aplicación según su modo de desarrollo. Las funciones existentes no necesitan
+reconstruirse por cada tabla nueva ajena. No reinstalar Docker ni borrar volúmenes.
+Todos crean tablas dentro de CampusITSM, no una base/proyecto nuevo por módulo.
 
 Compartir datos no significa que un estudiante pueda ver casos ajenos. Mantener
 institución, titular, equipo y políticas comunes en NestJS. React consume NestJS;
@@ -81,22 +88,34 @@ su orden, relaciones comunes y aplicación a la base compartida. Prisma y
 `apps/api/prisma` siguen siendo la única fuente de esquema/migraciones de negocio;
 no crear una segunda historia de las mismas tablas con Supabase CLI o SQL suelto.
 
+**Autonomía aclarada por Roberto:** una vez habilitado el entorno y sus accesos,
+Johan/Jasmine y sus agentes pueden crear tablas, columnas e índices nuevos de su
+propio módulo, dentro del plan y compatibles con consumidores activos, validarlos
+y aplicarlos sin pedir permiso a Roberto por cada cambio. El encargo del módulo
+es autorización para esos cambios ordinarios. Registrar y avisar es coordinación,
+no una aprobación adicional por tabla. Mantener migraciones en Git y pruebas.
+
+Consultar antes de alterar tablas/contratos de otros módulos, identidad/permisos
+comunes o introducir un cambio que rompa consumidores. No se autoriza borrar
+tablas/datos existentes ni saltarse los límites del plan por tener acceso de
+colaborador. Esta autonomía no inicia por sí sola el traslado o las invitaciones.
+
 1. **Consultar:** antes de crear una tabla/columna/índice, revisar esquema actual,
    migraciones aplicadas, ramas activas y cambios anunciados. Confirmar que no
    existe ya ni está reservada por otro módulo.
-2. **Proponer:** anotar responsable, rama/commit, archivo de migración, tablas
+2. **Anotar el trabajo:** registrar responsable, rama/commit, archivo de migración, tablas
    afectadas, relaciones, consumidores y finalidad en
    [REGISTRO_CAMBIOS_BD.md](REGISTRO_CAMBIOS_BD.md).
 3. **Preparar y validar:** guardar la migración en Git, probarla sobre una base
    aislada y revisar compatibilidad con el código que siguen ejecutando los otros.
    Preferir cambios aditivos compatibles; coordinar renombrados, restricciones
    nuevas y eliminaciones antes de ejecutarlos.
-4. **Coordinar con Roberto:** compartir el cambio concreto y su impacto. Si ya
-   está autorizado en la sesión, proceder dentro de ese alcance sin pedir otra
-   confirmación idéntica. Tener rol Developer/colaborador no equivale a autorizar
-   cualquier cambio remoto. Sin autorización, continuar tareas independientes.
-5. **Aplicar de uno en uno:** Roberto o el integrante expresamente autorizado
-   ejecuta la migración revisada sobre el proyecto/entorno confirmado. Registrar
+4. **Distinguir el alcance:** para cambios ordinarios del módulo delegado,
+   registrar/anunciar el cambio y continuar sin esperar permiso por cada tabla.
+   Si afecta a partes compartidas, otros módulos o compatibilidad, coordinarlo
+   previamente con sus responsables/Roberto. No repetir una aprobación existente.
+5. **Aplicar de uno en uno:** el integrante responsable aplica su migración
+   validada dentro del alcance delegado, sobre el proyecto/entorno confirmado. Registrar
    quién la aplicó, versión exacta y resultado. Una sola aplicación por cambio.
 6. **Verificar y avisar:** comprobar estructura, datos y consumidores; actualizar
    el registro y los contratos/OpenAPI que correspondan. Cada integrante actualiza
@@ -105,8 +124,9 @@ no crear una segunda historia de las mismas tablas con Supabase CLI o SQL suelto
    conservar en Git todas las migraciones remotas ya aplicadas. No editarlas ni
    borrarlas para resolver conflictos; la corrección lleva una migración nueva.
 
-Un cambio común pequeño puede aprobarse, probarse y aplicarse al entorno de
-desarrollo **antes de fusionar el módulo completo** para desbloquear al equipo.
+Un cambio ordinario delegado puede validarse y aplicarse al entorno de desarrollo
+**antes de fusionar el módulo completo**. Un cambio común requiere el acuerdo de
+los responsables antes de aplicarlo para desbloquear al equipo.
 Debe quedar identificado por archivo y commit y compartirse como dependencia;
 no se presenta una rama pendiente como entrega ya integrada en main. Si el cambio
 rompe consumidores activos, se acuerda y prepara primero la actualización conjunta.

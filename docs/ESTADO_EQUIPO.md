@@ -6,6 +6,10 @@ Roberto decidió que los tres backend consulten una misma base de desarrollo en
 Supabase y que Johan/Jasmine participen como colaboradores. Cada integrante
 mantiene frontend/backend/Python en su Docker; las ramas siguen separando el código.
 Los datos y cambios de estructura remotos serán comunes después de habilitarlo.
+Aclaración de autonomía: tras habilitar el entorno, cada integrante puede crear
+tablas, columnas e índices nuevos de su módulo dentro del plan, compatibles y
+validados, sin permiso por cada cambio. Registrar/avisar; consultar antes partes
+comunes, otros módulos o incompatibilidades. No borrar tablas/datos existentes.
 Guía obligatoria: [COORDINACION_SUPABASE.md](COORDINACION_SUPABASE.md).
 Cambios de esquema: [REGISTRO_CAMBIOS_BD.md](REGISTRO_CAMBIOS_BD.md).
 
@@ -13,7 +17,8 @@ Estado técnico: el Compose actual sigue apuntando a PostgreSQL local con migrac
 automática al arrancar. No se trasladó negocio, adaptó esa conexión ni invitó a
 colaboradores en esta actualización documental. Roberto debe preparar/verificar
 esa entrega antes de que los compañeros apunten al destino remoto. No borrar
-volúmenes ni interpretar esta guía como habilitación o autorización de migraciones.
+volúmenes ni interpretar esta guía como conexión compartida ya habilitada. La
+autonomía delegada se ejerce cuando esa transición y los accesos estén disponibles.
 La edición actual solo cambia planes/contexto y regenera sus paquetes.
 
 ## Avance de identidad en rama, todavía sin integrar

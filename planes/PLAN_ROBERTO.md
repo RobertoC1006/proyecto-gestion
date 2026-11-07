@@ -131,7 +131,7 @@ Contratos mínimos que deben acordarse antes de implementar sus consumidores:
 
 Los nombres concretos de rutas y DTO se fijan en `docs/CONTRATOS.md` antes de desarrollar pantallas consumidoras. Identificar estados, campos obligatorios, permisos, paginación, errores y ejemplos. Compartir tipos desde OpenAPI, no copiar modelos Prisma al navegador. No tratar un contrato propuesto en otra rama como si ya estuviera integrado.
 
-Cada integrante escribe las migraciones de su módulo en el único esquema Prisma. Roberto coordina archivos globales, identidad, relaciones comunes y el orden de aplicación; Johan conserva componentes/incidencias y Jasmine administración/consentimiento/auditoría. Revisar esquema, ramas y cambios anunciados antes de duplicar una tabla o servicio. Una migración pequeña puede aplicarse al desarrollo compartido antes de fusionar el módulo completo, con archivo/commit, validación y autorización concreta de Roberto ya registradas. Roberto o el integrante autorizado la aplica una sola vez y avisa al equipo; una aprobación existente no se pide de nuevo. Conservar en Git el historial exacto, actualizar contratos y no editar migraciones ya aplicadas. Ver COORDINACION_SUPABASE y REGISTRO_CAMBIOS_BD.
+Cada integrante escribe y valida las migraciones de su módulo en el único esquema Prisma. Una vez habilitados Supabase compartido y sus accesos, puede crear tablas, columnas e índices nuevos de su módulo, compatibles y dentro del plan, sin pedir permiso por cada cambio. Revisar primero lo existente y las ramas, guardar archivo/commit en Git, validar y registrar/avisar qué se aplicó. Solo quien vaya a programar funciones sobre una tabla nueva necesita actualizar su modelo/código y reconstruir la aplicación si corresponde; ver la tabla en el panel o consultar nuevos registros no requiere reconstruir Docker. Consultar previamente cambios en otros módulos, identidad/permisos comunes o incompatibles. No borrar tablas/datos existentes. Puede aplicarse una migración ordinaria delegada antes de fusionar todo el módulo; main sigue bajo revisión de Roberto. Conservar el historial exacto de migraciones y compartir dependencias. Ver COORDINACION_SUPABASE y REGISTRO_CAMBIOS_BD.
 
 ### Revisión de ramas antes de trabajar
 
@@ -415,7 +415,7 @@ Ramas de compañeros revisadas y dependencias detectadas:
 Pantallas y acciones funcionales:
 Contratos/esquema modificados y coordinación realizada:
 Base de destino y estado de habilitación compartida:
-Migraciones propuestas/aplicadas, commit, autorización, ejecutor y verificación:
+Migraciones anunciadas/aplicadas, commit, alcance delegado o acuerdo común, ejecutor y verificación:
 Cambios/dependencias comunicados a los otros módulos:
 Pruebas ejecutadas y resultado:
 Capturas comparadas con cada mockup:

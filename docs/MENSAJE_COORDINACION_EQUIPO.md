@@ -9,11 +9,16 @@ Les voy a dar acceso como colaboradores, revisando los permisos para CampusITSM.
 El traslado y esas invitaciones todavía están pendientes: les avisaré cuando esté
 lista la conexión y les compartiré la configuración por un medio privado.
 
-Mantendremos una rama por módulo. Antes de crear o modificar tablas, columnas,
-relaciones o índices, coordinemos el cambio para no duplicar trabajo ni afectar
-lo que usa otro. Guarden sus migraciones en Git y valídenlas primero en una base de
-prueba. Los cambios aprobados podrán aplicarse a la base compartida sin esperar a
-terminar todo el módulo, dejando registrado qué se aplicó y quién lo hizo.
+Mantendremos una rama por módulo. Pueden crear las tablas, columnas e índices
+nuevos de su módulo, dentro del plan y sin afectar otros módulos, sin pedirme
+permiso por cada cambio. Revisen lo que ya existe, guarden las migraciones en Git,
+valídenlas y registren/avisen qué aplicaron. No necesitan esperar a terminar todo
+el módulo para compartirlo. Si van a modificar partes comunes o de otro módulo,
+o romper algo que ya funciona, coordinémoslo antes. No borren tablas ni datos existentes.
+
+Una tabla nueva se verá directamente en el panel de Supabase. Solo quien programe
+funciones para usarla necesitará actualizar su código y reconstruir la aplicación
+si corresponde; los cambios de datos no requieren reconstruir Docker.
 
 Pasen a sus agentes el ZIP actualizado de su plan. Deben leer AGENTS.md, su plan,
 docs/COORDINACION_SUPABASE.md, docs/ESTADO_EQUIPO.md y los contratos antes de empezar.
