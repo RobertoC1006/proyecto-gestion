@@ -1,13 +1,38 @@
 ---
 responsable: Jasmine
 revision: 2026-11-06
-estado: plan_de_implementacion_no_ejecutado
-pantallas_asignadas: [P01, P09, P10, P11, P12, P15, P20, P21, P22, P23]
+estado: plan_sincronizado_con_base_compartida_identidad_pendiente
+pantallas_asignadas: [P09, P10, P11, P12, P15, P20, P21, P22, P23]
 ---
 
 # Plan de implementación de CampusITSM para Jasmine
 
-Este plan está dirigido exclusivamente a Jasmine y su agente. Eres responsable del frontend y backend de acceso, usuarios, permisos, constancias, privacidad, auditoría y reportes. Ejecuta únicamente la semana que Jasmine indique, con revisión antes de la siguiente.
+Este plan está dirigido exclusivamente a Jasmine y su agente. Eres responsable del frontend y backend de administración de usuarios/permisos, consentimiento, constancias, privacidad, auditoría y reportes. Roberto asume P01, Supabase Auth y la autorización común. Ejecuta únicamente la semana que Jasmine indique.
+
+## Estado vigente y punto de partida — 6 de noviembre de 2026
+
+Esta revisión incorpora el avance real de Roberto y sustituye el estado inicial
+del plan. Roberto autorizó integrar la entrega de calendario/diseño en main mediante
+la [PR #2](https://github.com/RobertoC1006/proyecto-gestion/pull/2).
+Antes de comenzar, confirmar que está integrada y que `origin/main` contiene
+`047d1a2e0fd4f71bb189ff301cacb6e1f21019cf` o un descendiente; no consumir una propuesta como entrega publicada.
+
+| Área | Estado real y referencia |
+| --- | --- |
+| Base Docker | Publicada en main, `196a2144aae253ca672eeeaf721c62204516245a`, PR #1. Web, NestJS, PostgreSQL/Prisma, Python interno, migraciones, salud y volúmenes probados |
+| Frontend y diseño | `apps/web`, componentes reales de casos-gestion adaptados; DM Sans/Manrope y Phosphor. Código visual `047d1a2e0fd4f71bb189ff301cacb6e1f21019cf` y guía `docs/DISENO_COMPONENTES.md` |
+| Calendario manual de Roberto | Cursos/secciones/asociaciones y CRUD de eventos en `apps/api`; P17/P18, contratos, pruebas PostgreSQL y capturas. Forma parte de la entrega PR #2 |
+| Acceso real | Todavía no implementado. Las API académicas deniegan acceso sin identidad; pruebas con adaptadores/fixtures no acreditan login real |
+| Próxima base de identidad | Roberto implementará Supabase Auth, P01 y roles/permisos comunes en `identidad-supabase`. Ver `docs/CONTRATO_IDENTIDAD.md` |
+| Incidencias y administración | Los módulos propios de Johan/Jasmine siguen pendientes; revisar ramas actuales antes de empezar |
+| Semanas posteriores | CSV, factores/SLA, IA clasificadora, predicción y notificaciones siguen pendientes. No elegir proveedor de IA ni desarrollar otras semanas por esta actualización |
+
+**No recrear Docker, backend, catálogos académicos ni la base visual.** La base y
+archivos de cada compañero son locales; no se conectan a la computadora de Roberto.
+En cada sesión revisar `AGENTS.md`, este plan, `PROYECTO.md`, `docs/ESTADO_EQUIPO.md`,
+`docs/CONTRATOS.md`, `docs/DISENO_COMPONENTES.md`, `docs/CONTRATO_IDENTIDAD.md`
+y, al consumir calendario, `docs/CONTRATO_CALENDARIO.md`.
+La fotografía histórica de MEMORIA_PROYECTO.md no reemplaza el código/estado vigente.
 
 ## Contexto completo y alcance acordado
 
@@ -19,9 +44,9 @@ CampusITSM es una mesa de ayuda para la Universidad Privada Tallán, institució
 
 El equipo es Roberto, Johan y Jasmine. Cada integrante hace frontend, backend y pruebas de sus módulos. Roberto coordina integración. Hay cuatro semanas relativas al inicio efectivo, sin fechas de calendario fijadas, con 11–20 horas semanales por persona. La cuarta semana se reserva principalmente para integración, pruebas y correcciones.
 
-Este archivo es autocontenido: no requiere otra conversación ni otro plan individual. Los [casos de uso y catálogo](../diseno/campusitsm/CASOS_DE_USO_Y_PANTALLAS.md) son material complementario; las instrucciones actuales acordadas aquí actualizan las decisiones abiertas de ese catálogo.
+Este plan y su paquete incluyen el contexto necesario para comenzar sin otra conversación; los documentos compartidos y el código vigente se revisan en cada sesión. Los [casos de uso y catálogo](../diseno/campusitsm/CASOS_DE_USO_Y_PANTALLAS.md) son material complementario; las instrucciones actuales acordadas aquí actualizan las decisiones abiertas de ese catálogo.
 
-**Primera versión:** aplicación local completa en Docker, una institución y un equipo de soporte, cuentas propias, calendario manual/CSV, PDF verificable y notificaciones dentro de la aplicación. No se incluye todavía inicio de sesión institucional externo, integración académica real, correo, firma digital certificada, reapertura/cierre adicional, multiinstitución ni publicación en servidores. Esas ampliaciones no deben bloquear la entrega local.
+**Primera versión:** aplicación de negocio en Docker para una institución/equipo, acceso con Supabase Auth, calendario manual/CSV, PDF verificable y notificaciones internas. Roberto fijará la modalidad de Auth antes de implementarla; no se ha aprobado migrar la base de negocio a Supabase. No se incluye todavía inicio de sesión institucional externo, integración académica real, correo, firma digital certificada, reapertura/cierre adicional, multiinstitución ni publicación en servidores. Esas ampliaciones no deben bloquear la entrega local.
 
 La clasificación por IA y el pronóstico son componentes distintos. El proveedor con opción gratuita de clasificación se elegirá con Roberto cuando llegue ese módulo; no asumir que un proveedor sigue siendo gratuito ni contratarlo unilateralmente. El pronóstico se ejecutará localmente en Python.
 
@@ -30,8 +55,9 @@ La clasificación por IA y el pronóstico son componentes distintos. El proveedo
 | Capa | Decisión |
 | --- | --- |
 | Frontend | React + Vite + TypeScript; React Router para navegación; TanStack Query para datos del servidor |
-| Diseño | Componentes reutilizables, CSS con tokens comunes, Lucide para iconos y Recharts para gráficos |
+| Diseño | Base visual compartida de casos-gestion; DM Sans/Manrope, Phosphor y CSS con tokens; Recharts al implementar gráficos |
 | Backend | Una API NestJS modular en TypeScript, prefijo `/api/v1`, contratos OpenAPI |
+| Identidad | Supabase Auth y autorización común de NestJS, a cargo de Roberto; integración pendiente |
 | Persistencia | Una base PostgreSQL por instalación, Prisma y migraciones versionadas |
 | Predicciones | Python con pandas y statsmodels, expuesto solo al backend mediante servicio interno |
 | Tareas | pg-boss sobre PostgreSQL; tareas persistentes sin añadir Redis en esta versión |
@@ -41,18 +67,23 @@ La clasificación por IA y el pronóstico son componentes distintos. El proveedo
 
 La infraestructura compartida debe fijar versiones compatibles y archivos de bloqueo, configuración de ejemplo sin secretos, salud y volúmenes para datos, archivos y modelos. Las claves solo se configuran en el servidor. No conectar React directamente a PostgreSQL o Python.
 
-### Estado inicial verificado el 6 de noviembre de 2026
+### Base recibida y organización actual
 
 Repositorio: `https://github.com/RobertoC1006/proyecto-gestion.git`.
+Obtener main después de la integración de la PR #2 y registrar su commit exacto.
+La base Docker anterior es `196a2144aae253ca672eeeaf721c62204516245a` y la base visual es `047d1a2e0fd4f71bb189ff301cacb6e1f21019cf`.
 
-- `main` local y en GitHub: `1501f5aaec13a77f3ebb79da52bf50d66e4e6678`; contiene únicamente README.
-- `front-vistas` en GitHub y referencia `origin/front-vistas`: `a4896261f92507155f5f153f7476fd29d99d631b`.
-- El frontend existe en `front-vistas`: React/Vite/TypeScript, componentes, cuatro tickets ficticios y vistas mayormente estáticas.
-- El documento `PROYECTO.md` está en esa rama; todavía menciona Next.js, seis integrantes y decisiones anteriores. Roberto debe actualizarlo a lo acordado aquí.
-- Los diseños y estos planes se preparan en carpetas locales que inicialmente no están publicadas. Su existencia en la computadora de Roberto no demuestra que los compañeros los tengan.
-- Todavía no hay backend NestJS, Docker, PostgreSQL conectado ni IA real en el código revisado.
+- `apps/web`: React/Vite/TypeScript, React Router, TanStack Query y componentes compartidos.
+- `apps/api`: una API modular NestJS con Prisma, OpenAPI y módulo académico.
+- `apps/api/prisma`: esquema y migraciones únicos, coordinados por Roberto.
+- `services/predictions`: solo salud/esqueleto interno; no hay pronóstico real.
+- `diseno/campusitsm`, `planes` y `docs`: referencias y entregas ya publicadas.
+- `front-vistas` quedó preservada en la historia; no es una nueva base que integrar.
 
-Esta es una fotografía de origen, no una condición permanente. El agente debe comprobar la situación real antes de cada avance; no sobrescribir trabajo posterior para volver a estos commits.
+Las rutas efectivas se comprueban en OpenAPI. La mayoría de contratos de tickets,
+identidad y constancias todavía son propuestas. El calendario ya implementa
+`/academic/me/events` y consultas internas; `/academic/context` no está implementada,
+y el cálculo del factor corresponde a semana 2. No duplicar ese servicio.
 
 ## Trabajo coordinado sin duplicación
 
@@ -60,23 +91,24 @@ Esta es una fotografía de origen, no una condición permanente. El agente debe 
 
 | Responsable | Propiedad principal | Pantallas propias |
 | --- | --- | --- |
-| Roberto | Docker, esquema/migraciones, contratos comunes, calendario/configuración, predicción y notificaciones | P13, P14, P16, P17, P18, P19, P24 |
+| Roberto | Base Docker/esquema/contratos; P01, Supabase Auth y autorización común; calendario/configuración, predicción y notificaciones | P01, P13, P14, P16, P17, P18, P19, P24 |
 | Johan | Componentes visuales compartidos, tickets, prioridad, seguimiento, atención y clasificación | P02, P03, P04, P05, P06, P07, P08 |
-| Jasmine | Identidad, permisos, consentimiento, constancias, privacidad, auditoría y reportes | P01, P09, P10, P11, P12, P15, P20, P21, P22, P23 |
+| Jasmine | Administración de usuarios/permisos sobre la identidad común de Roberto; consentimiento, constancias, privacidad, auditoría y reportes | P09, P10, P11, P12, P15, P20, P21, P22, P23 |
 
-Reutilizar primero `AppHeader`, `Sidebar`, `PriorityBadge` y las vistas existentes; mejorarlos de manera coordinada. Crear una sola familia compartida de formularios, botones, tablas, tarjetas, filtros, diálogos y estados. No duplicar módulos para poder avanzar.
+La base visual compartida ya existe: reutilizar `ui.tsx`, `AppHeader`, `Sidebar`, `Dialog` y `PriorityBadge`. Johan coordina su evolución, no debe rehacerla. Ampliar los componentes comunes de forma acordada, sin duplicar controles ni módulos.
 
 Las reglas viven en servicios NestJS, no en componentes React. Las vistas solicitan acciones y muestran resultados. Python recibe datos analíticos y no replica la prioridad de los tickets.
 
 ### Contratos y archivos compartidos
 
-Roberto publicará `PROYECTO.md` actualizado, `docs/CONTRATOS.md` y `docs/ESTADO_EQUIPO.md` al entregar la base. Son archivos a crear, no prerrequisitos ya existentes. El último registra base utilizable, commit, ramas/responsables y dependencias pendientes.
+Ya existen `PROYECTO.md`, `docs/CONTRATOS.md`, `docs/ESTADO_EQUIPO.md`, `docs/DISENO_COMPONENTES.md`, `docs/CONTRATO_CALENDARIO.md` y `docs/CONTRATO_IDENTIDAD.md`. Consultarlos antes de modificar consumidores. El estado del equipo identifica entregas reales, contratos propuestos y dependencias pendientes.
 
 Contratos mínimos que deben acordarse antes de implementar sus consumidores:
 
 | Dominio | Responsable | Capacidades públicas/internas que debe proporcionar |
 | --- | --- | --- |
-| Identidad | Jasmine | Login/logout, usuario actual, rol, permisos, equipo, consentimiento y autorización por objeto |
+| Identidad/autorización | Roberto | Supabase Auth, login/logout, sesión, usuario actual, rol, permisos, institución/equipo y autorización por objeto |
+| Administración y consentimiento | Jasmine | P20/P21, perfiles/estado/equipo, consentimientos y auditoría usando la identidad y políticas de Roberto |
 | Contexto académico | Roberto | Cursos/secciones y asociaciones; eventos aplicables al usuario/curso/fecha; factor y motivo; configuración versionada de SLA |
 | Tickets | Johan | Crear/listar/consultar con permisos, adjuntos, asignación, clasificación/ajuste, historial, plazos, resolución y confirmación de falla |
 | Constancias | Jasmine | Elegibilidad, emisión idempotente, PDF privado, consulta pública mínima y comprobación de archivo |
@@ -87,7 +119,7 @@ Contratos mínimos que deben acordarse antes de implementar sus consumidores:
 
 Los nombres concretos de rutas y DTO se fijan en `docs/CONTRATOS.md` antes de desarrollar pantallas consumidoras. Identificar estados, campos obligatorios, permisos, paginación, errores y ejemplos. Compartir tipos desde OpenAPI, no copiar modelos Prisma al navegador. No tratar un contrato propuesto en otra rama como si ya estuviera integrado.
 
-Roberto administra archivos globales y migraciones; Johan, componentes y navegación compartidos; Jasmine, identidad y auditoría. Solicitar cambios a su responsable y obtener la actualización acordada antes de introducir otra implementación. Las migraciones pendientes se revisan secuencialmente sobre `main`; nunca editar una migración ya aplicada para resolver un conflicto.
+Roberto administra archivos globales, migraciones, Supabase Auth y autorización común; Johan, la evolución de componentes/navegación; Jasmine, administración, consentimiento y auditoría. Solicitar cambios a su responsable y obtener la actualización acordada antes de introducir otra implementación. Las migraciones pendientes se revisan secuencialmente sobre `main`; nunca editar una migración ya aplicada para resolver un conflicto.
 
 ### Revisión de ramas antes de trabajar
 
@@ -114,7 +146,7 @@ La limpieza se hace por módulo, no por calendario. Si un módulo sigue abierto,
 
 - Roles: `estudiante`, `docente`, `ti_agente`, `ti_supervisor`, `administrador`. El servidor determina el rol; no se eligen privilegios desde el encabezado.
 - Estudiante/docente ven sus casos; agente, tickets del equipo autorizado; supervisor, operación/analítica autorizada; administrador, configuración/gobierno. Público solo consulta mínima de constancias. Comprobar siempre permisos en la API y en descargas.
-- Sesiones en PostgreSQL, contraseñas protegidas, cookies HttpOnly y protección de operaciones de escritura. No guardar credenciales ni datos de negocio en localStorage.
+- Supabase Auth gestionará credenciales. Roberto define una única sesión/autorización de servidor, conservando cookies HttpOnly y protección de escrituras; no duplicar contraseñas. No guardar tokens, credenciales ni datos de negocio en localStorage. Ver el diseño de integración pendiente en `docs/CONTRATO_IDENTIDAD.md`.
 - Fechas guardadas en UTC, mostradas en `America/Lima`. SLA inicial continuo, sin descontar noches o feriados.
 - Estados iniciales: `registrado`, `clasificado`, `en_atencion`, `resuelto`. Mantener estado de clasificación independiente si falta revisión. Confirmación de falla es un dato separado.
 - Urgencia e impacto de 1 a 3. Factor: regular: 1; entrega con vencimiento futuro menor a 48 h: 1,5; matrícula en curso: 1,7; examen en curso o menor a 24 h: 2. Usar el máximo aplicable a ese usuario/curso.
@@ -132,19 +164,38 @@ La marca de la interfaz es CampusITSM, Universidad Privada Tallán. No confundir
 
 ## Fidelidad visual y reutilización
 
-Las imágenes finales son la referencia de implementación, no inspiración para otro diseño. Examinar el cuadrante correspondiente sin los rótulos externos de la lámina. Implementar controles, datos, navegación y gráficos reales.
+La estructura, campos y acciones se toman del cuadrante asignado en los mockups
+finales. El acabado vigente usa la base visual que Roberto ya adaptó de
+`RobertoC1006/casos-gestion`, no la vista provisional de front-vistas.
+Esta decisión actualiza la indicación anterior de Lucide/estilos a reproducir
+desde cero. Leer `docs/DISENO_COMPONENTES.md` antes de implementar una pantalla.
 
-Conservar menú, cabecera, jerarquía, proporciones, verde/menta, superficies claras, bordes, sombras y estilo de iconos. Cambiar solamente ejemplos, textos ilustrativos y errores tipográficos cuando lo exija el funcionamiento. No copiar un QR ilustrativo o un gráfico como imagen: generar su contenido real.
+- Reutilizar `apps/web/src/components/ui.tsx`: Button/ButtonLink, Card/CardHeading,
+  Field/Select, Notice, PageHeading, Modal, Breadcrumbs y estados compartidos.
+- Mantener DM Sans/Manrope, Phosphor, tokens y estilos de `apps/web/src/app/globals.css`.
+  Usar el Sidebar/AppHeader/layout existentes, sin otro menú ni otra cabecera.
+- `Dialog` delega en el Modal común. No crear otro diálogo o catálogo de controles.
+- Las vistas antiguas están aisladas bajo `.legacy-view`; al registrar rutas nuevas,
+  coordinar el layout para que reciban los componentes vigentes, sin estilos de
+  compatibilidad provisionales ni una nueva familia de controles.
+- Ampliar componentes compartidos solo donde falte una capacidad real, revisar su
+  efecto en calendario/acceso y documentar la entrega para los otros módulos.
+- No importar localStorage, datos, cuentas, flujos ni reglas de Soluciona TI:
+  únicamente se reutilizó su base visual para CampusITSM.
 
-Usar un viewport de escritorio de 1440 × 900 para las capturas de revisión; comparar cada pantalla con su cuadrante escalado. Comprobar también 390 × 844 para móvil: adaptación accesible del mismo diseño, sin inventar otro sistema visual. El agente debe abrir las capturas y revisar distribución, solapamientos, textos y controles; no basta una compilación correcta.
+Conservar distribución, jerarquía, verde/menta, superficies y contenido de los
+mockups, sustituyendo datos ilustrativos por datos reales. Un gráfico o QR debe
+generarse desde su función, no copiarse como imagen. No inventar métricas.
 
-Cada cierre semanal debe adjuntar captura implementada, imagen de referencia y diferencias pendientes. Ninguna imagen de ejemplo prueba que la funcionalidad esté implementada.
+Revisar capturas con viewport 1440 × 900 y adaptación 390 × 844; abrirlas y comparar
+legibilidad, distribución, solapamientos, foco y estados. Las capturas con fixtures
+deben identificarse como prueba visual y no demuestran un recorrido autenticado.
+Cada entrega registra diferencias funcionales/visuales pendientes.
 
 ## Pantallas propias y mockups exactos
 
 | Pantalla | Resultado a implementar | Referencia y posición |
 | --- | --- | --- |
-| P01 Acceso institucional local | Login de cuentas propias y consentimiento; no selección libre de privilegios | Lámina 1, arriba izquierda |
 | P09 Mis constancias | Disponibles, emitidas, elegibilidad y solicitud | Lámina 3, arriba izquierda |
 | P10 PDF de constancia | Vista, descarga y datos de emisión reales | Lámina 3, arriba derecha |
 | P11 Verificación válida | Página pública mínima con datos enmascarados | Lámina 3, abajo izquierda |
@@ -155,11 +206,12 @@ Cada cierre semanal debe adjuntar captura implementada, imagen de referencia y d
 | P22 Consentimientos y datos analíticos | Versiones/aceptaciones y preparación de conjunto sin identificadores directos | Lámina 6, arriba derecha |
 | P23 Auditoría | Filtros, detalle antes/después y exportación de registros de solo lectura | Lámina 6, abajo izquierda |
 
-### Lámina 1 — P01
+### Acceso P01 — referencia de Roberto
 
-Archivo final: `01_cu01_ingreso_reporte_v2.png`. P02–P04 son de Johan.
-
-![Mockups de ingreso: Jasmine implementa únicamente P01](../diseno/campusitsm/01_cu01_ingreso_reporte_v2.png)
+P01 pasó a Roberto con Supabase Auth y no es una pantalla propia de Jasmine.
+Tu P20/P21 consume su usuario actual y su autorización. La lámina 1 queda en
+`diseno/campusitsm/01_cu01_ingreso_reporte_v2.png` como referencia compartida,
+sin implementar otro login o selector de privilegios.
 
 ### Lámina 3 — P09 a P12
 
@@ -185,52 +237,70 @@ Archivo final: `06_cu03_permisos_privacidad_auditoria_v2.png`. P24 es de Roberto
 
 ![Mockups de permisos y auditoría: Jasmine implementa P21, P22 y P23](../diseno/campusitsm/06_cu03_permisos_privacidad_auditoria_v2.png)
 
-## Antes de comenzar — Verificar Docker y contratos publicados
+## Antes de comenzar — Obtener Docker, diseño y contratos vigentes
 
-Roberto prepara y publica primero la base compartida en `main`. No generar otro backend o Docker propio incompatible.
+La base Docker de Roberto ya está publicada. La entrega de componentes/calendario
+se libera por PR #2; comprobar su integración en main antes de consumirla.
 
-1. Revisar cambios locales, referencias remotas, ramas activas y contexto vigente.
-2. Obtener el commit de base publicado por Roberto, configuración de ejemplo y documentación.
-3. Crear configuración local sin credenciales reales compartidas; construir los mismos servicios en tu Docker con `docker compose up --build`.
-4. Verificar salud, migraciones y persistencia tras reinicio. La base y volúmenes son tuyos, no una conexión a la computadora de Roberto.
-5. Coordinar modelo de usuarios, sesiones, consentimiento y auditoría antes de añadir endpoints consumidores.
-6. Publicar pronto los contratos de identidad y autorización para que Johan y Roberto puedan conectar sus módulos.
+1. Revisar Git conservando trabajo propio y obtener el commit vigente de main.
+2. Construir los mismos contenedores/volúmenes locales con README; no preparar otra API/DB.
+3. Leer `docs/DISENO_COMPONENTES.md`, `docs/CONTRATO_IDENTIDAD.md` y
+   `docs/CONTRATO_CALENDARIO.md`. Los componentes ya existen: no esperar otro diseño.
+4. Coordinar con Roberto los perfiles/equipo y la relación con la identidad Supabase
+   antes de añadir migraciones. P01 y las guardias comunes pertenecen a Roberto.
+5. Preparar consentimiento/auditoría y administración como dominios propios; si
+   falta acceso real, mantener endpoints cerrados y usar fixtures solo en pruebas.
+6. Entregar a Roberto el contrato de auditoría para integrar AcademicChange.
 
-Si falta la base o un contrato, revisar diseños y preparar pruebas/propuestas de esa semana. No habilitar rutas públicas, un selector de administrador o datos ficticios ocultos para presentar como terminada una conexión pendiente.
+Tu siguiente base funcional depende de la identidad de Roberto, no de crear otra
+sesión local ni otra tabla de contraseñas. El paquete del plan no contiene claves.
 
-## Semana 1 — Identidad, consentimiento y usuarios básicos
+## Semana 1 — Administración de usuarios, consentimiento y auditoría inicial
 
-**Rama:** `accesos-usuarios`.
+**Rama:** `administracion-usuarios`, desde main con la base compartida.
+La rama antigua prevista `accesos-usuarios` se sustituye por este alcance; no hay
+trabajo remoto de Jasmine que borrar o renombrar sin revisar su estado real.
 
 ### Backend y servicios compartidos
 
-- Implementar cuentas administradas, hash de contraseñas, sesiones persistentes y cierre de sesión.
-- Cookies HttpOnly, protección de escritura y controles de intentos de acceso. En el entorno local HTTP documentar su configuración; no prometer cifrado de producción.
-- Obtener titular y permisos del servidor, no de valores editables en el navegador.
-- Crear contratos de usuario actual y autorización por objeto que consuman compañeros.
-- Administrar los cinco roles definidos y asociar agentes a equipo. Impedir eliminar/desactivar al último administrador.
-- Registrar consentimiento explícito con versión y fecha. Una casilla no marcada no debe producir aceptación.
-- Implementar servicio de auditoría inicial con actor, instante, acción, objeto y cambios permitidos, sin claves o archivos privados.
-- Coordinar con Roberto migraciones y privilegios para proteger los registros de auditoría; la cuenta de aplicación no tendrá una ruta de modificación/borrado de esos registros.
+- Recibir de Roberto sesión validada, usuario actual, directorio canónico, roles,
+  permisos y autorización por objeto. No implementar P01, passwords, login/logout,
+  renovación o verificación Supabase en un servicio paralelo.
+- Implementar administración de perfiles, estado y equipo desde NestJS, autorizada
+  por las políticas comunes. Las operaciones sensibles de cuenta/rol se delegan al
+  servicio central de Roberto, incluida la protección del último administrador.
+- Definir el consentimiento explícito con versión y fecha, ligado al usuario
+  canónico. Una casilla no marcada no debe producir aceptación.
+- Crear la auditoría inicial con actor validado, acción, objeto y cambios permitidos,
+  evitando claves, tokens, passwords y archivos privados completos.
+- Acordar transacciones/entrega persistente con Roberto e integrar AcademicChange;
+  no crear un segundo historial académico ni perder sus cambios ya registrados.
+- Coordinar esquema/migraciones y privilegios. No exponer edición/borrado de auditoría.
 
 ### Pantallas
 
-Completar P01 y P20 básico con componentes de Johan. El encabezado muestra el rol asignado, no concede privilegios al cambiar una opción visual. Administrar usuarios no equivale a crear una cuenta con rol arbitrario desde el login público.
+Completar P20 básico con la base visual ya publicada. P01 pertenece a Roberto.
+P21 se completa en semana 3 mostrando permisos efectivos del servicio común,
+sin otro catálogo o motor de permisos independiente.
+Registrar rutas nuevas sin estilos provisionales `.legacy-view` y reutilizar los
+componentes que ya usan P17/P18. La cabecera muestra el rol validado por el servidor.
 
 ### Aceptación
 
-- [ ] Login/logout y sesión vencida funcionan; credenciales inválidas no revelan existencia de cuentas.
-- [ ] Consentimiento conserva versión/instante y se puede consultar por el usuario autorizado.
-- [ ] Estudiante no consulta tickets/adjuntos ajenos y no usa endpoints de administrador.
-- [ ] Cambios de rol/estado quedan registrados y no dejan al sistema sin administrador.
-- [ ] Johan/Roberto tienen contratos utilizables e integrados.
-- [ ] P01/P20 básico reproducen los mockups y distinguen error/carga.
+- [ ] P20 permite las acciones autorizadas sobre perfiles/estado/equipo y conserva los cambios.
+- [ ] Sin permiso o cambiando un identificador no se administran cuentas ajenas.
+- [ ] Las operaciones de cuenta/rol consumen el servicio de Roberto y protegen al último administrador.
+- [ ] Consentimiento conserva versión/instante y no se acepta sin acción explícita.
+- [ ] Auditoría registra cambios y puede recibir los eventos académicos sin duplicarlos.
+- [ ] P20 aplica los componentes vigentes y distingue estados de error/carga/pendencia.
 
-**Demostración:** ingresar como estudiante y administrador, comprobar menús/permisos y, con Johan integrado, registrar/consultar un reporte propio.
+**Demostración:** cuando Roberto integre acceso real, entrar como administrador,
+administrar un perfil permitido y consultar consentimiento/auditoría. Sin ese
+contrato no afirmar que se probó un recorrido autenticado completo.
 
 ## Semana 2 — Emisión y verificación de constancias
 
-**Rama:** cerrar acceso; después `constancias-verificables`.
+**Rama:** integrar administración de usuarios; después `constancias-verificables`. Consumir identidad de Roberto y tickets de Johan.
 
 ### Backend
 
@@ -296,17 +366,17 @@ P09 separa elegibles de emitidas y muestra claramente por qué un caso aún no p
 
 ## Semana 4 — Validación y entrega
 
-**Rama:** `validacion-constancias`, después de integrar los módulos anteriores. Incluye correcciones de acceso, privacidad y reportes de tu responsabilidad.
+**Rama:** `validacion-constancias`, después de integrar los módulos anteriores. Incluye correcciones de administración, privacidad y reportes de tu responsabilidad; cambios de autenticación se coordinan con Roberto.
 
 1. Probar sesiones, cambios de rol, accesos por identificador, descargas y exportaciones con distintos usuarios.
 2. Probar constancias de casos no elegibles, emisiones simultáneas, PDFs modificados y exposición de datos públicos.
 3. Revisar auditoría completa de registro/ajuste/asignación/resolución/emisión/configuración con los otros módulos.
 4. Comprobar filtros, periodos, valores ausentes y coherencia de P15 frente a P13/P16.
-5. Comparar capturas de las diez pantallas a 1440 × 900, revisar versión móvil 390 × 844 y estados de error/espera.
+5. Comparar capturas de las nueve pantallas a 1440 × 900, revisar versión móvil 390 × 844 y estados de error/espera.
 6. Aportar manual de administración, consulta de constancias, verificación y evidencias de aceptación.
 7. Entregar a Roberto la lista real de problemas para integración y la demostración del CU02 y tus funciones de CU03.
 
-**Cierre:** identidad compartida estable, constancias verificables, privacidad y reportes conectados. No crear una implementación de predicción o notificaciones alternativa por falta de un endpoint de Roberto.
+**Cierre:** administración conectada a la identidad de Roberto, constancias verificables, privacidad y reportes conectados. No crear una implementación de predicción o notificaciones alternativa por falta de un endpoint de Roberto.
 
 ## Entrega semanal y regla de parada
 
@@ -333,4 +403,3 @@ No marcar un módulo terminado porque se ve bien si aún usa respuestas ficticia
 **Detenerse después de entregar el avance.** No iniciar automáticamente la siguiente semana ni resolver módulos de otro integrante para eludir una dependencia. Si el integrante no indicó semana, empezar por revisar precondiciones y Semana 1. Puede continuarse con pruebas, documentación o tareas independientes de esa misma semana mientras se solicita un contrato pendiente.
 
 La cuarta semana debe terminar con los tres casos integrados y las 24 pantallas funcionales. La disponibilidad 99,5 %, los 500 usuarios simultáneos y las metas académicas se evalúan y se reportan; no se afirman por instalar Docker ni se presentan como alcanzadas si las mediciones no lo respaldan.
-

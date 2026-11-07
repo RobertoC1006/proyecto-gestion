@@ -1,5 +1,10 @@
 # Roberto — semana 1, calendario manual en revisión
 
+> Informe histórico de la entrega indicada. Estado vigente: Roberto autorizó
+> integrar el calendario/diseño en PR #2 y asumió P01, Supabase Auth y roles/permisos.
+> Jasmine conserva administración, consentimiento y auditoría. Consultar
+> [ESTADO_EQUIPO.md](../ESTADO_EQUIPO.md) y [CONTRATO_IDENTIDAD.md](../CONTRATO_IDENTIDAD.md).
+
 Actualización visual posterior solicitada por Roberto: la referencia vigente del
 acabado y componentes es `casos-gestion`. Ver
 [adaptación y capturas nuevas](roberto-calendario-diseno-casos-gestion.md).

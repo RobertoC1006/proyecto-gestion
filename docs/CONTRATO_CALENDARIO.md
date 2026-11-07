@@ -1,13 +1,13 @@
 # Calendario manual — contrato de rama v1
 
 Rama `calendario-academico`, derivada de `196a2144aae253ca672eeeaf721c62204516245a`.
-No integrado en main. Semana 1: calendario manual P17/P18; CSV, configuración de
+Entrega aprobada para integrar mediante PR #2. Semana 1: calendario manual P17/P18; CSV, configuración de
 factores/SLA y cálculo del factor corresponden a semana 2.
 
 ## Identidad y auditoría: dependencias explícitas
 
 No hay identidad implementada. `AcademicIdentity` es el único punto de integración:
-Jasmine debe proporcionar `resolve(request)` desde su sesión validada y devolver
+Roberto debe proporcionar `resolve(request)` mediante su integración Supabase Auth y devolver
 `{id,institutionId,role,csrfVerified}`. `csrfVerified` solo es true tras validar la
 protección de escritura en el servidor. El adaptador predeterminado devuelve null:
 todas las rutas académicas responden 401. No acepta roles, usuarios ni permisos
@@ -15,8 +15,8 @@ desde cabeceras, cookies inventadas o cuerpo del navegador.
 
 Administración: rol administrador; otras cuentas solo consultan sus propios
 eventos con `/academic/me/events`. Identificadores UUID; institución del principal,
-nunca del cuerpo. Contrato de integración propuesto para Jasmine, no identidad
-acordada ni implementada en su nombre. Los sujetos de asociaciones se validan
+nunca del cuerpo. Contrato de integración para Roberto/Supabase Auth, no identidad
+implementada todavía. Ver `CONTRATO_IDENTIDAD.md`. Los sujetos de asociaciones se validan
 mediante `AcademicDirectory`; por defecto no disponible (503). No se crean tablas
 de usuarios ni cuentas ficticias. El directorio debe verificar usuario/institución.
 

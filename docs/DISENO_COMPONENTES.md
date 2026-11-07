@@ -3,7 +3,8 @@
 Roberto pidió sustituir el acabado inicial del calendario por el diseño y los
 componentes de [RobertoC1006/casos-gestion](https://github.com/RobertoC1006/casos-gestion),
 adaptándolos a nuestras pantallas del mockup. Esta decisión corresponde a la rama
-`calendario-academico` y sigue pendiente de integración autorizada en main.
+`calendario-academico`; Roberto aprobó su integración en main mediante PR #2.
+Los compañeros deben obtener el main que contenga esa entrega y reutilizarla.
 
 Referencia revisada: commit
 [`1d13d5c0d68ebe09d5c3b03d871dd8cc62455692`](https://github.com/RobertoC1006/casos-gestion/tree/1d13d5c0d68ebe09d5c3b03d871dd8cc62455692),
@@ -51,4 +52,4 @@ La revisión visual vigente y sus capturas están en
 `docs/entregas/roberto-calendario-diseno-casos-gestion.md`.
 Las capturas con datos llevan `fixture` en el nombre: comprueban la presentación,
 no acreditan autenticación. La aplicación normal sigue bloqueando operaciones
-académicas sin sesión hasta integrar identidad y permisos.
+académicas sin sesión hasta que Roberto integre Supabase Auth y permisos comunes.

@@ -1,18 +1,19 @@
 # CampusITSM
 
-## Calendario manual en revisión
+## Base compartida y calendario manual
 
-Este apartado corresponde exclusivamente a `calendario-academico`, pendiente de
-autorización de Roberto para integrar en main. Ver contrato en
+Roberto autorizó integrar la base visual y calendario mediante PR #2. Obtener
+el main que incluya esa entrega; no empezar desde la vista provisional. Ver contrato en
 `docs/CONTRATO_CALENDARIO.md` y entrega en
 `docs/entregas/roberto-semana-01-calendario.md`.
 
 P17 `/admin/calendario`; P18 `/admin/calendario/nuevo`. La interfaz sigue los
 mockups finales. Las rutas académicas responden 401 y la escritura permanece
-deshabilitada hasta integrar la sesión/permisos de Jasmine. No usar el login
+deshabilitada hasta que Roberto integre Supabase Auth y roles/permisos. No usar el login
 provisional para probar privilegios. CSV y factores/SLA no están en esta entrega.
 
-Para revisar esta rama separada de los volúmenes de la base anterior:
+El arranque habitual desde main usa el puerto 8080 según la guía de abajo. Para
+mantener una instalación de revisión separada de los volúmenes habituales:
 
 ```powershell
 $env:WEB_PORT = '18083'
@@ -20,9 +21,8 @@ docker compose -p campusitsm-calendar-review up --build
 ```
 
 Abrir [calendario en revisión](http://localhost:18083/admin/calendario).
-No usar `docker compose up` sin proyecto explícito si se desea conservar la base
-anterior sin aplicar esta migración. El comando anterior usa otros volúmenes.
-Las migraciones de esta rama no se aplicaron en la base habitual.
+El comando anterior usa otros volúmenes. La migración académica se aplica con el
+arranque habitual de la nueva base; es aditiva y no reinicia ni borra datos existentes.
 
 Prueba real PostgreSQL y persistencia aislada:
 
@@ -44,6 +44,12 @@ npm run test:e2e
 Contrato OpenAPI versionado: `docs/api/openapi.json`. Tras actualizar el backend,
 exportar de `/api/openapi.json` y ejecutar `npm run api:types` en `apps/web`.
 Los tipos de calendario se generan desde ese contrato, no desde modelos Prisma.
+
+Los tres planes están actualizados en `planes/`. Roberto hará P01/Supabase Auth y
+autorización; Jasmine administración/consentimiento/auditoría; Johan incidencias
+y evolución de componentes. Consultar `docs/CONTRATO_IDENTIDAD.md` antes de crear
+otro acceso. Los paquetes de documentación se regeneran con
+`python scripts/prepare-plan-packages.py` y quedan en `outputs/planes_para_compartir/`.
 
 ## Base Docker
 

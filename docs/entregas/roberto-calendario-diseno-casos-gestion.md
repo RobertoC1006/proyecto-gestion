@@ -1,8 +1,8 @@
 # Calendario — adaptación del diseño de casos-gestion
 
 Responsable: Roberto. Fecha: 6 de noviembre de 2026.
-Rama: `calendario-academico`. PR de revisión: [#2, borrador](https://github.com/RobertoC1006/proyecto-gestion/pull/2).
-**No integrar en main sin indicación expresa de Roberto.**
+Rama: `calendario-academico`. Entrega: [PR #2](https://github.com/RobertoC1006/proyecto-gestion/pull/2).
+**Roberto aprobó este diseño y autorizó expresamente integrarlo en main.**
 
 ## Cambio solicitado
 
@@ -13,7 +13,7 @@ exacta y la correspondencia de archivos están en [DISENO_COMPONENTES.md](../DIS
 
 La base del cambio es `06abbbd0eee2de26fff7a1ce974ca27f8cafa825`.
 La referencia es `casos-gestion@1d13d5c0d68ebe09d5c3b03d871dd8cc62455692`.
-Se conserva `main` en `196a2144aae253ca672eeeaf721c62204516245a`.
+La base anterior de `main` era `196a2144aae253ca672eeeaf721c62204516245a`.
 
 ## Resultado
 
@@ -37,8 +37,21 @@ Se conserva `main` en `196a2144aae253ca672eeeaf721c62204516245a`.
 
 Las pruebas de interfaz con datos interceptan respuestas con fixtures; las pruebas
 de PostgreSQL documentadas en la entrega anterior son independientes. Sin el módulo
-de identidad de Jasmine, el entorno real continúa respondiendo 401 al calendario
+de identidad de Roberto con Supabase Auth, el entorno real continúa respondiendo 401 al calendario
 y no permite guardar desde el navegador. El cambio visual no sustituye esa integración.
+
+### Cierre de revisión y coordinación
+
+Roberto autorizó integrar esta entrega. Se actualizaron los tres planes y el
+contexto compartido: P01/Supabase Auth y autorización común pasan a Roberto;
+Jasmine conserva administración/consentimiento/auditoría y Johan incidencias.
+El nuevo contrato de identidad es una propuesta de integración, sin código Auth
+ni proyecto Supabase creado. Los paquetes ZIP se regeneran desde los planes.
+
+Comprobación previa a integrar: compilación web correcta, seis pruebas Playwright
+correctas y siete escenarios PostgreSQL correctos (ocho resultados contando la
+prueba contenedora), además de persistencia tras recrear contenedores en
+`campusitsm-calendar-check-20261106193830`. Se conservaron sus volúmenes.
 
 ## Capturas revisadas
 
@@ -60,4 +73,4 @@ presentan datos ilustrativos como información autenticada.
 
 `http://localhost:18083/admin/calendario` y `/admin/calendario/nuevo`.
 Reproducir: levantar `campusitsm-calendar-review` en 18083 como indica README y
-ejecutar `npm run test:e2e` desde `apps/web`. No cambiar a main para esta revisión.
+ejecutar `npm run test:e2e` desde `apps/web`. Tras integrar PR #2, main permite reproducir la misma entrega en el puerto habitual 8080.

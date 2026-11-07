@@ -12,7 +12,7 @@ export interface AcademicRequest {
   academicPrincipal?: AcademicPrincipal;
 }
 
-// Puertos a conectar al módulo de Jasmine; nunca interpretar identidad del cliente aquí.
+// Puertos a conectar a la identidad Supabase de Roberto; nunca interpretar identidad del cliente aquí.
 export abstract class AcademicIdentity {
   abstract resolve(request: AcademicRequest): Promise<AcademicPrincipal | null>;
 }

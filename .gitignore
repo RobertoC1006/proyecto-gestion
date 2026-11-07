@@ -28,3 +28,6 @@ __pycache__/
 .venv/
 *.pem
 *.key
+
+# Paquetes regenerables de planes y mockups
+/outputs/planes_para_compartir/
