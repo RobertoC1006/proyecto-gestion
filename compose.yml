@@ -7,7 +7,7 @@ x-api: &api
     dockerfile: apps/api/Dockerfile
     target: runtime
   environment: &api-env
-    DATABASE_URL: postgresql://${POSTGRES_USER:-campusitsm}:${POSTGRES_PASSWORD:-campusitsm_local_only}@db:5432/${POSTGRES_DB:-campusitsm}?schema=public&connect_timeout=5&socket_timeout=5
+    DATABASE_URL: ${DATABASE_URL:-}
     PREDICTIONS_URL: http://predictions:8000
     FILES_DIR: /data/files
     APP_ORIGIN: ${APP_ORIGIN:-http://localhost:8080}
@@ -16,10 +16,11 @@ x-api: &api
     AUTH_ENCRYPTION_KEY: ${AUTH_ENCRYPTION_KEY:-}
     AUTH_INSTITUTION_CODE: ${AUTH_INSTITUTION_CODE:-UPT-DEMO}
     TZ: UTC
-  networks: [internal]
+  networks: [internal, auth_egress]
 
 services:
   db:
+    profiles: [local-db]
     image: postgres:17-alpine@sha256:3540c0362c809df084ffac0ae69fe794515f9de92692f02178bcdce0ef0302ac
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-campusitsm}
@@ -37,17 +38,17 @@ services:
 
   migrate:
     <<: *api
+    profiles: [tools]
+    environment:
+      <<: *api-env
+      DATABASE_URL: ${MIGRATION_DATABASE_URL:-}
     command: [npm, run, db:deploy]
-    depends_on:
-      db: {condition: service_healthy}
     restart: "no"
 
   seed:
     <<: *api
     profiles: [tools]
     command: [npm, run, db:seed]
-    depends_on:
-      migrate: {condition: service_completed_successfully}
     restart: "no"
 
   predictions:
@@ -67,11 +68,10 @@ services:
 
   api:
     <<: *api
-    # Solo la API necesita salida a Internet para Supabase; PostgreSQL/Python siguen internos.
+    # La base compartida y Auth requieren salida desde NestJS; Python sigue interno.
     networks: [internal, auth_egress]
     volumes: [files_data:/data/files]
     depends_on:
-      migrate: {condition: service_completed_successfully}
       predictions: {condition: service_healthy}
     healthcheck:
       test: [CMD, node, -e, "fetch('http://127.0.0.1:3000/api/v1/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
@@ -89,8 +89,6 @@ services:
     environment:
       <<: *api-env
       BOOTSTRAP_USER_ID: ${BOOTSTRAP_USER_ID:-}
-    depends_on:
-      migrate: {condition: service_completed_successfully}
     restart: "no"
 
   web:

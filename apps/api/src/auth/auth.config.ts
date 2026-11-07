@@ -1,4 +1,5 @@
 import { Injectable, ServiceUnavailableException } from '@nestjs/common';
+import { createHash } from 'node:crypto';
 
 @Injectable()
 export class AuthConfig {
@@ -6,6 +7,8 @@ export class AuthConfig {
   get institutionCode() { return process.env.AUTH_INSTITUTION_CODE || 'UPT-DEMO'; }
   get cookieName() { return this.origin.startsWith('https:') ? '__Host-campus_session' : 'campus_session'; }
   get secure() { return this.origin.startsWith('https:'); }
+  // Identifica la instalación sin compartir ni almacenar su clave de cifrado.
+  get instanceId() { return createHash('sha256').update(this.key).digest('hex'); }
   get key(): Buffer {
     const key = Buffer.from(process.env.AUTH_ENCRYPTION_KEY || '', 'base64');
     if (key.length !== 32) throw this.unavailable();

@@ -1,0 +1,20 @@
+# Solo desarrollo/pruebas aisladas. No hereda las conexiones remotas de .env.
+services:
+  db:
+    profiles: !reset []
+  api:
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-campusitsm}:${POSTGRES_PASSWORD:-campusitsm_local_only}@db:5432/${POSTGRES_DB:-campusitsm}?schema=public&connection_limit=3
+    depends_on:
+      db: {condition: service_healthy}
+  migrate:
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-campusitsm}:${POSTGRES_PASSWORD:-campusitsm_local_only}@db:5432/${POSTGRES_DB:-campusitsm}?schema=public&connection_limit=3
+    depends_on:
+      db: {condition: service_healthy}
+  seed:
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-campusitsm}:${POSTGRES_PASSWORD:-campusitsm_local_only}@db:5432/${POSTGRES_DB:-campusitsm}?schema=public
+  bootstrap-admin:
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-campusitsm}:${POSTGRES_PASSWORD:-campusitsm_local_only}@db:5432/${POSTGRES_DB:-campusitsm}?schema=public

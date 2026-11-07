@@ -5,7 +5,7 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 Push-Location (Split-Path -Parent $PSScriptRoot)
-$composeArgs = @('compose', '-p', $Project, '-f', 'compose.yml', '-f', 'compose.calendar-test.yml')
+$composeArgs = @('compose', '-p', $Project, '-f', 'compose.yml', '-f', 'compose.local.yml', '-f', 'compose.calendar-test.yml')
 function Run-Compose {
   param([string[]]$CommandArgs)
   & docker @composeArgs @CommandArgs

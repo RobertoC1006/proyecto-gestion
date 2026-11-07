@@ -10,7 +10,7 @@ $repoRoot = Split-Path -Parent $PSScriptRoot
 Push-Location $repoRoot
 $previousPort = $env:WEB_PORT
 $env:WEB_PORT = [string]$Port
-$composeArgs = @('compose', '-p', $Project)
+$composeArgs = @('compose', '-p', $Project, '-f', 'compose.yml', '-f', 'compose.local.yml')
 
 function Invoke-Compose {
     param([string[]]$CommandArgs)
@@ -37,6 +37,8 @@ try {
     if ($existing -or $existingVolumes) { throw 'El proyecto de prueba ya existe; elegir otro nombre.' }
     $up = @('up', '-d', '--wait', '--wait-timeout', '180')
     if (-not $SkipBuild) { $up += '--build' }
+    if (-not $SkipBuild) { Invoke-Compose @('build', 'migrate') }
+    Invoke-Compose @('--profile', 'tools', 'run', '--rm', 'migrate')
     Invoke-Compose $up
     $baseUrl = "http://127.0.0.1:$Port"
     Assert-Equal (Invoke-RestMethod "$baseUrl/api/v1/health").status 'ok' 'Salud integral'

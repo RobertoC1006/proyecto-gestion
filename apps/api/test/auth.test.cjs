@@ -6,10 +6,11 @@ const { Test } = require('@nestjs/testing');
 const { UnauthorizedException, ServiceUnavailableException } = require('@nestjs/common');
 const { AppModule } = require('../dist/app.module');
 const { AuthProvider } = require('../dist/auth/auth.provider');
+const { AuthConfig } = require('../dist/auth/auth.config');
 const { IdentityDirectory } = require('../dist/auth/auth.directory');
 const { requireScope } = require('../dist/auth/auth.policy');
 const { PrismaService } = require('../dist/database/prisma.service');
-const { digest, decrypt } = require('../dist/auth/auth.crypto');
+const { digest, decrypt, csrfToken } = require('../dist/auth/auth.crypto');
 
 test('Identidad: sesiones reales de aplicación con PostgreSQL y proveedor sustituido solo en test', async t => {
   const institutionId = randomUUID(), otherInstitution = randomUUID();
@@ -29,11 +30,16 @@ test('Identidad: sesiones reales de aplicación con PostgreSQL y proveedor susti
     async exchange(code, storage) { const { email } = JSON.parse(storage); if (code !== 'valid-code' || !users.has(email)) throw new UnauthorizedException(); return issue(users.get(email)); },
     async changePassword() {},
   };
-  async function createApp() {
-    const module = await Test.createTestingModule({ imports: [AppModule] }).overrideProvider(AuthProvider).useValue(provider).compile();
+  async function createApp(config) {
+    const builder = Test.createTestingModule({ imports: [AppModule] }).overrideProvider(AuthProvider).useValue(provider);
+    if (config) builder.overrideProvider(AuthConfig).useValue(config);
+    const module = await builder.compile();
     const app = module.createNestApplication({ logger: false }); app.setGlobalPrefix('api/v1'); await app.listen(0, '127.0.0.1'); return app;
   }
   const app = await createApp(), secondApp = await createApp();
+  const differentConfig = new AuthConfig();
+  Object.defineProperty(differentConfig, 'key', { value: randomBytes(32) });
+  const otherInstallation = await createApp(differentConfig);
   const db = app.get(PrismaService), directory = app.get(IdentityDirectory);
   const base = await app.getUrl(), secondBase = await secondApp.getUrl();
   async function request(path, { method = 'GET', body, session, headers = {}, target = base } = {}) {
@@ -163,6 +169,27 @@ test('Identidad: sesiones reales de aplicación con PostgreSQL y proveedor susti
       assert.equal((await request('auth/recovery/status', { session: flow })).status, 401);
       assert.equal((await request('auth/me', { session: one })).status, 401); assert.equal((await request('auth/me', { session: two })).status, 401);
     });
+    await t.test('Dos instalaciones comparten usuarios/datos sin descifrar o borrar sesiones/PKCE ajenos', async () => {
+      const session = await login(student.email);
+      const id = digest(session.cookie.split('=')[1]), target = await otherInstallation.getUrl();
+      assert.equal((await request('auth/me', { session, target })).status, 401);
+      const foreignCsrf = csrfToken(differentConfig.key, session.cookie.split('=')[1]);
+      assert.equal((await request('auth/logout', { method: 'POST', body: {}, session: { ...session, csrf: foreignCsrf }, target })).status, 200);
+      assert.ok(await db.authSession.findUnique({ where: { id } }));
+      assert.equal((await request('auth/me', { session })).status, 200);
+      const own = await request('auth/login', { method: 'POST', target, body: { email: student.email, password: 'Password-test-123' } });
+      assert.equal(own.status, 200); assert.equal(own.body.user.id, session.body.user.id);
+      const shared = await request('academic/me/events?from=2026-11-07T00:00:00Z&to=2026-11-08T00:00:00Z', {
+        target, session: { cookie: own.cookie.split(';')[0], csrf: own.body.csrfToken }
+      });
+      assert.equal(shared.status, 200); assert.equal(shared.body.total, 1);
+      const recover = await request('auth/recovery/request', { method: 'POST', body: { email: student.email } });
+      const flow = { cookie: recover.cookie.split(';')[0] };
+      const flowId = digest(flow.cookie.split('=')[1]);
+      assert.equal((await request('auth/callback?code=valid-code', { session: flow, target })).location, '/login?link=invalid');
+      assert.ok(await db.authFlow.findUnique({ where: { id: flowId } }));
+      assert.equal((await request('auth/callback?code=valid-code', { session: flow })).location, '/login?recovery=1');
+    });
     await t.test('Limitación de intentos persistente entre procesos', async () => {
       const email = `${randomUUID()}@example.test`;
       for (let i = 0; i < 12; i++) assert.equal((await request('auth/login', { method: 'POST', body: { email, password: 'incorrecta' }, target: i % 2 ? secondBase : base })).status, 401);
@@ -174,6 +201,6 @@ test('Identidad: sesiones reales de aplicación con PostgreSQL y proveedor susti
     for (const model of ['academicChange', 'academicEvent', 'academicMembership', 'academicSection', 'academicCourse', 'appUser']) await db[model].deleteMany({ where: { institutionId: { in: [institutionId, otherInstitution] } } });
     await db.institution.deleteMany({ where: { id: { in: [institutionId, otherInstitution] } } });
     await db.authThrottle.deleteMany(); await db.authFlow.deleteMany();
-    await secondApp.close(); await app.close();
+    await otherInstallation.close(); await secondApp.close(); await app.close();
   }
 });

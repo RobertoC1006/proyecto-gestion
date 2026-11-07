@@ -154,6 +154,7 @@ model AppUser {
 model AuthSession {
   // Solo la huella de la cookie opaca; tokens cifrados con AES-256-GCM.
   id            String @id @db.VarChar(64)
+  instanceId    String @default("legacy") @db.VarChar(64)
   userId        String @db.Uuid
   accessVersion Int
   tokens        String @db.Text
@@ -164,6 +165,7 @@ model AuthSession {
 
   @@index([userId])
   @@index([expiresAt])
+  @@index([instanceId, expiresAt])
 }
 
 model AuthThrottle {
@@ -174,9 +176,11 @@ model AuthThrottle {
 
 model AuthFlow {
   id        String @id @db.VarChar(64)
+  instanceId String @default("legacy") @db.VarChar(64)
   purpose   String @db.VarChar(20)
   secret    String @db.Text
   expiresAt DateTime @db.Timestamptz(3)
+  @@index([instanceId, expiresAt])
 }
 
 // Cambios de autorización atómicos para entrega futura a auditoría de Jasmine.

@@ -2,7 +2,7 @@ param([switch]$SkipBuild)
 $ErrorActionPreference = 'Stop'
 Push-Location (Split-Path -Parent $PSScriptRoot)
 $testProject = 'campusitsm-auth-check-' + (Get-Date -Format 'yyyyMMddHHmmss')
-$composeArgs = @('compose', '-p', $testProject, '-f', 'compose.yml', '-f', 'compose.auth-test.yml')
+$composeArgs = @('compose', '-p', $testProject, '-f', 'compose.yml', '-f', 'compose.local.yml', '-f', 'compose.auth-test.yml')
 try {
   if (-not $SkipBuild) {
     & docker @composeArgs build auth-test migrate

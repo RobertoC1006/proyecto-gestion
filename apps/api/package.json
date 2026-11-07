@@ -7,7 +7,7 @@
     "start": "node dist/main.js",
     "dev": "node --watch --require ts-node/register src/main.ts",
     "prisma:generate": "prisma generate",
-    "db:deploy": "prisma migrate deploy",
+    "db:deploy": "node prisma/deploy.cjs",
     "db:seed": "node prisma/seed.cjs",
     "test:academic": "node --test test/academic.test.cjs",
     "test:auth": "node --test test/auth.test.cjs test/auth.provider.test.cjs",

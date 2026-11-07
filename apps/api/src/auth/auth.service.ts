@@ -83,10 +83,10 @@ export class AuthService {
     }
     const cookie = opaqueToken(), id = digest(cookie), previous = this.cookie(request);
     await this.db.$transaction(async tx => {
-      await tx.authSession.deleteMany({ where: { expiresAt: { lt: new Date() } } });
+      await tx.authSession.deleteMany({ where: { instanceId: this.config.instanceId, expiresAt: { lt: new Date() } } });
       await tx.authThrottle.deleteMany({ where: { expiresAt: { lt: new Date() } } });
-      if (previous) await tx.authSession.deleteMany({ where: { id: digest(previous) } });
-      await tx.authSession.create({ data: { id, userId: user.id, accessVersion: user.accessVersion,
+      if (previous) await tx.authSession.deleteMany({ where: { id: digest(previous), instanceId: this.config.instanceId } });
+      await tx.authSession.create({ data: { id, instanceId: this.config.instanceId, userId: user.id, accessVersion: user.accessVersion,
         tokens: encrypt(this.config.key, id, tokens), tokenExpiresAt: new Date(tokens.expiresAt * 1000), expiresAt: new Date(Date.now() + 8 * 3600000) } });
     });
     this.setCookie(response, cookie);
@@ -105,9 +105,9 @@ export class AuthService {
     const id = digest(cookie);
     const result = await this.db.$transaction(async tx => {
       // Un solo refresh por sesión, incluso entre procesos. No confiar en locks de memoria.
-      await tx.$queryRaw`SELECT "id" FROM "AuthSession" WHERE "id" = ${id} FOR UPDATE`;
+      await tx.$queryRaw`SELECT "id" FROM "AuthSession" WHERE "id" = ${id} AND "instanceId" = ${this.config.instanceId} FOR UPDATE`;
       const session = await tx.authSession.findUnique({ where: { id }, include: { user: true } });
-      if (!session) return { principal: null };
+      if (!session || session.instanceId !== this.config.instanceId) return { principal: null };
       const discard = async () => { await tx.authSession.delete({ where: { id } }); return { principal: null }; };
       if (session.expiresAt.getTime() <= Date.now() || !session.user.active || session.accessVersion !== session.user.accessVersion) return discard();
       try {
@@ -139,9 +139,9 @@ export class AuthService {
     this.checkWrite(request, cookie);
     const id = digest(cookie);
     const tokens = await this.db.$transaction(async tx => {
-      await tx.$queryRaw`SELECT "id" FROM "AuthSession" WHERE "id" = ${id} FOR UPDATE`;
+      await tx.$queryRaw`SELECT "id" FROM "AuthSession" WHERE "id" = ${id} AND "instanceId" = ${this.config.instanceId} FOR UPDATE`;
       const session = await tx.authSession.findUnique({ where: { id } });
-      if (!session) return null;
+      if (!session || session.instanceId !== this.config.instanceId) return null;
       await tx.authSession.delete({ where: { id } });
       return decrypt<ProviderTokens>(this.config.key, id, session.tokens);
     });
@@ -163,9 +163,9 @@ export class AuthService {
   private async saveFlow(request: AuthRequest, response: AuthResponse, purpose: string, secret: string) {
     const cookie = opaqueToken(), id = digest(cookie), previous = this.flowCookie(request);
     await this.db.$transaction(async tx => {
-      await tx.authFlow.deleteMany({ where: { expiresAt: { lt: new Date() } } });
-      if (previous) await tx.authFlow.deleteMany({ where: { id: digest(previous) } });
-      await tx.authFlow.create({ data: { id, purpose, secret: encrypt(this.config.key, id, secret), expiresAt: new Date(Date.now() + 3600000) } });
+      await tx.authFlow.deleteMany({ where: { instanceId: this.config.instanceId, expiresAt: { lt: new Date() } } });
+      if (previous) await tx.authFlow.deleteMany({ where: { id: digest(previous), instanceId: this.config.instanceId } });
+      await tx.authFlow.create({ data: { id, instanceId: this.config.instanceId, purpose, secret: encrypt(this.config.key, id, secret), expiresAt: new Date(Date.now() + 3600000) } });
     });
     this.setFlowCookie(response, cookie);
   }
@@ -189,9 +189,9 @@ export class AuthService {
     if (!cookie || typeof code !== 'string' || code.length > 1000) throw failed();
     const id = digest(cookie);
     const purpose = await this.db.$transaction(async tx => {
-      await tx.$queryRaw`SELECT "id" FROM "AuthFlow" WHERE "id" = ${id} FOR UPDATE`;
+      await tx.$queryRaw`SELECT "id" FROM "AuthFlow" WHERE "id" = ${id} AND "instanceId" = ${this.config.instanceId} FOR UPDATE`;
       const flow = await tx.authFlow.findUnique({ where: { id } });
-      if (!flow || flow.expiresAt.getTime() < Date.now() || !['signup', 'recovery'].includes(flow.purpose)) throw failed();
+      if (!flow || flow.instanceId !== this.config.instanceId || flow.expiresAt.getTime() < Date.now() || !['signup', 'recovery'].includes(flow.purpose)) throw failed();
       const tokens = await this.provider.exchange(code, decrypt<string>(this.config.key, id, flow.secret));
       await this.provider.validate(tokens.access);
       if (flow.purpose === 'recovery') {
@@ -208,7 +208,7 @@ export class AuthService {
     const cookie = this.flowCookie(request);
     if (!cookie) throw failed();
     const flow = await this.db.authFlow.findUnique({ where: { id: digest(cookie) } });
-    if (!flow || flow.purpose !== 'password' || flow.expiresAt.getTime() < Date.now()) throw failed();
+    if (!flow || flow.instanceId !== this.config.instanceId || flow.purpose !== 'password' || flow.expiresAt.getTime() < Date.now()) throw failed();
     return { csrfToken: csrfToken(this.config.key, cookie) };
   }
   async reset(request: AuthRequest, response: AuthResponse, body: unknown) {
@@ -220,9 +220,9 @@ export class AuthService {
     const id = digest(cookie);
     await this.limit(request, 'reset', id);
     const error = await this.db.$transaction(async tx => {
-      await tx.$queryRaw`SELECT "id" FROM "AuthFlow" WHERE "id" = ${id} FOR UPDATE`;
+      await tx.$queryRaw`SELECT "id" FROM "AuthFlow" WHERE "id" = ${id} AND "instanceId" = ${this.config.instanceId} FOR UPDATE`;
       const flow = await tx.authFlow.findUnique({ where: { id } });
-      if (!flow || flow.purpose !== 'password' || flow.expiresAt.getTime() < Date.now()) throw failed();
+      if (!flow || flow.instanceId !== this.config.instanceId || flow.purpose !== 'password' || flow.expiresAt.getTime() < Date.now()) throw failed();
       const tokens = decrypt<ProviderTokens>(this.config.key, id, flow.secret);
       const identity = await this.provider.validate(tokens.access);
       let failure: unknown;

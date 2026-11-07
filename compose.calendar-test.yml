@@ -1,5 +1,7 @@
 # Pruebas en un proyecto Compose aislado: no publica ningún acceso privilegiado.
 services:
+  migrate:
+    profiles: !reset []
   academic-test:
     image: campusitsm-academic-test:local
     build:
