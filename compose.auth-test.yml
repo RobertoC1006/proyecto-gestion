@@ -1,0 +1,20 @@
+# Solo pruebas con proveedor inyectado; nunca publica un login ficticio.
+services:
+  auth-test:
+    image: campusitsm-auth-test:local
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+      target: test
+    command: [node, --test, test/academic.test.cjs, test/auth.test.cjs, test/auth.provider.test.cjs]
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-campusitsm}:${POSTGRES_PASSWORD:-campusitsm_local_only}@db:5432/${POSTGRES_DB:-campusitsm}?schema=public
+      APP_ORIGIN: http://localhost:8080
+      SUPABASE_URL: https://test.supabase.co
+      SUPABASE_PUBLISHABLE_KEY: sb_publishable_test_only
+      AUTH_ENCRYPTION_KEY: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+      AUTH_INSTITUTION_CODE: AUTH-TEST
+    networks: [internal]
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+    restart: "no"

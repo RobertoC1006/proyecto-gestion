@@ -11,6 +11,7 @@ fs.mkdirSync(screenshots, { recursive: true });
 
 async function fixtures(page, options = {}) {
   const state = { events: [{ ...first }, { ...second }], writes: [], ...options };
+  await page.route('**/api/v1/auth/me', route => route.fulfill({ contentType: 'application/json', body: JSON.stringify({ user: { id: '00000000-0000-4000-8000-000000000099', institutionId, displayName: 'Prueba visual', email: 'fixture@example.test', role: 'administrador', teamId: null, active: true, permissions: ['academic:manage'] }, csrfToken: 'csrf-fixture' }) }));
   // Datos únicamente de pruebas de interfaz. No se insertan en PostgreSQL ni se publican como sesión.
   await page.route('**/api/v1/academic/**', async route => {
     const req = route.request(), url = new URL(req.url()), endpoint = url.pathname.split('/academic/')[1];

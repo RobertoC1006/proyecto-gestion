@@ -27,7 +27,7 @@ def package_sources():
     paths.update(ROOT / 'docs/entregas' / name for name in (
         'roberto-semana-01-base.md',
         'roberto-semana-01-calendario.md',
-        'roberto-calendario-diseno-casos-gestion.md',
+    'roberto-calendario-diseno-casos-gestion.md',
     ))
     paths.add(ROOT / 'docs/api/openapi.json')
     paths.add(ROOT / 'diseno/campusitsm/CASOS_DE_USO_Y_PANTALLAS.md')
@@ -78,7 +78,8 @@ y sigue el README del repositorio. Cada integrante usa su Docker y datos locales
 
 No recrear Docker ni el diseño compartido. Roberto asume P01/Supabase Auth y
 autorización común; Jasmine administra usuarios/permisos sobre esa base y conserva
-consentimiento/auditoría; Johan desarrolla incidencias. Auth todavía está pendiente.
+consentimiento/auditoría; Johan desarrolla incidencias. Identidad tiene un avance en
+su rama propia: revisar docs/ESTADO_EQUIPO.md y la entrega antes de consumirlo como main.
 Las capturas con fixture son ejemplos de prueba, no datos reales ni un login listo.
 
 MANIFIESTO.json identifica el contenido por SHA-256. El generador toma los archivos
@@ -87,7 +88,7 @@ los documentos de este paquete ya estuvieran confirmados en ese commit.
 '''.encode('utf-8')
         manifest = {
             'responsable': person.title(),
-            'fecha_revision_planes': '2026-11-06',
+            'fecha_revision_planes': '2026-11-07',
             'commit_checkout_al_generar': head,
             'origen_archivos': 'directorio_de_trabajo_verificado_por_sha256',
             'base_docker_main': '196a2144aae253ca672eeeaf721c62204516245a',

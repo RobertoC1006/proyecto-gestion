@@ -11,6 +11,17 @@ Este plan está dirigido exclusivamente a Roberto y su agente. Tu base Docker y 
 
 ## Estado vigente y punto de partida — 6 de noviembre de 2026
 
+**Avance de rama — 7 de noviembre:** Roberto autorizó iniciar `identidad-supabase`.
+Supabase alojado creado y conectado; eligió registro propio. Completó registro,
+confirmación y login reales; autorizó su cuenta como primer administrador local
+y comprobó el acceso a Crear evento. Sesiones, roles y adaptadores académicos
+implementados/pruebas aprobadas. Esta rama aún no está integrada en main.
+Siguiente punto: resolver SMTP para correos externos y los contratos de consentimiento/
+auditoría de Jasmine, revisar la entrega e integrar solo con autorización de Roberto.
+Ver [entrega vigente](../docs/entregas/roberto-semana-01-identidad.md).
+Los pendientes de inicio descritos más abajo corresponden al estado previo de main;
+no recrear el proyecto Supabase ni repetir la implementación al reanudar.
+
 Esta revisión incorpora el avance real de Roberto y sustituye el estado inicial
 del plan. Roberto autorizó integrar la entrega de calendario/diseño en main mediante
 la [PR #2](https://github.com/RobertoC1006/proyecto-gestion/pull/2).

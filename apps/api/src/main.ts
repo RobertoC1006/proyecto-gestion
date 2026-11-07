@@ -9,7 +9,8 @@ async function bootstrap() {
   app.enableShutdownHooks();
   const document = SwaggerModule.createDocument(app, new DocumentBuilder()
     .setTitle('CampusITSM — base compartida')
-    .setDescription('Infraestructura y calendario manual. Las rutas académicas requieren integrar la sesión de identidad; el adaptador inicial deniega acceso.')
+    .setDescription('Infraestructura, identidad Supabase y calendario manual. Sesión opaca HttpOnly; escrituras con Origin y X-CSRF-Token. Auth requiere configuración del proyecto.')
+    .addCookieAuth('campus_session', undefined, 'campus_session')
     .setVersion('1.0.0').build());
   SwaggerModule.setup('api/docs', app, document, { jsonDocumentUrl: '/api/openapi.json' });
   await app.listen(3000, '0.0.0.0');

@@ -10,6 +10,11 @@ x-api: &api
     DATABASE_URL: postgresql://${POSTGRES_USER:-campusitsm}:${POSTGRES_PASSWORD:-campusitsm_local_only}@db:5432/${POSTGRES_DB:-campusitsm}?schema=public&connect_timeout=5&socket_timeout=5
     PREDICTIONS_URL: http://predictions:8000
     FILES_DIR: /data/files
+    APP_ORIGIN: ${APP_ORIGIN:-http://localhost:8080}
+    SUPABASE_URL: ${SUPABASE_URL:-}
+    SUPABASE_PUBLISHABLE_KEY: ${SUPABASE_PUBLISHABLE_KEY:-}
+    AUTH_ENCRYPTION_KEY: ${AUTH_ENCRYPTION_KEY:-}
+    AUTH_INSTITUTION_CODE: ${AUTH_INSTITUTION_CODE:-UPT-DEMO}
     TZ: UTC
   networks: [internal]
 
@@ -62,6 +67,8 @@ services:
 
   api:
     <<: *api
+    # Solo la API necesita salida a Internet para Supabase; PostgreSQL/Python siguen internos.
+    networks: [internal, auth_egress]
     volumes: [files_data:/data/files]
     depends_on:
       migrate: {condition: service_completed_successfully}
@@ -74,6 +81,17 @@ services:
       start_period: 10s
     init: true
     restart: unless-stopped
+
+  bootstrap-admin:
+    <<: *api
+    profiles: [tools]
+    command: [node, prisma/bootstrap-admin.cjs]
+    environment:
+      <<: *api-env
+      BOOTSTRAP_USER_ID: ${BOOTSTRAP_USER_ID:-}
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+    restart: "no"
 
   web:
     image: campusitsm-web:local
@@ -96,6 +114,7 @@ networks:
   internal:
     internal: true
   entry:
+  auth_egress:
 
 volumes:
   postgres_data:

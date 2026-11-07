@@ -1,4 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
+import { useAuth } from '../features/auth/AuthContext'
 import {
   Pulse as Activity,
   BookOpen,
@@ -38,6 +39,8 @@ const administration: { label: string; icon: Icon }[] = [
 
 export function Sidebar({ menuOpen = false }: { menuOpen?: boolean }) {
   const { pathname } = useLocation()
+  const { user } = useAuth()
+  const links = navigation.map(item => item.to === '/admin/calendario' && user && !user.permissions.includes('academic:manage') ? { ...item, to: '/calendario' } : item)
   return (
     <aside
       id="app-navigation"
@@ -60,7 +63,7 @@ export function Sidebar({ menuOpen = false }: { menuOpen?: boolean }) {
         <span>Universidad Privada Tallán</span>
       </div>
       <nav className="sidebar__nav" aria-label="Navegación principal">
-        {navigation.map(({ label, icon: Icon, to }) => {
+        {links.map(({ label, icon: Icon, to }) => {
           const active =
             to === '/' ? pathname === '/' : !!to && pathname.startsWith(to)
           return to ? (

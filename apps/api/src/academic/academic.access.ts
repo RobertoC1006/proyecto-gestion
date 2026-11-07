@@ -1,9 +1,11 @@
-import { CanActivate, ExecutionContext, ForbiddenException, Inject, Injectable, ServiceUnavailableException, UnauthorizedException } from '@nestjs/common';
+import { CanActivate, ExecutionContext, ForbiddenException, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import type { CampusRole } from '@prisma/client';
+import { rolePermissions } from '../auth/auth.policy';
 
 export interface AcademicPrincipal {
   id: string;
   institutionId: string;
-  role: 'estudiante' | 'docente' | 'ti_agente' | 'ti_supervisor' | 'administrador';
+  role: CampusRole;
   csrfVerified: boolean;
 }
 
@@ -12,24 +14,13 @@ export interface AcademicRequest {
   academicPrincipal?: AcademicPrincipal;
 }
 
-// Puertos a conectar a la identidad Supabase de Roberto; nunca interpretar identidad del cliente aquí.
+// Puertos conectados a la sesión común; nunca interpretar identidad del cliente aquí.
 export abstract class AcademicIdentity {
   abstract resolve(request: AcademicRequest): Promise<AcademicPrincipal | null>;
 }
 export abstract class AcademicDirectory {
   abstract belongsToInstitution(subjectId: string, institutionId: string): Promise<boolean>;
 }
-@Injectable()
-export class UnavailableIdentity extends AcademicIdentity {
-  async resolve(): Promise<null> { return null; }
-}
-@Injectable()
-export class UnavailableDirectory extends AcademicDirectory {
-  async belongsToInstitution(): Promise<boolean> {
-    throw new ServiceUnavailableException({ code: 'IDENTITY_NOT_AVAILABLE', message: 'No se pudo verificar el usuario.' });
-  }
-}
-
 @Injectable()
 export class AcademicSessionGuard implements CanActivate {
   constructor(@Inject(AcademicIdentity) private readonly identity: AcademicIdentity) {}
@@ -40,7 +31,7 @@ export class AcademicSessionGuard implements CanActivate {
     if (!principal || !uuidPattern.test(principal.id) || !uuidPattern.test(principal.institutionId)) {
       throw new UnauthorizedException({ code: 'SESSION_REQUIRED', message: 'Necesitas una sesión válida para consultar el calendario.' });
     }
-    if (!['estudiante', 'docente', 'ti_agente', 'ti_supervisor', 'administrador'].includes(principal.role)) {
+    if (!Object.hasOwn(rolePermissions, principal.role)) {
       throw new ForbiddenException({ code: 'FORBIDDEN', message: 'No tienes acceso al calendario.' });
     }
     if (!['GET', 'HEAD'].includes(request.method) && principal.csrfVerified !== true) {
@@ -52,7 +43,7 @@ export class AcademicSessionGuard implements CanActivate {
 }
 
 export function requireAdministrator(principal: AcademicPrincipal) {
-  if (principal.role !== 'administrador') {
+  if (!rolePermissions[principal.role]?.includes('academic:manage')) {
     throw new ForbiddenException({ code: 'ADMIN_REQUIRED', message: 'Solo administración puede gestionar el calendario.' });
   }
 }

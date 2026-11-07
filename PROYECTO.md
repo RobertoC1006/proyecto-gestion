@@ -13,8 +13,9 @@ adaptados a la estructura y funciones de los mockups de CampusITSM. Ver
 `docs/DISENO_COMPONENTES.md`. No añadir una segunda familia de controles.
 
 - `apps/web`: React/Vite/TypeScript, vistas recuperadas de `front-vistas`, incluidos
-  `AppHeader`, `Sidebar`, `PriorityBadge` y ejemplos. Siguen siendo demostrativas:
-  no son autenticación, tickets ni constancias reales.
+  `AppHeader`, `Sidebar` y `PriorityBadge`. La rama identidad-supabase conecta P01
+  a acceso real y cabecera con sesión. Las vistas de tickets/constancias siguen
+  siendo demostrativas y pertenecen a los módulos de sus responsables.
 - `apps/api`: una API modular NestJS, prefijo `/api/v1`, Prisma y OpenAPI.
   Una instancia Prisma compartida mediante `DatabaseModule`.
 - `apps/api/prisma`: único esquema y migraciones, coordinados por Roberto.
@@ -42,10 +43,10 @@ implementar gráficos reales. Reutilizar una sola navegación y familia de contr
 | Johan | Componentes/navegación compartidos, incidencias, prioridad, atención y clasificación |
 | Jasmine | Administración de usuarios/permisos usando la identidad de Roberto; consentimiento/auditoría/privacidad, constancias y reportes |
 
-La base ya incluye infraestructura, componentes visuales y calendario manual
-P17/P18. Sus rutas permanecen cerradas hasta integrar identidad. Supabase Auth,
-P01 y roles/permisos serán el siguiente módulo de Roberto; no están implementados
-por actualizar los planes. Ver `docs/CONTRATO_IDENTIDAD.md`.
+La base incluye infraestructura, componentes visuales y calendario manual P17/P18.
+La rama identidad-supabase añade P01, registro/login reales y autorización común,
+conecta sus puertos y mantiene el cierre sin sesión/permisos. No está integrada en
+main todavía. Ver `docs/CONTRATO_IDENTIDAD.md` y `docs/ESTADO_EQUIPO.md`.
 
 ## Reglas comunes
 
@@ -53,9 +54,9 @@ por actualizar los planes. Ver `docs/CONTRATO_IDENTIDAD.md`.
   `main` antes de borrar únicamente la rama propia integrada; conservar ramas ajenas.
 - Reutilizar servicios y componentes; no duplicar catálogos, esquemas ni reglas.
 - Roles: estudiante, docente, ti_agente, ti_supervisor y administrador. La API
-  autoriza por rol y objeto; el selector de la demo no otorga permisos reales.
-- Supabase Auth gestionará credenciales. Roberto concretará la sesión de servidor,
-  cookies HttpOnly y protección de escrituras según el contrato de identidad.
+  autoriza por rol y objeto; el registro propio no permite seleccionar privilegios.
+- Supabase Auth gestiona credenciales. Sesión de servidor con cookies HttpOnly,
+  tokens cifrados y protección de escrituras según el contrato de identidad.
   No guardar tokens, credenciales ni datos de negocio en localStorage.
 - Fechas UTC, presentación `America/Lima`. Archivos privados en volumen.
 - Puntaje = urgencia × impacto × máximo factor aplicable al usuario/curso.

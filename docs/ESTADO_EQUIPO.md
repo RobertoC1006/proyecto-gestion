@@ -1,4 +1,21 @@
-# Estado del equipo — 6 de noviembre de 2026
+# Estado del equipo — 7 de noviembre de 2026
+
+## Avance de identidad en rama, todavía sin integrar
+
+Roberto inició `identidad-supabase` desde main `02d10f5` tras verificar GitHub.
+Supabase Auth alojado creado/conectado, registro propio, confirmación y recuperación
+por enlace PKCE, login/logout y sesiones de servidor implementados. Roberto completó
+registro/confirmación/login reales y autorizó su cuenta como primer administrador.
+Roles y permisos viven en PostgreSQL local; no se migró la base de negocio.
+Ver [contrato operativo](CONTRATO_IDENTIDAD.md), [configuración del equipo](AUTH_DESARROLLO.md)
+y [entrega de identidad](entregas/roberto-semana-01-identidad.md).
+
+Las observaciones anteriores sobre identidad no implementada, conservadas debajo
+como contexto de main/base, se refieren a la entrega previa. Esta rama aún no está
+publicada/integrada. Consumo de compañeros: esperar autorización de integración.
+Pendiente: SMTP propio para registro con correos fuera del equipo Supabase,
+consentimiento y auditoría global de Jasmine. Sus P20/P21 usan el servicio de acceso
+común; no deben crear otro login. Semana 1 no se da por cerrada por esta entrega.
 
 ## Base para los tres integrantes
 

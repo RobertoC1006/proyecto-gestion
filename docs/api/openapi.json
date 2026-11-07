@@ -1,1 +1,1915 @@
-{"openapi":"3.0.0","paths":{"/api/v1/health":{"get":{"operationId":"HealthController_check","parameters":[],"responses":{"200":{"description":"","content":{"application/json":{"schema":{"$ref":"#/components/schemas/HealthResponse"}}}},"503":{"description":"Una dependencia no responde."}},"tags":["Infraestructura"]}},"/api/v1/academic/courses":{"get":{"operationId":"AcademicController_courses","parameters":[{"name":"page","required":false,"in":"query","schema":{"minimum":1,"default":1,"type":"number"}},{"name":"pageSize","required":false,"in":"query","schema":{"minimum":1,"maximum":100,"default":100,"type":"number"}}],"responses":{"200":{"description":"","content":{"application/json":{"schema":{"$ref":"#/components/schemas/CoursePageDto"}}}},"400":{"description":"VALIDATION_ERROR; fields contiene el error de cada campo."},"401":{"description":"Sesión no disponible o inválida."},"403":{"description":"Requiere administrador y protección de escritura."},"404":{"description":"Objeto no visible en la institución."},"409":{"description":"Código duplicado o versión desactualizada."}},"tags":["Calendario académico — administración"]},"post":{"operationId":"AcademicController_createCourse","parameters":[],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/CourseInputDto"}}}},"responses":{"201":{"description":"","content":{"application/json":{"schema":{"$ref":"#/components/schemas/CourseDto"}}}},"400":{"description":"VALIDATION_ERROR; fields contiene el error de cada campo."},"401":{"description":"Sesión no disponible o inválida."},"403":{"description":"Requiere administrador y protección de escritura."},"404":{"description":"Objeto no visible en la institución."},"409":{"description":"Código duplicado o versión desactualizada."}},"tags":["Calendario académico — administración"]}},"/api/v1/academic/sections":{"get":{"operationId":"AcademicController_sections","parameters":[{"name":"page","required":false,"in":"query","schema":{"minimum":1,"default":1,"type":"number"}},{"name":"pageSize","required":false,"in":"query","schema":{"minimum":1,"maximum":100,"default":100,"type":"number"}},{"name":"courseId","required":false,"in":"query","schema":{"format":"uuid","type":"string"}}],"responses":{"200":{"description":"","content":{"application/json":{"schema":{"$ref":"#/components/schemas/SectionPageDto"}}}},"400":{"description":"VALIDATION_ERROR; fields contiene el error de cada campo."},"401":{"description":"Sesión no disponible o inválida."},"403":{"description":"Requiere administrador y protección de escritura."},"404":{"description":"Objeto no visible en la institución."},"409":{"description":"Código duplicado o versión desactualizada."}},"tags":["Calendario académico — administración"]},"post":{"operationId":"AcademicController_createSection","parameters":[],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/SectionInputDto"}}}},"responses":{"201":{"description":"","content":{"application/json":{"schema":{"$ref":"#/components/schemas/SectionDto"}}}},"400":{"description":"VALIDATION_ERROR; fields contiene el error de cada campo."},"401":{"description":"Sesión no disponible o inválida."},"403":{"description":"Requiere administrador y protección de escritura."},"404":{"description":"Objeto no visible en la institución."},"409":{"description":"Código duplicado o versión desactualizada."}},"tags":["Calendario académico — administración"]}},"/api/v1/academic/memberships":{"post":{"operationId":"AcademicController_associate","parameters":[],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/MembershipDto"}}}},"responses":{"201":{"description":""},"400":{"description":"VALIDATION_ERROR; fields contiene el error de cada campo."},"401":{"description":"Sesión no disponible o inválida."},"403":{"description":"Requiere administrador y protección de escritura."},"404":{"description":"Objeto no visible en la institución."},"409":{"description":"Código duplicado o versión desactualizada."}},"tags":["Calendario académico — administración"]}},"/api/v1/academic/memberships/{sectionId}/{subjectId}":{"delete":{"operationId":"AcademicController_dissociate","parameters":[{"name":"sectionId","required":true,"in":"path","schema":{"type":"string"}},{"name":"subjectId","required":true,"in":"path","schema":{"type":"string"}}],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/ReasonDto"}}}},"responses":{"200":{"description":"","content":{"application/json":{"schema":{"$ref":"#/components/schemas/DeletedDto"}}}},"400":{"description":"VALIDATION_ERROR; fields contiene el error de cada campo."},"401":{"description":"Sesión no disponible o inválida."},"403":{"description":"Requiere administrador y protección de escritura."},"404":{"description":"Objeto no visible en la institución."},"409":{"description":"Código duplicado o versión desactualizada."}},"tags":["Calendario académico — administración"]}},"/api/v1/academic/events":{"get":{"operationId":"AcademicController_events","parameters":[{"name":"page","required":false,"in":"query","schema":{"minimum":1,"default":1,"type":"number"}},{"name":"pageSize","required":false,"in":"query","schema":{"minimum":1,"maximum":100,"default":100,"type":"number"}},{"name":"courseId","required":false,"in":"query","schema":{"format":"uuid","type":"string"}},{"name":"from","required":true,"in":"query","schema":{"format":"date-time","type":"string"}},{"name":"to","required":true,"in":"query","schema":{"format":"date-time","type":"string"}},{"name":"sectionId","required":false,"in":"query","schema":{"format":"uuid","type":"string"}},{"name":"type","required":false,"in":"query","schema":{"type":"string","enum":["examen","entrega","matricula"]}}],"responses":{"200":{"description":"","content":{"application/json":{"schema":{"$ref":"#/components/schemas/EventPageDto"}}}},"400":{"description":"VALIDATION_ERROR; fields contiene el error de cada campo."},"401":{"description":"Sesión no disponible o inválida."},"403":{"description":"Requiere administrador y protección de escritura."},"404":{"description":"Objeto no visible en la institución."},"409":{"description":"Código duplicado o versión desactualizada."}},"tags":["Calendario académico — administración"]},"post":{"operationId":"AcademicController_createEvent","parameters":[],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/EventInputDto"}}}},"responses":{"201":{"description":"","content":{"application/json":{"schema":{"$ref":"#/components/schemas/EventDto"}}}},"400":{"description":"VALIDATION_ERROR; fields contiene el error de cada campo."},"401":{"description":"Sesión no disponible o inválida."},"403":{"description":"Requiere administrador y protección de escritura."},"404":{"description":"Objeto no visible en la institución."},"409":{"description":"Código duplicado o versión desactualizada."}},"tags":["Calendario académico — administración"]}},"/api/v1/academic/events/{id}":{"get":{"operationId":"AcademicController_event","parameters":[{"name":"id","required":true,"in":"path","schema":{"type":"string"}}],"responses":{"200":{"description":"","content":{"application/json":{"schema":{"$ref":"#/components/schemas/EventDto"}}}},"400":{"description":"VALIDATION_ERROR; fields contiene el error de cada campo."},"401":{"description":"Sesión no disponible o inválida."},"403":{"description":"Requiere administrador y protección de escritura."},"404":{"description":"Objeto no visible en la institución."},"409":{"description":"Código duplicado o versión desactualizada."}},"tags":["Calendario académico — administración"]},"patch":{"operationId":"AcademicController_updateEvent","parameters":[{"name":"id","required":true,"in":"path","schema":{"type":"string"}}],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/EventUpdateDto"}}}},"responses":{"200":{"description":"","content":{"application/json":{"schema":{"$ref":"#/components/schemas/EventDto"}}}},"400":{"description":"VALIDATION_ERROR; fields contiene el error de cada campo."},"401":{"description":"Sesión no disponible o inválida."},"403":{"description":"Requiere administrador y protección de escritura."},"404":{"description":"Objeto no visible en la institución."},"409":{"description":"Código duplicado o versión desactualizada."}},"tags":["Calendario académico — administración"]},"delete":{"operationId":"AcademicController_deleteEvent","parameters":[{"name":"id","required":true,"in":"path","schema":{"type":"string"}}],"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/EventDeleteDto"}}}},"responses":{"200":{"description":"","content":{"application/json":{"schema":{"$ref":"#/components/schemas/DeletedDto"}}}},"400":{"description":"VALIDATION_ERROR; fields contiene el error de cada campo."},"401":{"description":"Sesión no disponible o inválida."},"403":{"description":"Requiere administrador y protección de escritura."},"404":{"description":"Objeto no visible en la institución."},"409":{"description":"Código duplicado o versión desactualizada."}},"tags":["Calendario académico — administración"]}},"/api/v1/academic/me/events":{"get":{"operationId":"PersonalAcademicController_events","parameters":[{"name":"page","required":false,"in":"query","schema":{"minimum":1,"default":1,"type":"number"}},{"name":"pageSize","required":false,"in":"query","schema":{"minimum":1,"maximum":100,"default":100,"type":"number"}},{"name":"courseId","required":false,"in":"query","schema":{"format":"uuid","type":"string"}},{"name":"from","required":true,"in":"query","schema":{"format":"date-time","type":"string"}},{"name":"to","required":true,"in":"query","schema":{"format":"date-time","type":"string"}},{"name":"sectionId","required":false,"in":"query","schema":{"format":"uuid","type":"string"}},{"name":"type","required":false,"in":"query","schema":{"type":"string","enum":["examen","entrega","matricula"]}}],"responses":{"200":{"description":"","content":{"application/json":{"schema":{"$ref":"#/components/schemas/EventPageDto"}}}},"401":{"description":"Sesión válida requerida."}},"tags":["Calendario académico — titular"]}}},"info":{"title":"CampusITSM — base compartida","description":"Infraestructura y calendario manual. Las rutas académicas requieren integrar la sesión de identidad; el adaptador inicial deniega acceso.","version":"1.0.0","contact":{}},"tags":[],"servers":[],"components":{"schemas":{"HealthResponse":{"type":"object","properties":{"status":{"type":"string","example":"ok","enum":["ok"]},"service":{"type":"string","example":"campusitsm-api"},"database":{"type":"string","example":"ok","enum":["ok"]},"predictions":{"type":"string","example":"ok","enum":["ok"]}},"required":["status","service","database","predictions"]},"CourseDto":{"type":"object","properties":{"id":{"type":"string","format":"uuid"},"institutionId":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"createdAt":{"type":"string","format":"date-time"}},"required":["id","institutionId","code","name","createdAt"]},"CoursePageDto":{"type":"object","properties":{"total":{"type":"number"},"page":{"type":"number"},"pageSize":{"type":"number"},"items":{"type":"array","items":{"$ref":"#/components/schemas/CourseDto"}}},"required":["total","page","pageSize","items"]},"CourseInputDto":{"type":"object","properties":{"reason":{"type":"string","minLength":5,"maxLength":500,"example":"Programación de exámenes parciales."},"code":{"type":"string","maxLength":40,"example":"RED-01"},"name":{"type":"string","maxLength":160,"example":"Redes I"}},"required":["reason","code","name"]},"SectionDto":{"type":"object","properties":{"id":{"type":"string","format":"uuid"},"institutionId":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"createdAt":{"type":"string","format":"date-time"},"courseId":{"type":"string","format":"uuid"}},"required":["id","institutionId","code","name","createdAt","courseId"]},"SectionPageDto":{"type":"object","properties":{"total":{"type":"number"},"page":{"type":"number"},"pageSize":{"type":"number"},"items":{"type":"array","items":{"$ref":"#/components/schemas/SectionDto"}}},"required":["total","page","pageSize","items"]},"SectionInputDto":{"type":"object","properties":{"reason":{"type":"string","minLength":5,"maxLength":500,"example":"Programación de exámenes parciales."},"code":{"type":"string","maxLength":40,"example":"RED-01"},"name":{"type":"string","maxLength":160,"example":"Redes I"},"courseId":{"type":"string","format":"uuid"}},"required":["reason","code","name","courseId"]},"MembershipDto":{"type":"object","properties":{"reason":{"type":"string","minLength":5,"maxLength":500,"example":"Programación de exámenes parciales."},"subjectId":{"type":"string","format":"uuid"},"sectionId":{"type":"string","format":"uuid"}},"required":["reason","subjectId","sectionId"]},"ReasonDto":{"type":"object","properties":{"reason":{"type":"string","minLength":5,"maxLength":500,"example":"Programación de exámenes parciales."}},"required":["reason"]},"DeletedDto":{"type":"object","properties":{"id":{"type":"string","format":"uuid"},"deleted":{"type":"boolean","example":true}},"required":["id","deleted"]},"EventRelationDto":{"type":"object","properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"}},"required":["id","code","name"]},"EventDto":{"type":"object","properties":{"id":{"type":"string","format":"uuid"},"institutionId":{"type":"string","format":"uuid"},"title":{"type":"string"},"type":{"type":"string","enum":["examen","entrega","matricula"]},"scope":{"type":"string","enum":["institution","course","section"]},"source":{"type":"string","enum":["manual"]},"courseId":{"type":"string","format":"uuid","nullable":true},"sectionId":{"type":"string","format":"uuid","nullable":true},"course":{"nullable":true,"type":"object","allOf":[{"$ref":"#/components/schemas/EventRelationDto"}]},"section":{"nullable":true,"type":"object","allOf":[{"$ref":"#/components/schemas/EventRelationDto"}]},"startsAt":{"type":"string","format":"date-time"},"endsAt":{"type":"string","format":"date-time"},"createdAt":{"type":"string","format":"date-time"},"updatedAt":{"type":"string","format":"date-time"},"version":{"type":"number","minimum":1}},"required":["id","institutionId","title","type","scope","source","courseId","sectionId","course","section","startsAt","endsAt","createdAt","updatedAt","version"]},"EventPageDto":{"type":"object","properties":{"total":{"type":"number"},"page":{"type":"number"},"pageSize":{"type":"number"},"items":{"type":"array","items":{"$ref":"#/components/schemas/EventDto"}}},"required":["total","page","pageSize","items"]},"EventInputDto":{"type":"object","properties":{"reason":{"type":"string","minLength":5,"maxLength":500,"example":"Programación de exámenes parciales."},"title":{"type":"string","maxLength":160,"example":"Redes I · Parcial"},"type":{"type":"string","enum":["examen","entrega","matricula"]},"scope":{"type":"string","enum":["institution","course","section"]},"courseId":{"type":"string","format":"uuid","nullable":true},"sectionId":{"type":"string","format":"uuid","nullable":true},"startsAt":{"type":"string","format":"date-time","example":"2026-11-06T10:30:00-05:00"},"endsAt":{"type":"string","format":"date-time","example":"2026-11-06T12:00:00-05:00"}},"required":["reason","title","type","scope","startsAt","endsAt"]},"EventUpdateDto":{"type":"object","properties":{"reason":{"type":"string","minLength":5,"maxLength":500,"example":"Programación de exámenes parciales."},"title":{"type":"string","maxLength":160,"example":"Redes I · Parcial"},"type":{"type":"string","enum":["examen","entrega","matricula"]},"scope":{"type":"string","enum":["institution","course","section"]},"courseId":{"type":"string","format":"uuid","nullable":true},"sectionId":{"type":"string","format":"uuid","nullable":true},"startsAt":{"type":"string","format":"date-time","example":"2026-11-06T10:30:00-05:00"},"endsAt":{"type":"string","format":"date-time","example":"2026-11-06T12:00:00-05:00"},"expectedVersion":{"type":"number","minimum":1}},"required":["reason","title","type","scope","startsAt","endsAt","expectedVersion"]},"EventDeleteDto":{"type":"object","properties":{"reason":{"type":"string","minLength":5,"maxLength":500,"example":"Programación de exámenes parciales."},"expectedVersion":{"type":"number","minimum":1}},"required":["reason","expectedVersion"]}}}}
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/api/v1/health": {
+      "get": {
+        "operationId": "HealthController_check",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Una dependencia no responde."
+          }
+        },
+        "tags": [
+          "Infraestructura"
+        ]
+      }
+    },
+    "/api/v1/auth/status": {
+      "get": {
+        "operationId": "AuthController_status",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthStatusDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Campos inválidos; code/message/fields."
+          },
+          "401": {
+            "description": "Credenciales, código o sesión inválidos."
+          },
+          "403": {
+            "description": "Origen/CSRF inválido o cuenta desactivada."
+          },
+          "503": {
+            "description": "Supabase sin configurar o temporalmente no disponible."
+          }
+        },
+        "tags": [
+          "Identidad — Supabase Auth"
+        ]
+      }
+    },
+    "/api/v1/auth/login": {
+      "post": {
+        "operationId": "AuthController_login",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Campos inválidos; code/message/fields."
+          },
+          "401": {
+            "description": "Credenciales, código o sesión inválidos."
+          },
+          "403": {
+            "description": "Origen/CSRF inválido o cuenta desactivada."
+          },
+          "503": {
+            "description": "Supabase sin configurar o temporalmente no disponible."
+          }
+        },
+        "tags": [
+          "Identidad — Supabase Auth"
+        ]
+      }
+    },
+    "/api/v1/auth/me": {
+      "get": {
+        "operationId": "AuthController_me",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Campos inválidos; code/message/fields."
+          },
+          "401": {
+            "description": "Credenciales, código o sesión inválidos."
+          },
+          "403": {
+            "description": "Origen/CSRF inválido o cuenta desactivada."
+          },
+          "503": {
+            "description": "Supabase sin configurar o temporalmente no disponible."
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Identidad — Supabase Auth"
+        ]
+      }
+    },
+    "/api/v1/auth/logout": {
+      "post": {
+        "operationId": "AuthController_logout",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthMessageDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Campos inválidos; code/message/fields."
+          },
+          "401": {
+            "description": "Credenciales, código o sesión inválidos."
+          },
+          "403": {
+            "description": "Origen/CSRF inválido o cuenta desactivada."
+          },
+          "503": {
+            "description": "Supabase sin configurar o temporalmente no disponible."
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Identidad — Supabase Auth"
+        ]
+      }
+    },
+    "/api/v1/auth/register": {
+      "post": {
+        "operationId": "AuthController_register",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthMessageDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Campos inválidos; code/message/fields."
+          },
+          "401": {
+            "description": "Credenciales, código o sesión inválidos."
+          },
+          "403": {
+            "description": "Origen/CSRF inválido o cuenta desactivada."
+          },
+          "503": {
+            "description": "Supabase sin configurar o temporalmente no disponible."
+          }
+        },
+        "tags": [
+          "Identidad — Supabase Auth"
+        ]
+      }
+    },
+    "/api/v1/auth/recovery/request": {
+      "post": {
+        "operationId": "AuthController_recover",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthMessageDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Campos inválidos; code/message/fields."
+          },
+          "401": {
+            "description": "Credenciales, código o sesión inválidos."
+          },
+          "403": {
+            "description": "Origen/CSRF inválido o cuenta desactivada."
+          },
+          "503": {
+            "description": "Supabase sin configurar o temporalmente no disponible."
+          }
+        },
+        "tags": [
+          "Identidad — Supabase Auth"
+        ]
+      }
+    },
+    "/api/v1/auth/callback": {
+      "get": {
+        "operationId": "AuthController_callback",
+        "parameters": [
+          {
+            "name": "code",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "303": {
+            "description": "Redirige a login, confirmación completada, recuperación limitada o enlace inválido."
+          },
+          "400": {
+            "description": "Campos inválidos; code/message/fields."
+          },
+          "401": {
+            "description": "Credenciales, código o sesión inválidos."
+          },
+          "403": {
+            "description": "Origen/CSRF inválido o cuenta desactivada."
+          },
+          "503": {
+            "description": "Supabase sin configurar o temporalmente no disponible."
+          }
+        },
+        "tags": [
+          "Identidad — Supabase Auth"
+        ]
+      }
+    },
+    "/api/v1/auth/recovery/status": {
+      "get": {
+        "operationId": "AuthController_recoveryStatus",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecoveryStatusDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Campos inválidos; code/message/fields."
+          },
+          "401": {
+            "description": "Credenciales, código o sesión inválidos."
+          },
+          "403": {
+            "description": "Origen/CSRF inválido o cuenta desactivada."
+          },
+          "503": {
+            "description": "Supabase sin configurar o temporalmente no disponible."
+          }
+        },
+        "tags": [
+          "Identidad — Supabase Auth"
+        ]
+      }
+    },
+    "/api/v1/auth/recovery/reset": {
+      "post": {
+        "operationId": "AuthController_reset",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthMessageDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Campos inválidos; code/message/fields."
+          },
+          "401": {
+            "description": "Credenciales, código o sesión inválidos."
+          },
+          "403": {
+            "description": "Origen/CSRF inválido o cuenta desactivada."
+          },
+          "503": {
+            "description": "Supabase sin configurar o temporalmente no disponible."
+          }
+        },
+        "tags": [
+          "Identidad — Supabase Auth"
+        ]
+      }
+    },
+    "/api/v1/academic/courses": {
+      "get": {
+        "operationId": "AcademicController_courses",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 100,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CoursePageDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "VALIDATION_ERROR; fields contiene el error de cada campo."
+          },
+          "401": {
+            "description": "Sesión no disponible o inválida."
+          },
+          "403": {
+            "description": "Requiere administrador y protección de escritura."
+          },
+          "404": {
+            "description": "Objeto no visible en la institución."
+          },
+          "409": {
+            "description": "Código duplicado o versión desactualizada."
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Calendario académico — administración"
+        ]
+      },
+      "post": {
+        "operationId": "AcademicController_createCourse",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CourseInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CourseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "VALIDATION_ERROR; fields contiene el error de cada campo."
+          },
+          "401": {
+            "description": "Sesión no disponible o inválida."
+          },
+          "403": {
+            "description": "Requiere administrador y protección de escritura."
+          },
+          "404": {
+            "description": "Objeto no visible en la institución."
+          },
+          "409": {
+            "description": "Código duplicado o versión desactualizada."
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Calendario académico — administración"
+        ]
+      }
+    },
+    "/api/v1/academic/sections": {
+      "get": {
+        "operationId": "AcademicController_sections",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 100,
+              "type": "number"
+            }
+          },
+          {
+            "name": "courseId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SectionPageDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "VALIDATION_ERROR; fields contiene el error de cada campo."
+          },
+          "401": {
+            "description": "Sesión no disponible o inválida."
+          },
+          "403": {
+            "description": "Requiere administrador y protección de escritura."
+          },
+          "404": {
+            "description": "Objeto no visible en la institución."
+          },
+          "409": {
+            "description": "Código duplicado o versión desactualizada."
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Calendario académico — administración"
+        ]
+      },
+      "post": {
+        "operationId": "AcademicController_createSection",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SectionInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SectionDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "VALIDATION_ERROR; fields contiene el error de cada campo."
+          },
+          "401": {
+            "description": "Sesión no disponible o inválida."
+          },
+          "403": {
+            "description": "Requiere administrador y protección de escritura."
+          },
+          "404": {
+            "description": "Objeto no visible en la institución."
+          },
+          "409": {
+            "description": "Código duplicado o versión desactualizada."
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Calendario académico — administración"
+        ]
+      }
+    },
+    "/api/v1/academic/memberships": {
+      "post": {
+        "operationId": "AcademicController_associate",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MembershipDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "400": {
+            "description": "VALIDATION_ERROR; fields contiene el error de cada campo."
+          },
+          "401": {
+            "description": "Sesión no disponible o inválida."
+          },
+          "403": {
+            "description": "Requiere administrador y protección de escritura."
+          },
+          "404": {
+            "description": "Objeto no visible en la institución."
+          },
+          "409": {
+            "description": "Código duplicado o versión desactualizada."
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Calendario académico — administración"
+        ]
+      }
+    },
+    "/api/v1/academic/memberships/{sectionId}/{subjectId}": {
+      "delete": {
+        "operationId": "AcademicController_dissociate",
+        "parameters": [
+          {
+            "name": "sectionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "subjectId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReasonDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeletedDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "VALIDATION_ERROR; fields contiene el error de cada campo."
+          },
+          "401": {
+            "description": "Sesión no disponible o inválida."
+          },
+          "403": {
+            "description": "Requiere administrador y protección de escritura."
+          },
+          "404": {
+            "description": "Objeto no visible en la institución."
+          },
+          "409": {
+            "description": "Código duplicado o versión desactualizada."
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Calendario académico — administración"
+        ]
+      }
+    },
+    "/api/v1/academic/events": {
+      "get": {
+        "operationId": "AcademicController_events",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 100,
+              "type": "number"
+            }
+          },
+          {
+            "name": "courseId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            }
+          },
+          {
+            "name": "sectionId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "type",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "examen",
+                "entrega",
+                "matricula"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventPageDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "VALIDATION_ERROR; fields contiene el error de cada campo."
+          },
+          "401": {
+            "description": "Sesión no disponible o inválida."
+          },
+          "403": {
+            "description": "Requiere administrador y protección de escritura."
+          },
+          "404": {
+            "description": "Objeto no visible en la institución."
+          },
+          "409": {
+            "description": "Código duplicado o versión desactualizada."
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Calendario académico — administración"
+        ]
+      },
+      "post": {
+        "operationId": "AcademicController_createEvent",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EventInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "VALIDATION_ERROR; fields contiene el error de cada campo."
+          },
+          "401": {
+            "description": "Sesión no disponible o inválida."
+          },
+          "403": {
+            "description": "Requiere administrador y protección de escritura."
+          },
+          "404": {
+            "description": "Objeto no visible en la institución."
+          },
+          "409": {
+            "description": "Código duplicado o versión desactualizada."
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Calendario académico — administración"
+        ]
+      }
+    },
+    "/api/v1/academic/events/{id}": {
+      "get": {
+        "operationId": "AcademicController_event",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "VALIDATION_ERROR; fields contiene el error de cada campo."
+          },
+          "401": {
+            "description": "Sesión no disponible o inválida."
+          },
+          "403": {
+            "description": "Requiere administrador y protección de escritura."
+          },
+          "404": {
+            "description": "Objeto no visible en la institución."
+          },
+          "409": {
+            "description": "Código duplicado o versión desactualizada."
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Calendario académico — administración"
+        ]
+      },
+      "patch": {
+        "operationId": "AcademicController_updateEvent",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EventUpdateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "VALIDATION_ERROR; fields contiene el error de cada campo."
+          },
+          "401": {
+            "description": "Sesión no disponible o inválida."
+          },
+          "403": {
+            "description": "Requiere administrador y protección de escritura."
+          },
+          "404": {
+            "description": "Objeto no visible en la institución."
+          },
+          "409": {
+            "description": "Código duplicado o versión desactualizada."
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Calendario académico — administración"
+        ]
+      },
+      "delete": {
+        "operationId": "AcademicController_deleteEvent",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EventDeleteDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeletedDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "VALIDATION_ERROR; fields contiene el error de cada campo."
+          },
+          "401": {
+            "description": "Sesión no disponible o inválida."
+          },
+          "403": {
+            "description": "Requiere administrador y protección de escritura."
+          },
+          "404": {
+            "description": "Objeto no visible en la institución."
+          },
+          "409": {
+            "description": "Código duplicado o versión desactualizada."
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Calendario académico — administración"
+        ]
+      }
+    },
+    "/api/v1/academic/me/events": {
+      "get": {
+        "operationId": "PersonalAcademicController_events",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 100,
+              "type": "number"
+            }
+          },
+          {
+            "name": "courseId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            }
+          },
+          {
+            "name": "sectionId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "type",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "examen",
+                "entrega",
+                "matricula"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventPageDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sesión válida requerida."
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Calendario académico — titular"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "CampusITSM — base compartida",
+    "description": "Identidad Supabase y calendario. Cookie HttpOnly; Origin y X-CSRF-Token para escrituras.",
+    "version": "1.0.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "campus_session": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "campus_session"
+      }
+    },
+    "schemas": {
+      "HealthResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "ok",
+            "enum": [
+              "ok"
+            ]
+          },
+          "service": {
+            "type": "string",
+            "example": "campusitsm-api"
+          },
+          "database": {
+            "type": "string",
+            "example": "ok",
+            "enum": [
+              "ok"
+            ]
+          },
+          "predictions": {
+            "type": "string",
+            "example": "ok",
+            "enum": [
+              "ok"
+            ]
+          }
+        },
+        "required": [
+          "status",
+          "service",
+          "database",
+          "predictions"
+        ]
+      },
+      "AuthStatusDto": {
+        "type": "object",
+        "properties": {
+          "available": {
+            "type": "boolean"
+          },
+          "registrationEnabled": {
+            "type": "boolean"
+          },
+          "emailLinksRequired": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "available",
+          "registrationEnabled",
+          "emailLinksRequired"
+        ]
+      },
+      "LoginDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "maxLength": 254
+          },
+          "password": {
+            "type": "string",
+            "format": "password",
+            "minLength": 1,
+            "maxLength": 128,
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "CurrentUserDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "institutionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "email": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "estudiante",
+              "docente",
+              "ti_agente",
+              "ti_supervisor",
+              "administrador"
+            ]
+          },
+          "teamId": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid"
+          },
+          "active": {
+            "type": "boolean"
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "institutionId",
+          "email",
+          "displayName",
+          "role",
+          "teamId",
+          "active",
+          "permissions"
+        ]
+      },
+      "SessionDto": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/CurrentUserDto"
+          },
+          "csrfToken": {
+            "type": "string",
+            "description": "Solo protección CSRF; no es token de Supabase ni credencial de sesión."
+          }
+        },
+        "required": [
+          "user",
+          "csrfToken"
+        ]
+      },
+      "AuthMessageDto": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "providerRevoked": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "message"
+        ]
+      },
+      "RegisterDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "maxLength": 254
+          },
+          "password": {
+            "type": "string",
+            "format": "password",
+            "minLength": 10,
+            "maxLength": 128,
+            "writeOnly": true
+          },
+          "displayName": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 120
+          }
+        },
+        "required": [
+          "email",
+          "password",
+          "displayName"
+        ]
+      },
+      "EmailDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "RecoveryStatusDto": {
+        "type": "object",
+        "properties": {
+          "csrfToken": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "csrfToken"
+        ]
+      },
+      "PasswordDto": {
+        "type": "object",
+        "properties": {
+          "password": {
+            "type": "string",
+            "format": "password",
+            "minLength": 10,
+            "maxLength": 128,
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "password"
+        ]
+      },
+      "CourseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "institutionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "code": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "institutionId",
+          "code",
+          "name",
+          "createdAt"
+        ]
+      },
+      "CoursePageDto": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "number"
+          },
+          "page": {
+            "type": "number"
+          },
+          "pageSize": {
+            "type": "number"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CourseDto"
+            }
+          }
+        },
+        "required": [
+          "total",
+          "page",
+          "pageSize",
+          "items"
+        ]
+      },
+      "CourseInputDto": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 500,
+            "example": "Programación de exámenes parciales."
+          },
+          "code": {
+            "type": "string",
+            "maxLength": 40,
+            "example": "RED-01"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 160,
+            "example": "Redes I"
+          }
+        },
+        "required": [
+          "reason",
+          "code",
+          "name"
+        ]
+      },
+      "SectionDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "institutionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "code": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "courseId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "id",
+          "institutionId",
+          "code",
+          "name",
+          "createdAt",
+          "courseId"
+        ]
+      },
+      "SectionPageDto": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "number"
+          },
+          "page": {
+            "type": "number"
+          },
+          "pageSize": {
+            "type": "number"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SectionDto"
+            }
+          }
+        },
+        "required": [
+          "total",
+          "page",
+          "pageSize",
+          "items"
+        ]
+      },
+      "SectionInputDto": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 500,
+            "example": "Programación de exámenes parciales."
+          },
+          "code": {
+            "type": "string",
+            "maxLength": 40,
+            "example": "RED-01"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 160,
+            "example": "Redes I"
+          },
+          "courseId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "reason",
+          "code",
+          "name",
+          "courseId"
+        ]
+      },
+      "MembershipDto": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 500,
+            "example": "Programación de exámenes parciales."
+          },
+          "subjectId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "sectionId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "reason",
+          "subjectId",
+          "sectionId"
+        ]
+      },
+      "ReasonDto": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 500,
+            "example": "Programación de exámenes parciales."
+          }
+        },
+        "required": [
+          "reason"
+        ]
+      },
+      "DeletedDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "deleted": {
+            "type": "boolean",
+            "example": true
+          }
+        },
+        "required": [
+          "id",
+          "deleted"
+        ]
+      },
+      "EventRelationDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "code": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "name"
+        ]
+      },
+      "EventDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "institutionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "examen",
+              "entrega",
+              "matricula"
+            ]
+          },
+          "scope": {
+            "type": "string",
+            "enum": [
+              "institution",
+              "course",
+              "section"
+            ]
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "manual"
+            ]
+          },
+          "courseId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "sectionId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "course": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EventRelationDto"
+              }
+            ]
+          },
+          "section": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EventRelationDto"
+              }
+            ]
+          },
+          "startsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "version": {
+            "type": "number",
+            "minimum": 1
+          }
+        },
+        "required": [
+          "id",
+          "institutionId",
+          "title",
+          "type",
+          "scope",
+          "source",
+          "courseId",
+          "sectionId",
+          "course",
+          "section",
+          "startsAt",
+          "endsAt",
+          "createdAt",
+          "updatedAt",
+          "version"
+        ]
+      },
+      "EventPageDto": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "number"
+          },
+          "page": {
+            "type": "number"
+          },
+          "pageSize": {
+            "type": "number"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EventDto"
+            }
+          }
+        },
+        "required": [
+          "total",
+          "page",
+          "pageSize",
+          "items"
+        ]
+      },
+      "EventInputDto": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 500,
+            "example": "Programación de exámenes parciales."
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 160,
+            "example": "Redes I · Parcial"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "examen",
+              "entrega",
+              "matricula"
+            ]
+          },
+          "scope": {
+            "type": "string",
+            "enum": [
+              "institution",
+              "course",
+              "section"
+            ]
+          },
+          "courseId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "sectionId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "startsAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-11-06T10:30:00-05:00"
+          },
+          "endsAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-11-06T12:00:00-05:00"
+          }
+        },
+        "required": [
+          "reason",
+          "title",
+          "type",
+          "scope",
+          "startsAt",
+          "endsAt"
+        ]
+      },
+      "EventUpdateDto": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 500,
+            "example": "Programación de exámenes parciales."
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 160,
+            "example": "Redes I · Parcial"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "examen",
+              "entrega",
+              "matricula"
+            ]
+          },
+          "scope": {
+            "type": "string",
+            "enum": [
+              "institution",
+              "course",
+              "section"
+            ]
+          },
+          "courseId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "sectionId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "startsAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-11-06T10:30:00-05:00"
+          },
+          "endsAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-11-06T12:00:00-05:00"
+          },
+          "expectedVersion": {
+            "type": "number",
+            "minimum": 1
+          }
+        },
+        "required": [
+          "reason",
+          "title",
+          "type",
+          "scope",
+          "startsAt",
+          "endsAt",
+          "expectedVersion"
+        ]
+      },
+      "EventDeleteDto": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 500,
+            "example": "Programación de exámenes parciales."
+          },
+          "expectedVersion": {
+            "type": "number",
+            "minimum": 1
+          }
+        },
+        "required": [
+          "reason",
+          "expectedVersion"
+        ]
+      }
+    }
+  }
+}

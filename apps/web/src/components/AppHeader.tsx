@@ -1,4 +1,7 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { useAuth, roleLabels } from '../features/auth/AuthContext'
+import { Button } from './ui'
 import {
   Bell,
   CaretDown,
@@ -16,6 +19,12 @@ export function AppHeader({
   menuOpen: boolean
   onToggleMenu: () => void
 }) {
+  const { user, logout, loading } = useAuth()
+  const [error, setError] = useState(''), [closing, setClosing] = useState(false)
+  async function closeSession() {
+    setClosing(true); setError('')
+    try { await logout() } catch { setError('No se pudo cerrar la sesión. Inténtalo nuevamente.'); setClosing(false) }
+  }
   const ref = useRef<HTMLElement>(null)
   useEffect(() => {
     const close = (event: Event) => {
@@ -59,7 +68,7 @@ export function AppHeader({
       <div className="topbar__right">
         <span className="team-label">
           <Users size={23} aria-hidden="true" />
-          Administración
+          {user ? roleLabels[user.role] : 'CampusITSM'}
         </span>
         <button
           className="icon-button notification-button"
@@ -70,19 +79,18 @@ export function AppHeader({
         </button>
         <span className="topbar__divider" />
         <details className="header-dropdown">
-          <summary className="profile-button" aria-label="Opciones de cuenta, sin sesión">
+          <summary className="profile-button" aria-label={`Opciones de cuenta, ${user?.displayName || 'sin sesión'}`}>
             <span className="avatar">
               <User size={23} aria-hidden="true" />
             </span>
-            <span className="profile-button__name">Sin sesión</span>
+            <span className="profile-button__name">{user?.displayName || (loading ? 'Comprobando…' : 'Sin sesión')}</span>
             <CaretDown size={17} aria-hidden="true" />
           </summary>
           <div className="dropdown-panel profile-panel">
-            <h2>Acceso a CampusITSM</h2>
-            <p className="body-muted">
-              No hay una sesión activa. El acceso de usuarios todavía no está
-              disponible.
-            </p>
+            <h2>{user ? roleLabels[user.role] : 'Acceso a CampusITSM'}</h2>
+            <p className="body-muted">{user?.email || 'Inicia sesión para acceder a tus herramientas.'}</p>
+            {error && <p role="alert">{error}</p>}
+            {user ? <Button variant="ghost" onClick={closeSession} disabled={closing}>{closing ? 'Cerrando sesión…' : 'Cerrar sesión'}</Button> : <Link className="text-link" to="/login">Iniciar sesión</Link>}
           </div>
         </details>
       </div>

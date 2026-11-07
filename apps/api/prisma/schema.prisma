@@ -16,6 +16,7 @@ model Institution {
   teams     SupportTeam[]
   courses   AcademicCourse[]
   events    AcademicEvent[]
+  users     AppUser[]
 }
 
 enum AcademicEventType {
@@ -116,6 +117,77 @@ model SupportTeam {
   name          String      @db.VarChar(160)
   createdAt     DateTime    @default(now()) @db.Timestamptz(3)
   institution   Institution @relation(fields: [institutionId], references: [id], onDelete: Restrict)
+  users         AppUser[]
 
   @@unique([institutionId, code])
+  @@unique([institutionId, id])
+}
+
+enum CampusRole {
+  estudiante
+  docente
+  ti_agente
+  ti_supervisor
+  administrador
+}
+
+model AppUser {
+  // UUID canónico = subject de Supabase. Las credenciales permanecen en Auth.
+  id            String @id @db.Uuid
+  institutionId String @db.Uuid
+  email         String @db.VarChar(254)
+  displayName   String @db.VarChar(120)
+  role          CampusRole @default(estudiante)
+  active        Boolean @default(true)
+  teamId        String? @db.Uuid
+  accessVersion Int @default(1)
+  createdAt     DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt     DateTime @updatedAt @db.Timestamptz(3)
+  institution   Institution @relation(fields: [institutionId], references: [id], onDelete: Restrict)
+  team          SupportTeam? @relation(fields: [institutionId, teamId], references: [institutionId, id], onDelete: Restrict)
+  sessions      AuthSession[]
+
+  @@unique([institutionId, id])
+  @@index([institutionId, role, active])
+}
+
+model AuthSession {
+  // Solo la huella de la cookie opaca; tokens cifrados con AES-256-GCM.
+  id            String @id @db.VarChar(64)
+  userId        String @db.Uuid
+  accessVersion Int
+  tokens        String @db.Text
+  tokenExpiresAt DateTime @db.Timestamptz(3)
+  expiresAt     DateTime @db.Timestamptz(3)
+  createdAt     DateTime @default(now()) @db.Timestamptz(3)
+  user          AppUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model AuthThrottle {
+  id        String @id @db.VarChar(64)
+  attempts  Int @default(1)
+  expiresAt DateTime @db.Timestamptz(3)
+}
+
+model AuthFlow {
+  id        String @id @db.VarChar(64)
+  purpose   String @db.VarChar(20)
+  secret    String @db.Text
+  expiresAt DateTime @db.Timestamptz(3)
+}
+
+// Cambios de autorización atómicos para entrega futura a auditoría de Jasmine.
+model IdentityChange {
+  id            String @id @default(uuid()) @db.Uuid
+  institutionId String @db.Uuid
+  actorId       String @db.Uuid
+  subjectId     String @db.Uuid
+  reason        String @db.VarChar(500)
+  before        Json
+  after         Json
+  createdAt     DateTime @default(now()) @db.Timestamptz(3)
+  @@index([institutionId, createdAt])
 }

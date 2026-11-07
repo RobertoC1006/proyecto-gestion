@@ -1,5 +1,15 @@
 # CampusITSM
 
+## Identidad y calendario en la rama de trabajo
+
+`identidad-supabase` añade acceso real, registro propio, confirmación/recuperación
+por enlace y roles comunes, con los datos de negocio en Docker. Roberto ya probó
+su cuenta confirmada y el acceso como administrador. Configuración del equipo:
+[guía de acceso](docs/AUTH_DESARROLLO.md), [contrato](docs/CONTRATO_IDENTIDAD.md) y
+[entrega](docs/entregas/roberto-semana-01-identidad.md). Esta rama todavía no está
+integrada en main; las indicaciones sin identidad de la entrega anterior se
+conservan debajo como contexto de esa base.
+
 ## Base compartida y calendario manual
 
 Roberto autorizó integrar la base visual y calendario mediante PR #2. Obtener

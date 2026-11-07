@@ -1,13 +1,16 @@
-# Identidad, Supabase Auth y autorización — siguiente módulo de Roberto
+# Identidad, Supabase Auth y autorización — rama identidad-supabase
 
 Decisión expresa de Roberto, 6 de noviembre de 2026: Roberto asume login,
 autenticación con Supabase Auth y la base común de roles/permisos. P01 pasa a
 Roberto. Jasmine conserva P20/P21, consentimiento, auditoría, constancias y
 reportes, consumiendo la identidad y autorización comunes.
 
-**Estado: diseño de integración, todavía no implementado.** Esta entrega no crea
-un proyecto Supabase, no incorpora claves ni habilita sesiones. La publicación
-del calendario y de la base visual no significa que el login esté listo.
+**7 de noviembre de 2026: implementado en la rama de trabajo, sin integrar en main.**
+Proyecto alojado CampusITSM creado por solicitud de Roberto en su organización,
+plan gratuito. Roberto completó registro, confirmación de correo y login reales.
+También autorizó asignar su cuenta como primer administrador local.
+Pruebas automáticas y límites de aceptación en la entrega de identidad.
+La administración P20/P21 y el consentimiento/auditoría global siguen a cargo de Jasmine.
 
 ## Límites de cada módulo
 
@@ -19,19 +22,19 @@ del calendario y de la base visual no significa que el login esté listo.
 
 Supabase Auth gestionará credenciales e identidad. Los datos de negocio siguen
 en PostgreSQL/Prisma de Docker. No se ha aprobado migrar toda la base a Supabase.
-Antes de implementar, Roberto debe fijar proyecto y modalidad (servicio alojado
-o desarrollo local), configuración de acceso y creación/recuperación de cuentas.
-Si se elige servicio alojado, los nuevos ingresos y la renovación dependerán de
-ese servicio; no afirmar funcionamiento completamente desconectado.
+Modalidad elegida: servicio alojado; Roberto pidió que cada persona pueda registrarse.
+Registro con contraseña y confirmación por enlace; recuperación también por enlace.
+Los accesos y la validación/renovación de sesiones dependen del servicio externo.
+El correo incluido solo admite miembros de la organización Supabase. Abrir el
+registro a otras direcciones requiere configurar SMTP propio; no se contrató uno.
+Consultar [la guía de desarrollo](AUTH_DESARROLLO.md).
 
-## Decisiones que el módulo debe concretar
+## Decisiones implementadas
 
 - Mantener la regla de no guardar credenciales/tokens ni datos de negocio en
-  localStorage. La propuesta es que NestJS medie el acceso al proveedor y que el
-  navegador use una sesión opaca HttpOnly con CSRF; los tokens del proveedor se
-  administran solo en el servidor, cifrados si se persisten. Este flujo requiere
-  implementación explícita: no es el comportamiento por defecto de supabase-js
-  en el navegador ni una promesa de que bastará cambiar una opción del SDK.
+  localStorage. NestJS media el acceso y el navegador usa una sesión opaca HttpOnly
+  con Origin y CSRF. Tokens del proveedor y verificadores PKCE solo en servidor,
+  cifrados con AES-256-GCM al persistir. No se usa supabase-js en React.
 - Validar la identidad con el SDK/servidor o verificación JWT mantenida, según
   las claves del proyecto; comprobar firma, emisor, audiencia, vencimiento y
   estado de acceso. No confiar en un JWT solamente decodificado.
@@ -42,44 +45,63 @@ ese servicio; no afirmar funcionamiento completamente desconectado.
   efectivo, sin depender únicamente de datos viejos del navegador o del token.
 - Claves secretas/administrativas solo en servidor y configuración privada, nunca
   en React, repositorio, planes, paquetes de compañeros ni registros de errores.
-- Definir el UUID canónico del usuario y su relación con el sujeto de Supabase
-  antes de crear migraciones de perfiles/asociaciones. No duplicar identidades.
+- UUID canónico de AppUser = subject de Supabase. El primer login confirmado
+  crea el perfil local como estudiante; nunca toma rol/institución/equipo del cliente.
+  Los perfiles existentes conservan estado y asignaciones. Cada Docker es independiente.
 - Login/logout, protección de escrituras, renovación simultánea y revocación de
   sesión deben probarse explícitamente. No dar por revocado un JWT vigente solo
   por borrar datos del navegador. No seleccionar un plan de pago ni enviar correo
   o habilitar registro público por defecto.
 
-## Contratos por publicar antes de conectar consumidores
+## Contratos publicados en esta rama
 
-Rutas propuestas: `/api/v1/auth/login`, `/auth/logout` y `/auth/me` bajo el mismo
-prefijo `/api/v1`. La respuesta de usuario actual debe permitir conocer UUID,
-institución, rol, permisos, equipo/alcance y estado, sin claves ni tokens privados.
-Roberto debe versionar DTO/OpenAPI y el mecanismo de protección de escrituras.
+Todas bajo `/api/v1/auth`: GET `status`, POST `register`, POST `login`, GET `me`,
+POST `logout`, POST `recovery/request`, GET `callback`, GET `recovery/status` y
+POST `recovery/reset`. DTO/OpenAPI y tipos del navegador generados desde NestJS.
+`me`/`login` devuelven `{user:{id,institutionId,email,displayName,role,teamId,active,permissions},csrfToken}`.
+La cookie de sesión es HttpOnly, SameSite=Lax, Path=/; Secure y prefijo __Host-
+cuando APP_ORIGIN usa HTTPS. Vida local absoluta: ocho horas. Respuestas no-store.
+Los formularios públicos requieren Origin exacto y JSON; las escrituras con sesión
+requieren además X-CSRF-Token obtenido de `me`, sin guardarlo en localStorage.
 
-El calendario ya ofrece dos puertos que Roberto debe implementar contra esta base:
+`CampusSessionGuard`, `RequirePermissions`, `requirePermission` y `requireScope`
+son la base reutilizable de Johan/Jasmine. El permiso no sustituye la comprobación
+del objeto por institución, titular o equipo. Las capacidades de tickets/reportes/
+constancias se reservan para sus módulos; no acreditan endpoints ya implementados.
+`IdentityDirectory.changeAccess(actorId,subjectId,input)` es el único servicio
+de cambios de rol/estado/equipo: actor validado por el servidor, motivo y versión,
+sin cambiar institución ni eliminar al último administrador. Los cambios incrementan
+accessVersion y guardan IdentityChange en la misma transacción; las sesiones antiguas
+dejan de autorizar la siguiente solicitud. Jasmine crea su administración sobre él.
+
+El calendario conecta sus dos puertos a esta base:
 
 - `AcademicIdentity.resolve(request)` devuelve
   `{id,institutionId,role,csrfVerified}` desde la sesión validada del servidor.
 - `AcademicDirectory.belongsToInstitution(subjectId,institutionId)` comprueba un
   usuario real autorizado de esa institución; no lo deduce de campos del cliente.
 
-Se deben ajustar esas interfaces de forma coordinada si el contrato final necesita
-más permisos. Por ahora deniegan acceso: 401 sin identidad y directorio no disponible.
-No crear un adaptador de administrador ficticio para que las pantallas guarden.
+`SessionAcademicIdentity` resuelve sesión validada; `CanonicalAcademicDirectory`
+comprueba perfiles locales activos de la misma institución. Sin sesión se mantiene
+401; rol no autorizado o CSRF incorrecto devuelve 403. No existe acceso ficticio.
+`/calendario` consulta los eventos personales; P17/P18 siguen siendo administración.
 
-Jasmine entrega el contrato de auditoría e integra `AcademicChange`, conservando
+Jasmine debe entregar el contrato de consentimiento y de auditoría e integrar
+`AcademicChange` e `IdentityChange`, conservando
 actor/motivo/antes/después en la misma transacción o mediante entrega persistente.
 Johan consume contexto académico; `/academic/me/events` y el servicio interno ya
 existen, pero el cálculo del factor y la configuración SLA son de semana 2.
 No presentar `/academic/context` como ruta funcional: sigue siendo una propuesta.
 
-## Fuentes técnicas a revisar al implementar
+## Fuentes técnicas verificadas y referencias
 
-La integración deberá comprobar nuevamente la documentación vigente de Supabase:
+Documentación de Supabase consultada para esta entrega:
 [JWT y validación](https://supabase.com/docs/guides/auth/jwts),
 [sesiones](https://supabase.com/docs/guides/auth/sessions),
 [metadatos de usuarios](https://supabase.com/docs/guides/auth/users),
 [claves](https://supabase.com/docs/guides/getting-started/api-keys) y
 [desarrollo local](https://supabase.com/docs/guides/local-development).
-Las elecciones de arquitectura anteriores son propuestas del proyecto;
-no equivalen a una integración probada ni a configuración ya contratada.
+Registro y recuperación usan PKCE de servidor con las plantillas estándar de enlaces;
+no se desactivó la confirmación de correo ni se configuró SMTP de pago.
+Una caída al cerrar sesión invalida la sesión local e informa si no pudo confirmarse
+la revocación remota; no promete revocar inmediatamente un JWT externo vigente.

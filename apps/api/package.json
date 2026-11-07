@@ -9,7 +9,9 @@
     "prisma:generate": "prisma generate",
     "db:deploy": "prisma migrate deploy",
     "db:seed": "node prisma/seed.cjs",
-    "test:academic": "node --test test/academic.test.cjs"
+    "test:academic": "node --test test/academic.test.cjs",
+    "test:auth": "node --test test/auth.test.cjs test/auth.provider.test.cjs",
+    "api:export": "node prisma/export-openapi.cjs"
   },
   "dependencies": {
     "@nestjs/common": "11.2.8",
@@ -17,15 +19,16 @@
     "@nestjs/platform-express": "11.2.8",
     "@nestjs/swagger": "11.4.8",
     "@prisma/client": "6.19.3",
+    "@supabase/supabase-js": "2.119.0",
     "reflect-metadata": "0.2.2",
     "rxjs": "7.8.2"
   },
   "devDependencies": {
+    "@nestjs/testing": "11.2.8",
     "@types/node": "22.15.30",
     "prisma": "6.19.3",
-    "typescript": "5.9.3",
-    "@nestjs/testing": "11.2.8",
-    "ts-node": "10.9.2"
+    "ts-node": "10.9.2",
+    "typescript": "5.9.3"
   },
   "overrides": {
     "multer": "2.5.0",

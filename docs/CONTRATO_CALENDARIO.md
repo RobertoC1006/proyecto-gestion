@@ -6,7 +6,11 @@ factores/SLA y cálculo del factor corresponden a semana 2.
 
 ## Identidad y auditoría: dependencias explícitas
 
-No hay identidad implementada. `AcademicIdentity` es el único punto de integración:
+En main previo a identidad-supabase todavía no había identidad. En la rama de
+identidad actual, `AcademicIdentity` y `AcademicDirectory` ya se conectan a la
+sesión y perfiles canónicos reales de NestJS/Supabase. Ver el contrato actualizado
+de identidad y su entrega; no mezclar esa rama con la fotografía histórica siguiente.
+`AcademicIdentity` es el único punto de integración:
 Roberto debe proporcionar `resolve(request)` mediante su integración Supabase Auth y devolver
 `{id,institutionId,role,csrfVerified}`. `csrfVerified` solo es true tras validar la
 protección de escritura en el servidor. El adaptador predeterminado devuelve null:

@@ -1,10 +1,11 @@
 import { Body, Controller, Delete, Get, Inject, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
-import { ApiBadRequestResponse, ApiConflictResponse, ApiCreatedResponse, ApiForbiddenResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiConflictResponse, ApiCookieAuth, ApiCreatedResponse, ApiForbiddenResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { AcademicRequest, AcademicSessionGuard } from './academic.access';
 import { AcademicService } from './academic.service';
 import { CourseDto, CourseInputDto, CoursePageDto, DeletedDto, EventDeleteDto, EventDto, EventInputDto, EventPageDto, EventsQueryDto, EventUpdateDto, MembershipDto, PageQueryDto, ReasonDto, SectionDto, SectionInputDto, SectionPageDto, SectionQueryDto } from './academic.dto';
 
 @ApiTags('Calendario académico — administración')
+@ApiCookieAuth('campus_session')
 @ApiUnauthorizedResponse({ description: 'Sesión no disponible o inválida.' })
 @ApiForbiddenResponse({ description: 'Requiere administrador y protección de escritura.' })
 @ApiBadRequestResponse({ description: 'VALIDATION_ERROR; fields contiene el error de cada campo.' })
@@ -39,6 +40,7 @@ export class AcademicController {
 }
 
 @ApiTags('Calendario académico — titular')
+@ApiCookieAuth('campus_session')
 @ApiUnauthorizedResponse({ description: 'Sesión válida requerida.' })
 @UseGuards(AcademicSessionGuard)
 @Controller('academic/me')

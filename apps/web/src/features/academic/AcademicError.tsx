@@ -1,5 +1,5 @@
 import { LockKey, WarningCircle } from '@phosphor-icons/react'
-import { Button, Notice } from '../../components/ui'
+import { Button, ButtonLink, Notice } from '../../components/ui'
 import { ApiError } from '../../lib/api/academic'
 
 export function AcademicError({
@@ -25,6 +25,7 @@ export function AcademicError({
           ? error.message
           : 'Revisa tu conexión e inténtalo nuevamente.'}
       </p>
+      {error instanceof ApiError && error.status === 401 && <ButtonLink to="/login" variant="secondary">Iniciar sesión</ButtonLink>}
       {!denied && retry && (
         <Button variant="ghost" onClick={retry}>
           Reintentar

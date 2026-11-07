@@ -1,5 +1,11 @@
 # Contratos compartidos — base v1
 
+Actualización de rama del 7 de noviembre: identidad-supabase implementa el acceso,
+registro y recuperación por enlace, sesión opaca y autorización común, con proyecto
+real configurado. Los detalles vigentes están en [CONTRATO_IDENTIDAD.md](CONTRATO_IDENTIDAD.md).
+Las propuestas y el estado sin identidad descritos debajo corresponden al main
+anterior a esa rama; no acreditar su integración hasta que Roberto la autorice.
+
 La entrega aprobada de calendario/base visual se integra por PR #2. Su contrato
 está en [CONTRATO_CALENDARIO.md](CONTRATO_CALENDARIO.md). Las rutas académicas
 siguen cerradas sin sesión. Roberto implementará identidad/directorio/roles con
