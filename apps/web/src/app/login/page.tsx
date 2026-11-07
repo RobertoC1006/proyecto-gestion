@@ -1,4 +1,4 @@
-import { GraduationCap, Headphones, ShieldCheck, UserRound } from "lucide-react";
+import { GraduationCap, Headset as Headphones, ShieldCheck, UserCircle as UserRound } from '@phosphor-icons/react';
 
 const roles = [
   { label: "Estudiante", detail: "Reporta y consulta tus incidencias", icon: GraduationCap, href: "/" },

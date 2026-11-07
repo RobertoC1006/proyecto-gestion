@@ -1,5 +1,11 @@
 # CampusITSM — Tres casos de uso y catálogo de pantallas
 
+> Catálogo conceptual de referencia. Los planes vigentes actualizan su reparto:
+> P01/Supabase Auth y autorización común corresponden a Roberto; Jasmine conserva
+> administración, consentimiento y auditoría. El diseño aprobado reutiliza los
+> componentes de casos-gestion: ver [guía compartida](../../docs/DISENO_COMPONENTES.md).
+> Las láminas conservan estructura y funciones; sus datos son ilustrativos.
+
 Propuesta visual del 6 de noviembre de 2026. Mockups conceptuales de escritorio, no aplicación implementada. Basada en el documento académico, PROYECTO.md y la imagen de referencia del usuario. Las pantallas de soporte se agrupan en tres casos amplios para respetar el máximo solicitado; no son tres operaciones atómicas de UML.
 
 ## Dirección visual

@@ -1,5 +1,58 @@
 # CampusITSM
 
+## Base compartida y calendario manual
+
+Roberto autorizó integrar la base visual y calendario mediante PR #2. Obtener
+el main que incluya esa entrega; no empezar desde la vista provisional. Ver contrato en
+`docs/CONTRATO_CALENDARIO.md` y entrega en
+`docs/entregas/roberto-semana-01-calendario.md`.
+
+P17 `/admin/calendario`; P18 `/admin/calendario/nuevo`. La interfaz sigue los
+mockups finales. Las rutas académicas responden 401 y la escritura permanece
+deshabilitada hasta que Roberto integre Supabase Auth y roles/permisos. No usar el login
+provisional para probar privilegios. CSV y factores/SLA no están en esta entrega.
+
+El arranque habitual desde main usa el puerto 8080 según la guía de abajo. Para
+mantener una instalación de revisión separada de los volúmenes habituales:
+
+```powershell
+$env:WEB_PORT = '18083'
+docker compose -p campusitsm-calendar-review up --build
+```
+
+Abrir [calendario en revisión](http://localhost:18083/admin/calendario).
+El comando anterior usa otros volúmenes. La migración académica se aplica con el
+arranque habitual de la nueva base; es aditiva y no reinicia ni borra datos existentes.
+
+Prueba real PostgreSQL y persistencia aislada:
+
+```powershell
+./scripts/verify-calendar.ps1
+```
+
+Pruebas de interfaz (requieren revisión funcionando en 18083; las escenas con datos
+usan respuestas de prueba, separadas de las pruebas reales de PostgreSQL):
+
+```powershell
+cd apps/web
+npm ci
+$env:PLAYWRIGHT_BROWSERS_PATH = "$PWD/../../.local/browsers"
+npx playwright install chromium --only-shell
+npm run test:e2e
+```
+
+Contrato OpenAPI versionado: `docs/api/openapi.json`. Tras actualizar el backend,
+exportar de `/api/openapi.json` y ejecutar `npm run api:types` en `apps/web`.
+Los tipos de calendario se generan desde ese contrato, no desde modelos Prisma.
+
+Los tres planes están actualizados en `planes/`. Roberto hará P01/Supabase Auth y
+autorización; Jasmine administración/consentimiento/auditoría; Johan incidencias
+y evolución de componentes. Consultar `docs/CONTRATO_IDENTIDAD.md` antes de crear
+otro acceso. Los paquetes de documentación se regeneran con
+`python scripts/prepare-plan-packages.py` y quedan en `outputs/planes_para_compartir/`.
+
+## Base Docker
+
 Base local de la mesa de ayuda universitaria. Requiere Docker Desktop iniciado
 con contenedores Linux y Docker Compose v2. Cada integrante puede construirla sin
 instalar Node, Python ni PostgreSQL en su computadora.

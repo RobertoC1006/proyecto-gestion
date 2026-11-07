@@ -14,6 +14,99 @@ model Institution {
   name      String        @db.VarChar(160)
   createdAt DateTime      @default(now()) @db.Timestamptz(3)
   teams     SupportTeam[]
+  courses   AcademicCourse[]
+  events    AcademicEvent[]
+}
+
+enum AcademicEventType {
+  examen
+  entrega
+  matricula
+}
+
+enum AcademicScope {
+  institution
+  course
+  section
+}
+
+model AcademicCourse {
+  id            String @id @default(uuid()) @db.Uuid
+  institutionId String @db.Uuid
+  code          String @db.VarChar(40)
+  name          String @db.VarChar(160)
+  createdAt     DateTime @default(now()) @db.Timestamptz(3)
+  institution   Institution @relation(fields: [institutionId], references: [id], onDelete: Restrict)
+  sections      AcademicSection[]
+  events        AcademicEvent[]
+
+  @@unique([institutionId, code])
+  @@unique([institutionId, id])
+}
+
+model AcademicSection {
+  id            String @id @default(uuid()) @db.Uuid
+  institutionId String @db.Uuid
+  courseId      String @db.Uuid
+  code          String @db.VarChar(40)
+  name          String @db.VarChar(160)
+  createdAt     DateTime @default(now()) @db.Timestamptz(3)
+  course        AcademicCourse @relation(fields: [institutionId, courseId], references: [institutionId, id], onDelete: Restrict)
+  memberships   AcademicMembership[]
+  events        AcademicEvent[]
+
+  @@unique([courseId, code])
+  @@unique([institutionId, courseId, id])
+}
+
+model AcademicMembership {
+  institutionId String @db.Uuid
+  courseId      String @db.Uuid
+  sectionId     String @db.Uuid
+  // Referencia opaca al módulo de identidad; no es una tabla alternativa de usuarios.
+  subjectId     String @db.Uuid
+  section       AcademicSection @relation(fields: [institutionId, courseId, sectionId], references: [institutionId, courseId, id], onDelete: Restrict)
+  createdAt     DateTime @default(now()) @db.Timestamptz(3)
+
+  @@id([sectionId, subjectId])
+  @@index([institutionId, subjectId])
+}
+
+model AcademicEvent {
+  id            String @id @default(uuid()) @db.Uuid
+  institutionId String @db.Uuid
+  title         String @db.VarChar(160)
+  type          AcademicEventType
+  scope         AcademicScope
+  courseId      String? @db.Uuid
+  sectionId     String? @db.Uuid
+  source        String @default("manual") @db.VarChar(20)
+  startsAt      DateTime @db.Timestamptz(3)
+  endsAt        DateTime @db.Timestamptz(3)
+  version       Int @default(1)
+  createdAt     DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt     DateTime @updatedAt @db.Timestamptz(3)
+  institution   Institution @relation(fields: [institutionId], references: [id], onDelete: Restrict)
+  course        AcademicCourse? @relation(fields: [institutionId, courseId], references: [institutionId, id], onDelete: Restrict)
+  section       AcademicSection? @relation(fields: [institutionId, courseId, sectionId], references: [institutionId, courseId, id], onDelete: Restrict)
+
+  @@index([institutionId, startsAt, endsAt])
+}
+
+model AcademicChange {
+  id            String @id @default(uuid()) @db.Uuid
+  institutionId String @db.Uuid
+  actorId       String @db.Uuid
+  entityType    String @db.VarChar(40)
+  entityId      String @db.Uuid
+  action        String @db.VarChar(20)
+  reason        String @db.VarChar(500)
+  source        String @default("manual") @db.VarChar(20)
+  before        Json?
+  after         Json?
+  createdAt     DateTime @default(now()) @db.Timestamptz(3)
+
+  @@index([institutionId, createdAt])
 }
 
 model SupportTeam {

@@ -1,5 +1,10 @@
 # Roberto — semana 1, entrega previa Docker
 
+> Informe histórico de la entrega indicada. Estado vigente: Roberto autorizó
+> integrar el calendario/diseño en PR #2 y asumió P01, Supabase Auth y roles/permisos.
+> Jasmine conserva administración, consentimiento y auditoría. Consultar
+> [ESTADO_EQUIPO.md](../ESTADO_EQUIPO.md) y [CONTRATO_IDENTIDAD.md](../CONTRATO_IDENTIDAD.md).
+
 Responsable: Roberto. Fecha: 6 de noviembre de 2026.
 Módulo: `base-proyecto`. Esta entrega no completa toda la semana 1 ni el calendario.
 

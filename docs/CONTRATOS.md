@@ -1,5 +1,10 @@
 # Contratos compartidos — base v1
 
+La entrega aprobada de calendario/base visual se integra por PR #2. Su contrato
+está en [CONTRATO_CALENDARIO.md](CONTRATO_CALENDARIO.md). Las rutas académicas
+siguen cerradas sin sesión. Roberto implementará identidad/directorio/roles con
+Supabase Auth según [CONTRATO_IDENTIDAD.md](CONTRATO_IDENTIDAD.md), aún pendiente.
+
 ## Disponible
 
 Origen único del navegador: `http://localhost:8080`, prefijo `/api/v1`.
@@ -26,8 +31,9 @@ No hay rutas de pronóstico. Rutas API desconocidas responden 404.
 - Semilla explícita `UPT-DEMO` / `TI-DEMO`, identificadores constantes ficticios.
   No crea usuarios, concede permisos ni expone endpoints de esas tablas.
 
-No se coordinaron modelos de identidad/tickets con compañeros en esta sesión.
-Su implementación queda pendiente; la infraestructura ya permite construirla.
+El esquema académico ya amplía esta base con cursos, secciones, asociaciones,
+eventos y AcademicChange. Identidad/tickets no están implementados. Roberto coordina
+el UUID canónico y las migraciones de Supabase/perfiles antes de sus consumidores.
 
 ## Propuestas pendientes de coordinación, no implementadas
 
@@ -38,7 +44,8 @@ Se incorporarán al OpenAPI al implementar los controladores.
 
 | Responsable | Rutas reservadas propuestas | Datos/dependencias por acordar |
 | --- | --- | --- |
-| Jasmine | `/auth/login`, `/auth/logout`, `/auth/me`, `/users` | Sesión HttpOnly, CSRF, usuario, rol, permisos, equipo, consentimiento y autorización por objeto |
+| Roberto | `/auth/login`, `/auth/logout`, `/auth/me` | Supabase Auth, sesión, CSRF, usuario canónico, rol, permisos, institución/equipo y autorización por objeto |
+| Jasmine | `/users` y administración/consentimiento | Perfiles/estado/equipo y P20/P21 sobre servicios de identidad/autorización de Roberto; consentimiento y auditoría propios |
 | Johan | `/tickets`, `/tickets/{id}` | Titular/equipo, título, descripción, adjuntos, estado/clasificación separados, U/I, factor/motivo, prioridad, plazos e historial |
 | Roberto | `/academic/courses`, `/academic/sections`, `/academic/events`, `/academic/context` | Asociaciones explícitas; tipo/inicio/fin/alcance/fuente; usuario/curso/instante para contexto |
 | Roberto | `/configuration/sla` | Versión/vigencia/motivo, sin reiniciar relojes de tickets |
@@ -47,6 +54,8 @@ Se incorporarán al OpenAPI al implementar los controladores.
 | Roberto | `/notifications`, `/notifications/{id}/read`, `/events` | Destinatario autorizado, tipo/objeto/lectura; SSE y reconsulta al reconectar |
 | Jasmine | `/audit`, `/reports` | Auditoría inmutable por aplicación; consultas/reportes autorizados sobre servicios comunes |
 
-Estas rutas no responden éxitos simulados. Antes de integrar: Jasmine valida
-identidad/equipo/auditoría; Johan tickets/componentes/consumo de contexto; Roberto
-versiona esquema y contratos. Ninguna vista puede sustituir autorización del backend.
+Estas rutas propuestas no responden éxitos simulados. Roberto publica identidad
+y autorización; Jasmine administración/consentimiento/auditoría; Johan tickets y
+evolución de componentes. Las rutas académicas efectivas constan en OpenAPI y su
+contrato propio; `/academic/context` sigue siendo propuesta de semana 2.
+Ninguna vista puede sustituir autorización del backend.

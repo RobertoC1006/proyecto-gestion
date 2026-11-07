@@ -1,45 +1,107 @@
-import { BarChart3, BookOpen, CalendarDays, FileCheck2, Home, LifeBuoy, Settings, ShieldCheck, Ticket, Users } from "lucide-react";
+import { Link, useLocation } from 'react-router-dom'
+import {
+  Pulse as Activity,
+  BookOpen,
+  Buildings,
+  CalendarDots,
+  ChartBar,
+  ClipboardText,
+  Gear,
+  GraduationCap,
+  House,
+  Key,
+  LockKey,
+  ShieldCheck,
+  Users,
+  type Icon,
+} from '@phosphor-icons/react'
 
-const primaryLinks = [
-  { href: "/", label: "Resumen", icon: Home },
-  { href: "/incidencias", label: "Mis incidencias", icon: Ticket },
-  { href: "/incidencias/nueva", label: "Reportar incidencia", icon: LifeBuoy },
-  { href: "/constancias", label: "Constancias", icon: FileCheck2 },
-];
+const navigation: { label: string; icon: Icon; to?: string }[] = [
+  { label: 'Dashboard', icon: House, to: '/' },
+  { label: 'Tickets', icon: ClipboardText, to: '/incidencias' },
+  {
+    label: 'Calendario académico',
+    icon: CalendarDots,
+    to: '/admin/calendario',
+  },
+  { label: 'Reportes', icon: ChartBar },
+  { label: 'Modelos', icon: Activity },
+  { label: 'Operaciones de TI', icon: ShieldCheck, to: '/ti/cola' },
+]
+const administration: { label: string; icon: Icon }[] = [
+  { label: 'Usuarios', icon: Users },
+  { label: 'Permisos', icon: Key },
+  { label: 'Configuración', icon: Gear },
+  { label: 'Privacidad', icon: LockKey },
+  { label: 'Auditoría', icon: BookOpen },
+]
 
-const tiLinks = [
-  { href: "/ti/cola", label: "Cola de atención", icon: ShieldCheck },
-  { href: "/ti/dashboard", label: "Dashboard TI", icon: BarChart3 },
-];
-
-export function Sidebar() {
+export function Sidebar({ menuOpen = false }: { menuOpen?: boolean }) {
+  const { pathname } = useLocation()
   return (
-    <aside className="sidebar">
-      <div className="brand">
-        <span className="brand-mark"><span /></span>
-        <span>Campus<span className="brand-accent">Care</span></span>
+    <aside
+      id="app-navigation"
+      className={`sidebar ${menuOpen ? 'sidebar--open' : ''}`}
+    >
+      <Link to="/" className="brand" aria-label="CampusITSM, inicio">
+        <GraduationCap
+          className="brand__icon"
+          size={43}
+          weight="duotone"
+          aria-hidden="true"
+        />
+        <span>
+          <strong>CampusITSM</strong>
+          <small>Mesa de servicios</small>
+        </span>
+      </Link>
+      <div className="organization">
+        <Buildings size={21} aria-hidden="true" />
+        <span>Universidad Privada Tallán</span>
       </div>
-      <div className="profile-mini">
-        <div className="avatar">JR</div>
-        <div><strong>Johan Rodríguez</strong><small>Estudiante</small></div>
-      </div>
-      <nav className="side-nav" aria-label="Navegación principal">
-        <p className="nav-caption">MENÚ PRINCIPAL</p>
-        {primaryLinks.map(({ href, label, icon: Icon }) => (
-          <a className="nav-link" href={href} key={href}><Icon size={18} /><span>{label}</span></a>
-        ))}
-        <p className="nav-caption">OPERACIÓN TI</p>
-        {tiLinks.map(({ href, label, icon: Icon }) => (
-          <a className="nav-link" href={href} key={href}><Icon size={18} /><span>{label}</span></a>
-        ))}
-        <p className="nav-caption">ADMINISTRACIÓN</p>
-        <a className="nav-link" href="/admin"><Users size={18} /><span>Administración</span></a>
-        <a className="nav-link" href="/admin"><CalendarDays size={18} /><span>Calendario</span></a>
+      <nav className="sidebar__nav" aria-label="Navegación principal">
+        {navigation.map(({ label, icon: Icon, to }) => {
+          const active =
+            to === '/' ? pathname === '/' : !!to && pathname.startsWith(to)
+          return to ? (
+            <Link
+              key={label}
+              to={to}
+              className={`nav-item ${active ? 'nav-item--active' : ''}`}
+              aria-current={active ? 'page' : undefined}
+            >
+              <Icon size={23} aria-hidden="true" />
+              {label}
+            </Link>
+          ) : (
+            <span
+              key={label}
+              className="nav-item nav-item--unavailable"
+              aria-disabled="true"
+              title="Esta sección todavía no está disponible"
+            >
+              <Icon size={23} aria-hidden="true" />
+              {label}
+            </span>
+          )
+        })}
+        <div className="sidebar__secondary" aria-label="Administración">
+          {administration.map(({ label, icon: Icon }) => (
+            <span
+              className="nav-item nav-item--unavailable"
+              key={label}
+              aria-disabled="true"
+              title="Esta sección todavía no está disponible"
+            >
+              <Icon size={23} aria-hidden="true" />
+              {label}
+            </span>
+          ))}
+        </div>
       </nav>
-      <div className="sidebar-bottom">
-        <a className="nav-link" href="/admin"><Settings size={18} /><span>Configuración</span></a>
-        <div className="support-card"><BookOpen size={19} /><div><strong>¿Necesitas ayuda?</strong><small>Consulta el centro de soporte</small></div></div>
+      <div className="sidebar__note">
+        CampusITSM<small>Soporte a la comunidad universitaria</small>
       </div>
     </aside>
-  );
+  )
 }

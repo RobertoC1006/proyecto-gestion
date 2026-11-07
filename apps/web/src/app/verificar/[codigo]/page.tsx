@@ -1,4 +1,4 @@
-import { ArrowLeft, CheckCircle2, ExternalLink } from "lucide-react";
+import { ArrowLeft, CheckCircle as CheckCircle2, ArrowSquareOut as ExternalLink } from '@phosphor-icons/react';
 
 export default function VerifyCertificatePage() {
   return <section className="public-page">

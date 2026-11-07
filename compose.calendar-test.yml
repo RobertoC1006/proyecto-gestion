@@ -1,0 +1,14 @@
+# Pruebas en un proyecto Compose aislado: no publica ningún acceso privilegiado.
+services:
+  academic-test:
+    image: campusitsm-academic-test:local
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+      target: test
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-campusitsm}:${POSTGRES_PASSWORD:-campusitsm_local_only}@db:5432/${POSTGRES_DB:-campusitsm}?schema=public
+    networks: [internal]
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+    restart: "no"

@@ -7,6 +7,11 @@ histórica. El avance actual se consulta en `docs/ESTADO_EQUIPO.md` y las entreg
 
 ## Estructura y stack único
 
+Diseño compartido aprobado por Roberto y entregado mediante PR #2: componentes,
+fuentes DM Sans/Manrope e iconos Phosphor portados de `RobertoC1006/casos-gestion`,
+adaptados a la estructura y funciones de los mockups de CampusITSM. Ver
+`docs/DISENO_COMPONENTES.md`. No añadir una segunda familia de controles.
+
 - `apps/web`: React/Vite/TypeScript, vistas recuperadas de `front-vistas`, incluidos
   `AppHeader`, `Sidebar`, `PriorityBadge` y ejemplos. Siguen siendo demostrativas:
   no son autenticación, tickets ni constancias reales.
@@ -22,19 +27,21 @@ Imágenes oficiales fijadas por digest; dependencias Node bloqueadas con archivo
 `package-lock.json` y `npm ci`. Python usa solo biblioteca estándar en esta base.
 pg-boss se incorporará con tareas persistentes; no añadir Redis.
 
-React Router, TanStack Query y Recharts se incorporan por los responsables de sus
-consumidores. Esta recuperación no crea otra navegación ni otra familia de controles.
+React Router y TanStack Query ya están incorporados. Recharts se añadirá al
+implementar gráficos reales. Reutilizar una sola navegación y familia de controles.
 
 ## Responsables
 
 | Persona | Propiedad |
 | --- | --- |
-| Roberto | Base Docker, esquema/contratos, calendario/configuración, predicción y notificaciones |
+| Roberto | Base Docker/esquema/contratos, P01, Supabase Auth y autorización común; calendario/configuración, predicción y notificaciones |
 | Johan | Componentes/navegación compartidos, incidencias, prioridad, atención y clasificación |
-| Jasmine | Identidad/permisos, usuarios, auditoría/privacidad, constancias y reportes |
+| Jasmine | Administración de usuarios/permisos usando la identidad de Roberto; consentimiento/auditoría/privacidad, constancias y reportes |
 
-Esta entrega es infraestructura. No implementa los servicios de compañeros ni el
-calendario. Identidad y tickets requieren coordinación antes de crear sus entidades.
+La base ya incluye infraestructura, componentes visuales y calendario manual
+P17/P18. Sus rutas permanecen cerradas hasta integrar identidad. Supabase Auth,
+P01 y roles/permisos serán el siguiente módulo de Roberto; no están implementados
+por actualizar los planes. Ver `docs/CONTRATO_IDENTIDAD.md`.
 
 ## Reglas comunes
 
@@ -43,8 +50,9 @@ calendario. Identidad y tickets requieren coordinación antes de crear sus entid
 - Reutilizar servicios y componentes; no duplicar catálogos, esquemas ni reglas.
 - Roles: estudiante, docente, ti_agente, ti_supervisor y administrador. La API
   autoriza por rol y objeto; el selector de la demo no otorga permisos reales.
-- Sesiones en PostgreSQL, cookies HttpOnly y protección de escrituras al desarrollar
-  identidad. No guardar credenciales ni datos de negocio en localStorage.
+- Supabase Auth gestionará credenciales. Roberto concretará la sesión de servidor,
+  cookies HttpOnly y protección de escrituras según el contrato de identidad.
+  No guardar tokens, credenciales ni datos de negocio en localStorage.
 - Fechas UTC, presentación `America/Lima`. Archivos privados en volumen.
 - Puntaje = urgencia × impacto × máximo factor aplicable al usuario/curso.
   P1 ≥9; P2 ≥5 y <9; P3 ≥3 y <5; P4 <3. Factores 1 / 1,5 / 1,7 / 2 según plan.
@@ -62,7 +70,7 @@ calendario. Identidad y tickets requieren coordinación antes de crear sus entid
 ## Operación
 
 Ver `README.md`. Migraciones con `prisma migrate deploy`; nunca editar una aplicada
-ni usar `db push` como entrega. Esquema inicial solo institución/equipo.
+ni usar `db push` como entrega. Esquema de institución/equipo y módulo académico.
 Contratos disponibles y propuestas por coordinar: `docs/CONTRATOS.md`.
 Primera versión local, una institución/equipo; sin publicación pública,
 conexión institucional, correo ni firma digital certificada.

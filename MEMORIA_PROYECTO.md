@@ -11,23 +11,23 @@ Actualizada el 6 de noviembre de 2026 por solicitud expresa de Roberto. Este arc
 - Los tres planes son independientes: [Roberto](planes/PLAN_ROBERTO.md), [Johan](planes/PLAN_JOHAN.md) y [Jasmine](planes/PLAN_JASMINE.md). Cada uno contiene contexto, stack, tareas semanales, dependencias, pruebas, mockups y reglas de Git. No volver a solicitar los archivos al usuario si siguen disponibles en la carpeta.
 - [Casos de uso y catálogo de pantallas](diseno/campusitsm/CASOS_DE_USO_Y_PANTALLAS.md). Los detalles marcados como pendientes en ese documento inicial pueden haber quedado resueltos por los planes y esta memoria.
 
-## Estado real al cerrar este chat
+## Estado vigente y decisiones expresas
 
-- Se realizó revisión del repositorio, análisis del Word, definición de flujos, generación de 24 pantallas en seis láminas y redacción de tres planes.
-- No se ha empezado a implementar Docker, NestJS, PostgreSQL conectado ni IA real. Guardar memoria no autoriza a iniciar ahora el desarrollo.
-- Rama local seleccionada: `main`, commit `1501f5aaec13a77f3ebb79da52bf50d66e4e6678`; su contenido publicado solo tiene README.
-- `origin/front-vistas`, commit `a4896261f92507155f5f153f7476fd29d99d631b`, contiene el frontend React/Vite/TypeScript, vistas mayormente estáticas, componentes y datos ficticios. Sus dos commits adicionales son documentación y vistas.
-- Los diseños, planes y archivos de contexto preparados en este chat permanecen locales y sin integrar/publicar. No asumir que Johan y Jasmine ya los reciben al clonar GitHub. No confundir estos archivos con una base Docker entregada.
-- `PROYECTO.md` está en la rama de frontend, no inicialmente en `main`; todavía menciona Next.js y seis integrantes. Se debe actualizar al acuerdo vigente durante la base inicial.
-- Verificar ramas, estado y cambios ajenos antes de trabajar; esta fotografía no es prueba del estado futuro.
+- Base Docker publicada mediante PR #1, main `196a2144aae253ca672eeeaf721c62204516245a`: web, NestJS, PostgreSQL/Prisma, Python interno, salud, migraciones y volúmenes verificados. La historia de `front-vistas@a4896261f92507155f5f153f7476fd29d99d631b` quedó preservada al mover el frontend a `apps/web`.
+- Calendario manual y pantallas P17/P18 en la entrega [PR #2](https://github.com/RobertoC1006/proyecto-gestion/pull/2). Código visual aprobado: `047d1a2e0fd4f71bb189ff301cacb6e1f21019cf`. Roberto autorizó expresamente integrarlo en main; verificar integración y commit actual antes de consumirlo.
+- La base visual usa componentes reales de `RobertoC1006/casos-gestion`, adaptados a las pantallas del mockup. Guía vigente: `docs/DISENO_COMPONENTES.md`. Las demás vistas provisionales aún necesitan adaptación por sus responsables.
+- Roberto asume P01, Supabase Auth y la base de roles/permisos. Jasmine conserva administración de usuarios/permisos sobre esa base, consentimiento, auditoría, constancias y reportes. Ver `docs/CONTRATO_IDENTIDAD.md`.
+- Supabase todavía no está implementado ni configurado. El calendario real deniega acceso sin identidad; las pruebas con fixtures no acreditan login ni un recorrido autorizado. No crear un acceso de administrador ficticio.
+- No hay tickets, constancias, IA ni pronósticos reales implementados. CSV y factores/SLA siguen siendo semana 2.
+- Los tres planes se sincronizan con esta entrega. Regenerar sus ZIP al modificarlos. Verificar siempre Git, ramas ajenas y `docs/ESTADO_EQUIPO.md`; esta memoria no prueba el estado remoto futuro.
 
 ## Acuerdos de producto y arquitectura
 
 Tres casos de uso amplios: CU01 registrar/priorizar/atender incidencias; CU02 emitir y verificar constancias; CU03 anticipar demanda y administrar operación, permisos y datos.
 
-Stack decidido por Roberto: React con Vite y TypeScript, NestJS, PostgreSQL con Prisma, Docker Compose. Se aceptó un contenedor auxiliar Python para entrenamiento y predicción. Una sola API modular, una base por instalación, contratos OpenAPI; React Router, TanStack Query, Recharts y Lucide. Tareas persistentes con pg-boss sobre PostgreSQL.
+Stack decidido por Roberto: React con Vite y TypeScript, NestJS, PostgreSQL con Prisma, Docker Compose. Se aceptó un contenedor auxiliar Python para entrenamiento y predicción. Una sola API modular, una base de negocio por instalación, contratos OpenAPI; React Router, TanStack Query, Phosphor y DM Sans/Manrope. Recharts y pg-boss sobre PostgreSQL se incorporarán al implementar sus módulos.
 
-Primera versión local completa: cuentas propias, calendario manual/CSV, una institución/equipo, constancias PDF reales verificables y notificaciones internas. Quedan fuera por ahora conexión institucional externa, correo, firma digital certificada, multiinstitución y despliegue público.
+Primera versión: negocio en Docker, acceso con Supabase Auth, calendario manual/CSV, una institución/equipo, constancias PDF reales verificables y notificaciones internas. La modalidad de Auth (alojado o local) y creación/recuperación de cuentas se definirán al iniciar ese módulo; no se aprobó trasladar la base de negocio a Supabase. Quedan fuera conexión institucional externa, correo, firma digital certificada, multiinstitución y despliegue público.
 
 La IA clasificadora interpreta el texto y propone categoría y valores técnicos. El pronóstico de demanda es otro modelo, ejecutado en Python. **Preguntar a Roberto cuando llegue el módulo de IA para elegir un proveedor con opción gratuita vigente; no elegirlo ni contratarlo de antemano.** Consideró Gemini, Grok u otros como posibilidades, sin escoger uno.
 
@@ -43,22 +43,22 @@ Roberto, Johan y Jasmine trabajan por **módulos completos: frontend, backend y 
 
 | Persona | Responsabilidades | Pantallas |
 | --- | --- | --- |
-| Roberto | Base Docker, esquema/migraciones y coordinación; calendario/configuración; predicciones, alertas y notificaciones | P13, P14, P16, P17, P18, P19, P24 |
+| Roberto | Base Docker, esquema/migraciones y coordinación; P01, Supabase Auth y autorización común; calendario/configuración; predicciones, alertas y notificaciones | P01, P13, P14, P16, P17, P18, P19, P24 |
 | Johan | Componentes compartidos; incidencias, prioridad, seguimiento, atención y clasificación IA | P02–P08 |
-| Jasmine | Acceso, usuarios, permisos, consentimiento, constancias, privacidad, auditoría y reportes | P01, P09–P12, P15, P20–P23 |
+| Jasmine | Administración de usuarios/permisos sobre la base de Roberto; consentimiento, constancias, privacidad, auditoría y reportes | P09–P12, P15, P20–P23 |
 
-1. Semana 1: Roberto publica primero infraestructura/contexto/contratos mínimos; después calendario manual. Johan hace componentes y registro/listado. Jasmine hace acceso/permisos y usuarios básicos.
+1. Semana 1: base Docker y calendario manual ya entregados; Roberto continúa con identidad Supabase cuando se solicite. Johan reutiliza componentes para registro/listado; Jasmine prepara administración, consentimiento y auditoría usando los contratos comunes. La nueva carga de identidad debe revisarse antes de comprometer plazos posteriores.
 2. Semana 2: calendario CSV/configuración; atención y prioridad manual completas; constancias verificables.
 3. Semana 3: elección e integración de IA, predicciones/alertas y administración/reportes restantes.
 4. Semana 4: integración, fidelidad visual, permisos, fallos, persistencia, respaldo/restauración, carga, manuales y demostración.
 
-**Avanzar solo la semana indicada.** Si el usuario no señala otra, el punto de reanudación es la preparación previa y Semana 1 de Roberto. No implementar las cuatro semanas de golpe ni pasar automáticamente a la siguiente tras una entrega.
+**Avanzar solo la etapa indicada.** El siguiente módulo previsto de Roberto es `identidad-supabase`, todavía pendiente de inicio. Actualizar planes o integrar la entrega aprobada no autoriza implementarlo ahora ni avanzar automáticamente a otra semana.
 
 ## Docker primero y colaboración
 
-Roberto debe recuperar el frontend y preservar los documentos, preparar estructura, Docker Compose, salud, volúmenes, configuración sin secretos, migraciones y contratos. Publicará la base mínima en `main` y registrará el commit utilizable antes de exigir trabajo conectado a Johan/Jasmine. Ellos construirán los mismos contenedores en su propio Docker con bases/volúmenes locales; no necesitan conectarse a la computadora de Roberto.
+Roberto ya recuperó el frontend, preservó su historia y publicó Docker Compose, salud, volúmenes, configuración sin secretos, migraciones y contratos. Johan/Jasmine construirán la misma base de main en su propio Docker, con datos y volúmenes locales; no necesitan conectarse a la computadora de Roberto.
 
-Durante esa entrega se crearán/actualizarán `PROYECTO.md`, `docs/CONTRATOS.md` y `docs/ESTADO_EQUIPO.md`. Hoy no están entregados como base funcional. No inventar otra aplicación o infraestructura por falta temporal de contratos.
+`PROYECTO.md`, `docs/CONTRATOS.md` y `docs/ESTADO_EQUIPO.md` describen la base existente. Distinguir contratos funcionales de propuestas pendientes; no inventar otra infraestructura o identidad por falta temporal de contratos.
 
 Antes de cada avance: revisar cambios sin confirmar, referencias remotas, diferencias con `main`, ramas activas de compañeros, contratos y dependencias. Inspeccionar una rama ajena no autoriza a modificarla, fusionarla o borrarla. No descartar cambios para sincronizarse. Si no hay red, declarar que el estado remoto no fue verificado.
 
@@ -66,18 +66,18 @@ Antes de cada avance: revisar cambios sin confirmar, referencias remotas, difere
 
 - Una rama nueva por módulo con nombre normal, **sin `codex/` ni prefijos similares**, por instrucción expresa del usuario. No cambiar identidad de Git para aparentar otra autoría.
 - Puede haber hasta tres ramas activas, una por persona. Cada módulo se integra verificado en `main`; después se borra su rama local y de GitHub. No borrar trabajo sin integrar ni ramas activas ajenas; no usar borrado forzado como limpieza.
-- Un módulo puede durar más de una semana. Las ramas previstas de Roberto son `base-proyecto`, `calendario-academico`, `prediccion-demanda`, `alertas-notificaciones`, `integracion-final`. Las de compañeros se detallan en sus planes.
+- Un módulo puede durar más de una semana. `base-proyecto` ya se integró; `calendario-academico` corresponde a PR #2. Siguientes ramas previstas de Roberto: `identidad-supabase`, una rama de continuación de calendario al retomar CSV/configuración, `prediccion-demanda`, `alertas-notificaciones`, `integracion-final`. Las de compañeros se detallan en sus planes.
 - Reutilizar los componentes existentes y una sola familia compartida de controles, tablas, estados y layouts. No duplicar catálogos, lógica, servicios o esquemas para avanzar en paralelo.
-- Roberto coordina esquema/migraciones/configuración/contratos; Johan componentes/navegación/prioridad; Jasmine identidad/autorización/auditoría. Cambios compartidos se coordinan con su responsable.
+- Roberto coordina esquema/migraciones/configuración/contratos e identidad/autorización; Johan componentes/navegación/prioridad; Jasmine administración/consentimiento/auditoría. Cambios compartidos se coordinan con su responsable.
 - Las reglas de negocio y autorización viven en NestJS; React muestra resultados. No almacenar datos de negocio en localStorage. No duplicar cálculo de prioridad en Python.
 
 ## Mockups finales que ya están disponibles
 
-Las pantallas deben reproducir los mockups generados, no reinterpretarlos: distribución, componentes, paleta verde/menta, gráficos, tamaños relativos y espaciados. Reemplazar datos ilustrativos por reales y corregir errores de texto sin rediseñar. Comparar capturas implementadas con cada cuadrante; cada entrega tiene aceptación funcional y visual.
+Los mockups siguen definiendo pantallas, estructura y funciones. Roberto pidió usar el diseño y componentes reales de casos-gestion y aprobó la adaptación del calendario: esa decisión actualiza el acabado visual anterior. Reutilizar la guía compartida, reemplazar datos ilustrativos por reales y comparar capturas de escritorio/móvil; cada entrega tiene aceptación funcional y visual.
 
 | Lámina final en `diseno/campusitsm/` | Pantallas y responsables |
 | --- | --- |
-| `01_cu01_ingreso_reporte_v2.png` | P01 Jasmine; P02–P04 Johan |
+| `01_cu01_ingreso_reporte_v2.png` | P01 Roberto; P02–P04 Johan |
 | `02_cu01_seguimiento_atencion_v2.png` | P05–P08 Johan |
 | `03_cu02_constancias.png` | P09–P12 Jasmine |
 | `04_cu03_predicciones_alertas.png` | P13, P14, P16 Roberto; P15 Jasmine |
@@ -86,8 +86,8 @@ Las pantallas deben reproducir los mockups generados, no reinterpretarlos: distr
 
 Cada lámina tiene cuatro vistas en orden arriba izquierda, arriba derecha, abajo izquierda, abajo derecha. Usar las versiones `_v2` indicadas, no bocetos anteriores. Los planes tienen enlaces relativos e imágenes incorporadas y especifican cada posición.
 
-Paquetes independientes para compartir con agentes: `C:\Users\ROBERTO CARLOS\.codex\visualizations\2026\11\06\01a1b1fa-27da-7331-b96e-56b6c923d4c6\planes_para_compartir\PAQUETE_ROBERTO.zip`, y equivalentes `PAQUETE_JOHAN.zip` y `PAQUETE_JASMINE.zip`. Incluyen su plan y sus referencias. Si cambia un plan, regenerar su paquete para que coincida.
+Paquetes para compartir: `outputs/planes_para_compartir/PAQUETE_ROBERTO.zip` y equivalentes Johan/Jasmine; se generan con `python scripts/prepare-plan-packages.py`. Incluyen planes, contexto, contratos, guía visual y mockups, sin secretos ni dependencias. Los compañeros obtienen el código de main. Se mantienen también las copias compartidas en `C:\Users\ROBERTO CARLOS\.codex\visualizations\2026\11\06\01a1b1fa-27da-7331-b96e-56b6c923d4c6\planes_para_compartir\`. Si cambia un plan, regenerar su paquete para que coincida.
 
 ## Punto de reanudación en otro chat
 
-Abrir esta misma carpeta. Leer esta memoria y `planes/PLAN_ROBERTO.md`, comprobar Git y los archivos reales y comenzar únicamente la entrega previa de Docker/Semana 1 cuando Roberto solicite programar. Los planes y mockups ya existen; no pedir que se vuelvan a subir. El siguiente chat debe distinguir crear la base de desarrollar los módulos de los compañeros.
+Abrir esta misma carpeta. Leer esta memoria y el plan de la persona, comprobar Git y los archivos reales. No recrear Docker ni el diseño compartido. El siguiente módulo previsto de Roberto es identidad Supabase y P01; esperar su solicitud para iniciarlo y concretar entonces modalidad/proyecto/configuración. Los planes y mockups ya existen; no pedir que se vuelvan a subir ni desarrollar módulos ajenos por esta sincronización.
