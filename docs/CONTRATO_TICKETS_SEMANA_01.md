@@ -10,8 +10,8 @@ NestJS.
 El SQL de Corte 1 está en
 `apps/api/prisma/migrations/20261108000100_tickets_core/migration.sql`.
 El migrador local informa siete migraciones sin pendientes y la API inicia
-saludablemente con `compose.local.yml`. Faltan las pruebas HTTP con sesión real;
-no se ha aplicado a la base compartida.
+saludablemente con `compose.local.yml`. Johan confirmó las rutas HTTP
+funcionales; no se ha aplicado a la base compartida.
 
 ## Alcance y fuente de servicios
 
@@ -183,6 +183,14 @@ del módulo, sin una tabla nueva. El cliente consume esta respuesta para el
 selector de P03. El curso se selecciona de los datos académicos autorizados; no
 se crea un catálogo de cursos paralelo.
 
+Para Corte 2, P02–P05 consumen las rutas reales de tickets. P03 puede enviar
+reportes generales. La selección de `scope: curso` permanece deshabilitada en
+la interfaz porque las rutas actuales de cursos y secciones exigen
+`academic:manage`; Roberto debe proporcionar o acordar una consulta autorizada
+de los cursos y secciones del titular. El backend ya valida las asociaciones
+cuando recibe un reporte de curso. No se deducen cursos desde eventos ni se
+aceptan identificadores escritos a mano como sustituto del selector.
+
 La captura opcional de P03 sigue pendiente de cerrar con Roberto: flujo de
 carga, límites definitivos, almacenamiento privado y descarga autorizada. El
 plan menciona PNG/JPG/PDF hasta 5 MB como punto de partida, sujeto a esa
@@ -194,8 +202,8 @@ HTTP nunca incluye `storageKey` ni una ruta del sistema de archivos.
 
 Prisma expresa modelos, relaciones e índices únicos, pero **no crea por sí solo**
 los `CHECK` siguientes ni las políticas RLS. Se añadieron al SQL versionado
-de Corte 1 y deben revisarse y validarse primero en PostgreSQL local;
-los fragmentos de este contrato no se han ejecutado. La migración de metadatos
+de Corte 1, aplicado solo en PostgreSQL local. Faltan pruebas específicas de
+estas restricciones y la revisión de Roberto antes de la base compartida. La migración de metadatos
 requiere al menos estas restricciones SQL,
 además de la unicidad de `ticketId` y `storageKey` ya expresada en Prisma:
 
@@ -215,8 +223,8 @@ requiere `courseId` y `sectionId` nulos; `scope = curso` requiere `courseId`,
 con `sectionId` nullable. La FK compuesta garantiza que una sección indicada
 pertenezca al curso, mientras NestJS comprueba la asociación del titular.
 
-SQL incluido en la migración local propuesta, pendiente de revisión y validación en
-PostgreSQL local:
+SQL incluido en la migración local, pendiente de pruebas específicas de la
+restricción en PostgreSQL local y de revisión por Roberto:
 
 ```sql
 ALTER TABLE "Ticket" ADD CONSTRAINT "Ticket_scope_academic_fields"

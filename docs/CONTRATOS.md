@@ -51,9 +51,10 @@ No hay rutas de pronóstico. Rutas API desconocidas responden 404.
 
 El esquema académico ya amplía esta base con cursos, secciones, asociaciones,
 eventos y AcademicChange. La identidad integrada incluye AppUser, sesiones,
-flujos y cambios de acceso. Johan prepara tickets de Semana 1 en
-[CONTRATO_TICKETS_SEMANA_01.md](CONTRATO_TICKETS_SEMANA_01.md); su esquema aún no
-tiene migración aplicada. El UUID canónico ya es el sujeto de Supabase. Las
+flujos y cambios de acceso. Johan implementó el núcleo de tickets de Semana 1
+según [CONTRATO_TICKETS_SEMANA_01.md](CONTRATO_TICKETS_SEMANA_01.md); su migración
+se aplicó solo en PostgreSQL local y espera revisión de Roberto antes de la base
+compartida. El UUID canónico ya es el sujeto de Supabase. Las
 tablas comunes están en campusitsm; no duplicarlas.
 
 ## Contratos disponibles y propuestas pendientes
@@ -68,9 +69,9 @@ incorporarán al implementar sus módulos.
 | --- | --- | --- |
 | Roberto | `/auth/login`, `/auth/logout`, `/auth/me` | Disponibles en main: Supabase Auth, sesión, CSRF, usuario canónico, rol, permisos, institución/equipo y autorización por objeto |
 | Jasmine | `/users` y administración/consentimiento | Perfiles/estado/equipo y P20/P21 sobre servicios de identidad/autorización de Roberto; consentimiento y auditoría propios |
-| Johan | `/tickets`, `/tickets/{id}` | Semana 1: descripción, servicio, alcance general/curso, titular y estados iniciales; solo lectura propia. Captura opcional pendiente de contrato. Prioridad, atención e historial completo son posteriores. Ver contrato de tickets |
+| Johan | `/tickets`, `/tickets/{id}` | Backend disponible localmente: creación, listado y detalle propio con descripción, servicio, alcance y estados iniciales. P02–P05 consumen estas rutas; P03 solo puede seleccionar alcance general hasta acordar consulta académica propia. Captura opcional pendiente de contrato. Prioridad, atención e historial completo son posteriores |
 | Johan | `GET /api/v1/tickets/services` | Identificadores de servicios de TI de una lista local provisional del módulo de incidencias; Roberto puede sustituirla por su catálogo canónico antes de aplicar la migración compartida. No crea una tabla o catálogo paralelo |
-| Roberto | `/academic/courses`, `/academic/sections`, `/academic/events`, `/academic/context` | Asociaciones explícitas; tipo/inicio/fin/alcance/fuente; usuario/curso/instante para contexto |
+| Roberto | `/academic/courses`, `/academic/sections`, `/academic/events`, `/academic/context` | Las consultas de cursos y secciones actuales exigen administración. P03 necesita acordar una consulta de cursos/secciones propios autorizada para estudiante/docente; no crear un catálogo paralelo. `/academic/context` sigue pendiente |
 | Roberto | `/configuration/sla` | Versión/vigencia/motivo, sin reiniciar relojes de tickets |
 | Jasmine | `/certificates`, `/public/certificates/{code}` | Elegibilidad, emisión idempotente, PDF privado, verificación mínima y de archivo |
 | Roberto | `/analytics/series`, `/analytics/forecasts`, `/analytics/evaluations` | Periodo/unidad/fuente real o sintética, modelo, generación, capacidad, disponible/no disponible |

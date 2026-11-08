@@ -6,6 +6,7 @@ import LoginPage from './app/login/page'
 import IncidenciasPage from './app/incidencias/page'
 import NuevaIncidenciaPage from './app/incidencias/nueva/page'
 import IncidenciaDetailPage from './app/incidencias/[id]/page'
+import ReporteRecibidoPage from './app/incidencias/registrada/page'
 import ConstanciasPage from './app/constancias/page'
 import VerifyCertificatePage from './app/verificar/[codigo]/page'
 import TiQueuePage from './app/ti/cola/page'
@@ -17,6 +18,7 @@ import EventForm from './features/academic/EventForm'
 import PersonalCalendar from './features/academic/PersonalCalendar'
 import { AuthProvider } from './features/auth/AuthContext'
 import './features/academic/academic.css'
+import './features/tickets/tickets.css'
 import { IconContext } from '@phosphor-icons/react'
 import '@fontsource/dm-sans/latin-400.css'
 import '@fontsource/dm-sans/latin-500.css'
@@ -36,6 +38,7 @@ function ViewRouter() {
   if (path === '/login') return <LoginPage />
   if (path === '/incidencias') return <IncidenciasPage />
   if (path === '/incidencias/nueva') return <NuevaIncidenciaPage />
+  if (path.startsWith('/incidencias/registrada/')) return <ReporteRecibidoPage />
   if (path.startsWith('/incidencias/')) return <IncidenciaDetailPage />
   if (path === '/constancias') return <ConstanciasPage />
   if (path.startsWith('/verificar/')) return <VerifyCertificatePage />

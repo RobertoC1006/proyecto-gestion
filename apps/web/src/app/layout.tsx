@@ -9,6 +9,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const { pathname, key } = useLocation()
   const academic = pathname.startsWith('/admin/calendario') || pathname === '/calendario'
+  const currentTickets = pathname === '/' || pathname.startsWith('/incidencias')
   useEffect(() => {
     setMenuOpen(false)
     window.scrollTo({ top: 0, behavior: 'instant' })
@@ -33,7 +34,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           onToggleMenu={() => setMenuOpen((open) => !open)}
         />
         <main id="main-content" className="main-content" tabIndex={-1}>
-          {academic ? children : <div className="legacy-view">{children}</div>}
+          {academic || currentTickets ? children : <div className="legacy-view">{children}</div>}
         </main>
         <footer className="app-footer">
           <span>

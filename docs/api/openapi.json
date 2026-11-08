@@ -1145,6 +1145,245 @@
           "Calendario académico — titular"
         ]
       }
+    },
+    "/api/v1/tickets": {
+      "post": {
+        "operationId": "TicketsController_create",
+        "parameters": [
+          {
+            "name": "idempotency-key",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTicketDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Reintento idéntico.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketDto"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "VALIDATION_ERROR"
+          },
+          "401": {
+            "description": "SESSION_REQUIRED"
+          },
+          "403": {
+            "description": "FORBIDDEN o WRITE_PROTECTION_REQUIRED"
+          },
+          "409": {
+            "description": "IDEMPOTENCY_CONFLICT"
+          },
+          "503": {
+            "description": "DEPENDENCY_UNAVAILABLE"
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Incidencias — Semana 1"
+        ]
+      },
+      "get": {
+        "operationId": "TicketsController_list",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "registrado"
+              ]
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "maxLength": 100,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketPageDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "VALIDATION_ERROR"
+          },
+          "401": {
+            "description": "SESSION_REQUIRED"
+          },
+          "403": {
+            "description": "FORBIDDEN o WRITE_PROTECTION_REQUIRED"
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Incidencias — Semana 1"
+        ]
+      }
+    },
+    "/api/v1/tickets/services": {
+      "get": {
+        "operationId": "TicketsController_services",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TicketServiceDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "VALIDATION_ERROR"
+          },
+          "401": {
+            "description": "SESSION_REQUIRED"
+          },
+          "403": {
+            "description": "FORBIDDEN o WRITE_PROTECTION_REQUIRED"
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Incidencias — Semana 1"
+        ]
+      }
+    },
+    "/api/v1/tickets/{id}": {
+      "get": {
+        "operationId": "TicketsController_get",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "VALIDATION_ERROR"
+          },
+          "401": {
+            "description": "SESSION_REQUIRED"
+          },
+          "403": {
+            "description": "FORBIDDEN o WRITE_PROTECTION_REQUIRED"
+          },
+          "404": {
+            "description": "Ticket ajeno o inexistente."
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Incidencias — Semana 1"
+        ]
+      }
     }
   },
   "info": {
@@ -1908,6 +2147,197 @@
         "required": [
           "reason",
           "expectedVersion"
+        ]
+      },
+      "CreateTicketDto": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "minLength": 20,
+            "maxLength": 5000
+          },
+          "service": {
+            "type": "string",
+            "enum": [
+              "aula_virtual",
+              "wifi_red",
+              "correo",
+              "equipos",
+              "impresoras",
+              "cuentas_accesos",
+              "videoconferencia",
+              "sistemas_institucionales",
+              "almacenamiento_nube",
+              "software_licencias",
+              "otro"
+            ]
+          },
+          "scope": {
+            "type": "string",
+            "enum": [
+              "general",
+              "curso"
+            ]
+          },
+          "courseId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "sectionId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        },
+        "required": [
+          "description",
+          "service",
+          "scope",
+          "courseId",
+          "sectionId"
+        ]
+      },
+      "TicketDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "code": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "service": {
+            "type": "string",
+            "enum": [
+              "aula_virtual",
+              "wifi_red",
+              "correo",
+              "equipos",
+              "impresoras",
+              "cuentas_accesos",
+              "videoconferencia",
+              "sistemas_institucionales",
+              "almacenamiento_nube",
+              "software_licencias",
+              "otro"
+            ]
+          },
+          "scope": {
+            "type": "string",
+            "enum": [
+              "general",
+              "curso"
+            ]
+          },
+          "courseId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "sectionId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "registrado"
+            ]
+          },
+          "classificationStatus": {
+            "type": "string",
+            "enum": [
+              "pendiente"
+            ]
+          },
+          "priority": {
+            "type": "string",
+            "nullable": true,
+            "example": null
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "description",
+          "service",
+          "scope",
+          "courseId",
+          "sectionId",
+          "status",
+          "classificationStatus",
+          "priority",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "TicketServiceDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "enum": [
+              "aula_virtual",
+              "wifi_red",
+              "correo",
+              "equipos",
+              "impresoras",
+              "cuentas_accesos",
+              "videoconferencia",
+              "sistemas_institucionales",
+              "almacenamiento_nube",
+              "software_licencias",
+              "otro"
+            ]
+          },
+          "label": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "label"
+        ]
+      },
+      "TicketPageDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TicketDto"
+            }
+          },
+          "total": {
+            "type": "number"
+          },
+          "page": {
+            "type": "number"
+          },
+          "pageSize": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "page",
+          "pageSize"
         ]
       }
     }
