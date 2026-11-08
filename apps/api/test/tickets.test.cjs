@@ -58,6 +58,24 @@ test('el curso exige asociación académica del titular', async () => {
   assert.equal(rows.length, 0);
 });
 
+test('una colisión de código reintenta con la misma clave idempotente', async () => {
+  const { service, db, rows } = fixture();
+  const create = db.ticket.create;
+  let attempts = 0;
+  db.ticket.create = async input => {
+    attempts++;
+    if (attempts === 1) throw new Prisma.PrismaClientKnownRequestError('duplicate', {
+      code: 'P2002', clientVersion: '6.19.3', meta: { target: ['code'] },
+    });
+    assert.equal(input.data.idempotencyKey, key);
+    return create(input);
+  };
+  const result = await service.create(owner, general, key);
+  assert.equal(result.created, true);
+  assert.equal(attempts, 2);
+  assert.equal(rows.length, 1);
+});
+
 test('listado y detalle restringen institución y titular', async () => {
   const { service, db } = fixture();
   let listWhere;

@@ -7,6 +7,9 @@ aplicación a la base compartida; no hace falta terminar ni fusionar todo el
 módulo para esa revisión. La identidad utiliza Supabase Auth real a través de
 NestJS.
 
+Las solicitudes concretas para Roberto y Jasmine están en
+[la entrega de Corte 3](entregas/johan-semana-01-corte-03.md).
+
 El SQL de Corte 1 está en
 `apps/api/prisma/migrations/20261108000100_tickets_core/migration.sql`.
 El migrador local informa siete migraciones sin pendientes y la API inicia
