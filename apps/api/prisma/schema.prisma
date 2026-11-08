@@ -7,7 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Base de instalación; identidad y tickets se coordinan antes de añadir sus tablas.
+// Base de instalación; los tickets de Johan reutilizan identidad y calendario.
 model Institution {
   id        String        @id @default(uuid()) @db.Uuid
   code      String        @unique @db.VarChar(40)
@@ -40,6 +40,7 @@ model AcademicCourse {
   institution   Institution @relation(fields: [institutionId], references: [id], onDelete: Restrict)
   sections      AcademicSection[]
   events        AcademicEvent[]
+  tickets       Ticket[]
 
   @@unique([institutionId, code])
   @@unique([institutionId, id])
@@ -55,6 +56,7 @@ model AcademicSection {
   course        AcademicCourse @relation(fields: [institutionId, courseId], references: [institutionId, id], onDelete: Restrict)
   memberships   AcademicMembership[]
   events        AcademicEvent[]
+  tickets       Ticket[]
 
   @@unique([courseId, code])
   @@unique([institutionId, courseId, id])
@@ -146,6 +148,7 @@ model AppUser {
   institution   Institution @relation(fields: [institutionId], references: [id], onDelete: Restrict)
   team          SupportTeam? @relation(fields: [institutionId, teamId], references: [institutionId, id], onDelete: Restrict)
   sessions      AuthSession[]
+  tickets       Ticket[]
 
   @@unique([institutionId, id])
   @@index([institutionId, role, active])
@@ -194,4 +197,78 @@ model IdentityChange {
   after         Json
   createdAt     DateTime @default(now()) @db.Timestamptz(3)
   @@index([institutionId, createdAt])
+}
+
+// Identificadores iniciales aislados en incidencias. Si Roberto publica un
+// catálogo canónico, sustituir esta fuente mediante una migración coordinada.
+enum TicketService {
+  aula_virtual
+  wifi_red
+  correo
+  equipos
+  impresoras
+  cuentas_accesos
+  videoconferencia
+  sistemas_institucionales
+  almacenamiento_nube
+  software_licencias
+  otro
+}
+
+enum TicketScope {
+  general
+  curso
+}
+
+enum TicketStatus {
+  registrado
+}
+
+enum TicketClassificationStatus {
+  pendiente
+}
+
+model Ticket {
+  id                   String                     @id @default(uuid()) @db.Uuid
+  institutionId        String                     @db.Uuid
+  ownerId              String                     @db.Uuid
+  code                 String                     @unique @db.VarChar(40)
+  description          String                     @db.Text
+  service              TicketService
+  scope                TicketScope
+  // SQL futuro: general => ambos nulos; curso => courseId obligatorio.
+  // NestJS comprueba la asociación del titular; las FK no la acreditan.
+  courseId             String?                    @db.Uuid
+  sectionId            String?                    @db.Uuid
+  status               TicketStatus               @default(registrado)
+  classificationStatus TicketClassificationStatus @default(pendiente)
+  idempotencyKey       String                     @db.Uuid
+  requestHash          String                     @db.Char(64)
+  createdAt            DateTime                   @default(now()) @db.Timestamptz(3)
+  updatedAt            DateTime                   @updatedAt @db.Timestamptz(3)
+  owner                AppUser                    @relation(fields: [institutionId, ownerId], references: [institutionId, id], onDelete: Restrict)
+  course               AcademicCourse?            @relation(fields: [institutionId, courseId], references: [institutionId, id], onDelete: Restrict)
+  section              AcademicSection?           @relation(fields: [institutionId, courseId, sectionId], references: [institutionId, courseId, id], onDelete: Restrict)
+  attachment           TicketAttachment?
+
+  @@unique([institutionId, ownerId, idempotencyKey])
+  @@index([institutionId, ownerId, createdAt(sort: Desc), id(sort: Desc)])
+  @@index([institutionId, ownerId, status, createdAt(sort: Desc), id(sort: Desc)])
+}
+
+// Metadatos opcionales; carga y descarga aún pendientes de contrato con Roberto.
+// SQL futuro: tamaño positivo, MIME PNG/JPG/PDF, SHA-256 hexadecimal y
+// storageKey opaca sin componentes de ruta. RLS para esta tabla y Ticket.
+// Los bytes privados locales nunca se guardan en PostgreSQL ni se comparten
+// automáticamente entre computadoras.
+model TicketAttachment {
+  id           String   @id @default(uuid()) @db.Uuid
+  ticketId     String   @unique @db.Uuid
+  storageKey   String   @unique @db.VarChar(120)
+  originalName String   @db.VarChar(255)
+  mimeType     String   @db.VarChar(40)
+  sizeBytes    Int
+  sha256       String   @db.Char(64)
+  createdAt    DateTime @default(now()) @db.Timestamptz(3)
+  ticket       Ticket   @relation(fields: [ticketId], references: [id], onDelete: Restrict)
 }
