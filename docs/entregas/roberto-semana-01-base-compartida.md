@@ -1,5 +1,10 @@
 # Roberto — Semana 1, base compartida Supabase
 
+**Estado posterior:** identidad y base compartida publicadas en main por
+autorización de Roberto del 7 de noviembre de 2026. Los apartados históricos
+de pendientes conservan el momento de esta entrega; ver
+[publicación integrada](roberto-publicacion-identidad-supabase.md).
+
 Entrega del 7 de noviembre de 2026, solicitada por Roberto. No cierra toda la
 semana ni inicia CSV, IA, predicción o módulos de Johan/Jasmine.
 

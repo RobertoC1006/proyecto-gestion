@@ -12,7 +12,8 @@ Este plan está dirigido exclusivamente a Jasmine y su agente. Eres responsable 
 ## Estado vigente y punto de partida — 7 de noviembre de 2026
 
 La base de negocio ya está trasladada a Supabase y la instalación de Roberto
-está conectada, en la rama `base-compartida-supabase` (todavía sin integrar en main).
+está conectada. Identidad y transición están publicadas en `main` por autorización
+de Roberto del 7 de noviembre de 2026; obtener esa base antes de crear su rama.
 Cada persona ejecuta su aplicación Docker; al recibir la conexión privada usará
 los mismos usuarios, roles, eventos y datos autorizados. Leer
 [OPERACION_SUPABASE.md](../docs/OPERACION_SUPABASE.md),
@@ -23,7 +24,7 @@ los mismos usuarios, roles, eventos y datos autorizados. Leer
 
 | Área | Situación comprobada |
 | --- | --- |
-| Main | origin/main `02d10f5`; base visual/calendario integrados, identidad/transición aún en ramas locales |
+| Main | Identidad 8b02d6f, transición 864413a y coordinación integradas en main; partida 02d10f5. Sincronizar y registrar SHA actual |
 | Supabase | Proyecto CampusITSM en organización gratuita exclusiva CampusITSM (exhurkcxcrjlskvldchp), esquema campusitsm; UUID/datos conservados |
 | Docker | web/api/predictions en localhost:8080; PostgreSQL local detenido con volumen conservado |
 | Migraciones | Manuales y separadas del arranque; un historial Prisma. La API verifica las migraciones requeridas sin aplicarlas |
@@ -33,7 +34,8 @@ los mismos usuarios, roles, eventos y datos autorizados. Leer
 | Correo externo | SMTP propio pendiente; no desactivar confirmación ni duplicar Auth |
 | Alcance | Mismos módulos/pantallas/semanas; no se iniciaron tickets, CSV, IA o predicción |
 
-Obtener el código autorizado por Roberto; no presentar esta rama como main.
+Actualizar main con la entrega autorizada de identidad/base compartida y crear
+la rama personal del módulo desde esa base; no reconstruir otro login o infraestructura.
 Una sola instalación de trabajo campusitsm por computadora. No copiar claves de
 cifrado ajenas ni respaldos privados; generar la propia. Los archivos/modelos
 siguen siendo locales. No ejecutar semillas masivas o pruebas destructivas en

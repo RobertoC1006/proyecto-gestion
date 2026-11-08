@@ -18,15 +18,16 @@ las sesiones se separan por instalación. PostgreSQL local está detenido con su
 volumen conservado. Ver [OPERACION_SUPABASE.md](OPERACION_SUPABASE.md) y
 [entrega](entregas/roberto-semana-01-base-compartida.md).
 
-**Pendiente:** publicar/integrar el código con autorización de Roberto y entregar
-configuración privada/código a Johan/Jasmine y confirmar aceptación. Sus invitaciones
+**Código publicado en main por autorización de Roberto.** Los compañeros deben
+actualizar main antes de crear su rama. Pendiente: entregar configuración privada
+a Johan/Jasmine y confirmar sus accesos. Sus invitaciones
 Developer ya se enviaron en la organización gratuita exclusiva CampusITSM, tras
 trasladar solo este proyecto por autorización de Roberto. VEXOR permanece separado.
 Ver [COLABORADORES_SUPABASE.md](COLABORADORES_SUPABASE.md), incluida la autorización
 de la nueva organización en el conector de cada agente.
 
 Auth alojado sí está implementado en `identidad-supabase`, commit `8b02d6f`,
-todavía sin integrar en main al revisar GitHub para esta actualización.
+integrado en main junto con la transición por autorización de Roberto del 7 de noviembre.
 Roberto completó registro, confirmación, login y acceso de administrador reales.
 No recrear el proyecto ni otro login. El envío de confirmaciones a correos fuera
 del equipo Supabase sigue requiriendo un SMTP propio autorizado.

@@ -1,13 +1,14 @@
 # Acceso de CampusITSM durante el desarrollo
 
 Rama `identidad-supabase`, iniciada desde main `02d10f557fdf81af81fdeef1ecf7fb7d210aaeed`.
-Esta guía describe el código de la rama; no acredita que ya esté integrado en main.
+Entrega de identidad y transición integrada en main por autorización de Roberto
+del 7 de noviembre de 2026; el nombre de rama anterior es una referencia histórica.
 
 ## Base compartida ya conectada
 
 La rama base-compartida-supabase conserva esta identidad y trasladó negocio a
 Supabase, esquema campusitsm, con UUID/perfiles/roles comunes. La instalación de
-Roberto ya está conectada; no está integrada en main. Ver
+Roberto ya está conectada; identidad y transición están integradas en main. Ver
 [OPERACION_SUPABASE.md](OPERACION_SUPABASE.md) para preparar cada computadora,
 conexiones privadas, comando manual de migración y claves de cifrado propias.
 

@@ -12,7 +12,8 @@ Este plan está dirigido exclusivamente a Roberto y su agente. Tu base Docker y 
 ## Estado vigente y punto de partida — 7 de noviembre de 2026
 
 La base de negocio ya está trasladada a Supabase y la instalación de Roberto
-está conectada, en la rama `base-compartida-supabase` (todavía sin integrar en main).
+está conectada. Identidad y transición están publicadas en `main` por autorización
+de Roberto del 7 de noviembre de 2026; obtener esa base antes de crear su rama.
 Cada persona ejecuta su aplicación Docker; al recibir la conexión privada usará
 los mismos usuarios, roles, eventos y datos autorizados. Leer
 [OPERACION_SUPABASE.md](../docs/OPERACION_SUPABASE.md),
@@ -23,7 +24,7 @@ los mismos usuarios, roles, eventos y datos autorizados. Leer
 
 | Área | Situación comprobada |
 | --- | --- |
-| Main | origin/main `02d10f5`; base visual/calendario integrados, identidad/transición aún en ramas locales |
+| Main | Identidad 8b02d6f, transición 864413a y coordinación integradas en main; partida 02d10f5. Sincronizar y registrar SHA actual |
 | Supabase | Proyecto CampusITSM en organización gratuita exclusiva CampusITSM (exhurkcxcrjlskvldchp), esquema campusitsm; UUID/datos conservados |
 | Docker | web/api/predictions en localhost:8080; PostgreSQL local detenido con volumen conservado |
 | Migraciones | Manuales y separadas del arranque; un historial Prisma. La API verifica las migraciones requeridas sin aplicarlas |
@@ -33,7 +34,8 @@ los mismos usuarios, roles, eventos y datos autorizados. Leer
 | Correo externo | SMTP propio pendiente; no desactivar confirmación ni duplicar Auth |
 | Alcance | Mismos módulos/pantallas/semanas; no se iniciaron tickets, CSV, IA o predicción |
 
-Obtener el código autorizado por Roberto; no presentar esta rama como main.
+Actualizar main con la entrega autorizada de identidad/base compartida y crear
+la rama personal del módulo desde esa base; no reconstruir otro login o infraestructura.
 Una sola instalación de trabajo campusitsm por computadora. No copiar claves de
 cifrado ajenas ni respaldos privados; generar la propia. Los archivos/modelos
 siguen siendo locales. No ejecutar semillas masivas o pruebas destructivas en
@@ -271,8 +273,8 @@ traslado conservando UUID, conexión y sesiones por instalación están verifica
 El arranque ya está separado de las migraciones. Ver OPERACION_SUPABASE y la
 [entrega](../docs/entregas/roberto-semana-01-base-compartida.md). No repetir el traslado.
 
-1. Entregar/revisar el código de identidad y transición para su publicación e
-   integración cuando Roberto lo autorice; no presentar esta rama como main.
+1. Publicación de identidad/transición autorizada por Roberto y completada en
+   main. Los compañeros actualizan main antes de crear sus ramas de módulo.
 2. Confirmar que Johan/Jasmine acepten sus invitaciones Developer en CampusITSM
    y entregar conexión por medio privado. Autorizar la nueva organización en los conectores.
    No compartir claves de cifrado ni datos/respaldos privados en los ZIP.
@@ -287,9 +289,9 @@ IA o predicción ni da por cerrada toda la semana 1.
 
 **Entregas anteriores:** `base-proyecto` (PR #1) y `calendario-academico` (PR #2,
 integración autorizada por Roberto). No repetir infraestructura ni diseño.
-**Entrega actual de identidad:** `identidad-supabase`, commit `8b02d6f`, sin integrar
-en main. El siguiente avance de infraestructura es la transición compartida descrita
-arriba, implementado en base-compartida-supabase; no volver a iniciar el login.
+**Entrega de identidad:** implementada en `identidad-supabase`, commit `8b02d6f`, e
+integrada en main junto con la transición de base compartida `864413a`. Las ramas
+se conservan solo como referencias históricas; no volver a iniciar el login.
 
 ### Punto de reanudación
 
@@ -313,9 +315,9 @@ arriba, implementado en base-compartida-supabase; no volver a iniciar el login.
 
 - Cursos, secciones, asociaciones, CRUD de eventos, validaciones y versiones ya
   existen en el módulo académico. No duplicar sus tablas, endpoints ni catálogos.
-- P17/P18 ya consumen las API y componentes compartidos; en la entrega actual están
-  cerradas sin identidad. Las pruebas reales de dominio y las pruebas visuales
-  tienen evidencia separada, sin afirmar login funcional.
+- P17/P18 ya consumen las API y componentes compartidos con identidad real; sin
+  sesión se mantiene el cierre de acceso. Pruebas PostgreSQL y visuales tienen
+  evidencia separada; el recorrido real de Roberto también fue comprobado.
 - Mostrar los eventos aplicables al titular/curso desde el servicio existente.
   El cálculo del factor/SLA y el CSV corresponden a semana 2.
 

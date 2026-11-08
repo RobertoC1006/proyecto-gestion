@@ -18,17 +18,19 @@ historial; comprueba las migraciones requeridas al iniciar. Sesiones y PKCE tien
 [registro BD](REGISTRO_CAMBIOS_BD.md) y
 [entrega](entregas/roberto-semana-01-base-compartida.md).
 
-## Código y accesos pendientes
+## Código en main y accesos pendientes
 
-Rama local actual base-compartida-supabase, desde identidad-supabase@13c6cc7.
-Incluye identidad de 8b02d6f y coordinación de 1b84ba8/13c6cc7.
-origin/main comprobado en 02d10f5. Estas ramas no están publicadas/integradas;
-no afirmar que main incluye todavía login o la transición. No fusionar sin
-la autorización de Roberto. front-vistas se conserva, sin modificar ramas ajenas.
+Roberto autorizó publicar en main el 7 de noviembre de 2026. Se integraron
+identidad 8b02d6f, coordinación 1b84ba8/13c6cc7, transición 864413a y entrega
+de colaboradores 478ea0f, partiendo de origin/main 02d10f5. Comprobar el SHA
+actual al sincronizar. Las ramas propias se retiran solo tras verificar la
+integración completa; front-vistas se conserva. Ver
+[entrega de publicación](entregas/roberto-publicacion-identidad-supabase.md).
 
 Johan/Jasmine: invitaciones Developer enviadas en la organización gratuita
-exclusiva CampusITSM; Roberto sigue Owner. Pendientes de aceptación, código y
-configuración privada. VEXOR permanece en RobertoC1006. El conector de este chat
+exclusiva CampusITSM; Roberto sigue Owner. Roberto informó que una invitación fue aceptada; falta
+identificar/verificar el resto y entregar configuración privada. El código común
+ya se obtiene de main. VEXOR permanece en RobertoC1006. El conector de este chat
 aún necesita autorizar CampusITSM; panel y aplicación funcionan. Ver
 [COLABORADORES_SUPABASE.md](COLABORADORES_SUPABASE.md).
 
@@ -40,7 +42,7 @@ siguen a cargo de Jasmine sobre la identidad común.
 
 | Persona | Trabajo y dependencias |
 | --- | --- |
-| Roberto | P01/identidad/permisos comunes, infraestructura, calendario/configuración, predicción y notificaciones. Transición entregada; integrar código y habilitar compañeros cuando corresponda |
+| Roberto | P01/identidad/permisos comunes, infraestructura, calendario/configuración, predicción y notificaciones. Identidad/transición publicadas en main; acompañar conexión de compañeros y contratos pendientes |
 | Johan | P02–P08, incidencias/prioridad/atención/clasificación y evolución de componentes. Reutilizar identidad y calendario |
 | Jasmine | P09–P12/P15/P20–P23, administración con servicios comunes, consentimiento/auditoría, constancias/privacidad/reportes |
 

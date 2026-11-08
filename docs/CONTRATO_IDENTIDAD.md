@@ -5,7 +5,7 @@ autenticación con Supabase Auth y la base común de roles/permisos. P01 pasa a
 Roberto. Jasmine conserva P20/P21, consentimiento, auditoría, constancias y
 reportes, consumiendo la identidad y autorización comunes.
 
-**7 de noviembre de 2026: implementado en la rama de trabajo, sin integrar en main.**
+**7 de noviembre de 2026: identidad y transición Supabase integradas en main por autorización de Roberto.**
 Proyecto alojado CampusITSM creado por solicitud de Roberto en su organización,
 plan gratuito. Roberto completó registro, confirmación de correo y login reales.
 También autorizó asignar su cuenta como primer administrador, conservado al trasladar la base a Supabase.

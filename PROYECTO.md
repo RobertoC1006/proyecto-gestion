@@ -55,9 +55,9 @@ implementar gráficos reales. Reutilizar una sola navegación y familia de contr
 | Jasmine | Administración de usuarios/permisos usando la identidad de Roberto; consentimiento/auditoría/privacidad, constancias y reportes |
 
 La base incluye infraestructura, componentes visuales y calendario manual P17/P18.
-La rama identidad-supabase añade P01, registro/login reales y autorización común,
-conecta sus puertos y mantiene el cierre sin sesión/permisos. No está integrada en
-main todavía. Ver `docs/CONTRATO_IDENTIDAD.md` y `docs/ESTADO_EQUIPO.md`.
+La entrega de identidad añade P01, registro/login reales y autorización común,
+conecta sus puertos y mantiene el cierre sin sesión/permisos. Ya está integrada en
+main junto con la base Supabase, por autorización de Roberto. Ver `docs/CONTRATO_IDENTIDAD.md` y `docs/ESTADO_EQUIPO.md`.
 
 ## Reglas comunes
 

@@ -1,5 +1,10 @@
 # Roberto — semana 1: identidad Supabase
 
+**Estado posterior:** identidad y base compartida publicadas en main por
+autorización de Roberto del 7 de noviembre de 2026. Los apartados históricos
+de pendientes conservan el momento de esta entrega; ver
+[publicación integrada](roberto-publicacion-identidad-supabase.md).
+
 Fecha: 7 de noviembre de 2026. Rama `identidad-supabase`, desde main
 `02d10f557fdf81af81fdeef1ecf7fb7d210aaeed`. Trabajo todavía sin integrar en main.
 No equivale al cierre de semana 1 ni implementa módulos de Johan/Jasmine.

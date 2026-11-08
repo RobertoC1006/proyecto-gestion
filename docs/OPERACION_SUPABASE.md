@@ -8,7 +8,9 @@ en Authentication; AppUser conserva perfiles/roles con el mismo UUID.
 
 ## Preparar otra computadora
 
-1. Recibir el código autorizado por Roberto; esta entrega todavía no es main.
+1. Obtener main actualizado (`git switch main` y `git pull --ff-only`); identidad y
+   transición ya están integradas por autorización de Roberto. Crear después la
+   rama del módulo indicado en el plan.
 2. Ejecutar `./scripts/prepare-auth.ps1`. Genera una clave de cifrado propia.
 3. Recibir DATABASE_URL de API por un medio privado y completar SUPABASE_URL y
    SUPABASE_PUBLISHABLE_KEY del mismo proyecto en `.env`. Mantener origen

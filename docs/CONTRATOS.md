@@ -16,7 +16,7 @@ No acreditar su integración en main hasta que Roberto la autorice.
 La entrega aprobada de calendario/base visual se integró por PR #2. Su contrato
 está en [CONTRATO_CALENDARIO.md](CONTRATO_CALENDARIO.md). Las rutas académicas
 siguen cerradas sin sesión. La rama de identidad implementa sesión/directorio/roles
-según [CONTRATO_IDENTIDAD.md](CONTRATO_IDENTIDAD.md), con integración en main pendiente.
+según [CONTRATO_IDENTIDAD.md](CONTRATO_IDENTIDAD.md), con integración en main autorizada y completada junto con la transición Supabase.
 
 ## Disponible
 

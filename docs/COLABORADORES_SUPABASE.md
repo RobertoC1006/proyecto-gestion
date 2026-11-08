@@ -31,8 +31,8 @@ Verificación posterior: salud API/database/Python ok, 1 perfil administrador,
 3. Autorizar en su conexión Supabase de su agente la organización CampusITSM.
    Poder entrar al panel no concede automáticamente acceso a un conector ya
    autenticado para otra organización; comprobar el proyecto real desde su agente.
-4. Obtener el código autorizado por Roberto y la conexión de servidor por un
-   medio privado. El ZIP contiene documentación y referencias, no credenciales.
+4. Actualizar main con la entrega de identidad/base compartida y obtener la
+   conexión de servidor de Roberto por un medio privado. El ZIP contiene documentación y referencias, no credenciales.
    Seguir [OPERACION_SUPABASE.md](OPERACION_SUPABASE.md) y generar su propia
    AUTH_ENCRYPTION_KEY; no copiar el .env completo de otra persona.
 5. El acceso al panel no crea una cuenta ni un rol administrador dentro de la
@@ -69,8 +69,10 @@ volver a autorizar la nueva organización CampusITSM en esa conexión antes de
 usar el conector para consultas/migraciones. No interpretar el error como pérdida
 ni borrado o recreación de la base, ni intentar suplirlo con claves del navegador.
 
-Pendientes: aceptación de ambos, autorización de sus conectores, entrega privada
-de configuración/código e integración cuando Roberto la autorice; SMTP público
+Roberto informó que una invitación fue aceptada, sin identificar la cuenta en el
+chat; verificar las aceptaciones restantes antes de darlas por completadas.
+Pendientes: autorización de sus conectores y entrega privada de configuración.
+Código de identidad/transición ya integrado en main por autorización de Roberto; SMTP público
 y contratos de consentimiento/auditoría de Jasmine conservan su alcance.
 No se enviaron mensajes adicionales al equipo, solo las invitaciones solicitadas.
 

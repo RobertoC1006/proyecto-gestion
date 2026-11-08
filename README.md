@@ -5,8 +5,8 @@ La base de negocio y Auth están en [Supabase CampusITSM](https://supabase.com/d
 Frontend, backend y Python se ejecutan en la única instalación Docker de cada
 integrante, en [localhost:8080](http://localhost:8080).
 
-La transición está verificada para Roberto en `base-compartida-supabase`, basada
-en `identidad-supabase`. Ambas entregas siguen sin integrar en main. Organización gratuita exclusiva CampusITSM; invitaciones Developer de
+Identidad y transición a la base compartida integradas en `main` por autorización
+de Roberto del 7 de noviembre de 2026. Referencias de implementación: `8b02d6f` y `864413a`. Organización gratuita exclusiva CampusITSM; invitaciones Developer de
 Johan/Jasmine enviadas, pendientes de aceptación y configuración privada.
 Ver [colaboradores y conexión del agente](docs/COLABORADORES_SUPABASE.md).
 Leer AGENTS, MEMORIA_PROYECTO, plan personal y [estado](docs/ESTADO_EQUIPO.md).
@@ -17,6 +17,9 @@ Requiere Docker Desktop con contenedores Linux y Docker Compose v2 reciente
 (con soporte de `!reset` para las configuraciones aisladas de pruebas).
 
 ```powershell
+# Obtener la base común publicada antes de crear la rama del módulo.
+git switch main
+git pull --ff-only
 # Solo la primera vez. Conservar el .env propio en siguientes arranques.
 ./scripts/prepare-auth.ps1
 # Completar en privado DATABASE_URL de API, SUPABASE_URL y SUPABASE_PUBLISHABLE_KEY.
@@ -90,4 +93,5 @@ con `npm run api:export` en apps/api; `npm run api:types` en apps/web genera tip
 Esta transición no cambió DTO ni rutas públicas.
 
 Planes en planes/. Regenerar ZIP sin secretos con `python scripts/prepare-plan-packages.py`.
-La integración en main sigue requiriendo autorización de Roberto.
+Entrega de integración: [publicación de identidad y Supabase](docs/entregas/roberto-publicacion-identidad-supabase.md).
+Las siguientes integraciones de módulos requieren autorización de Roberto.

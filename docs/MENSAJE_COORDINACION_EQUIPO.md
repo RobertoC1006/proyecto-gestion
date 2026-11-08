@@ -8,8 +8,9 @@ mismos usuarios, roles, eventos y datos autorizados.
 Ya les envié invitaciones como Developer en la organización gratuita CampusITSM.
 Acepten con el correo al que les llegó; las invitaciones vencen en 24 horas. La
 base ya está conectada y VEXOR queda separado. Lean docs/COLABORADORES_SUPABASE.md
-y autoricen CampusITSM en la conexión Supabase de su agente. Les entregaré el código autorizado y
-la configuración por un medio privado. Generen su propia clave de cifrado: no copien
+y autoricen CampusITSM en la conexión Supabase de su agente. El código común ya
+está en main: actualícenlo antes de crear su rama. La configuración se entrega
+por un medio privado. Generen su propia clave de cifrado: no copien
 mi .env completo. Leer docs/OPERACION_SUPABASE.md para el arranque actual.
 
 Mantendremos una rama por módulo. Pueden crear las tablas, columnas e índices

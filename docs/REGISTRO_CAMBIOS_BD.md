@@ -6,7 +6,8 @@ auditoría de aplicación. Aplicar el procedimiento de
 
 Transición ejecutada por solicitud de Roberto el 7 de noviembre de 2026.
 Destino: CampusITSM / npjibnlxepiwfermtcmo / esquema campusitsm.
-Código de la entrega: `base-compartida-supabase@864413a`; aún sin main.
+Código de implementación: `864413a`, integrado en main con identidad `8b02d6f`
+por autorización de Roberto. La publicación no vuelve a ejecutar las migraciones.
 Respaldo final privado restaurado; traslado atómico con conteos/SHA256 de las
 12 tablas. Sin sobrescribir auth/storage ni datos remotos preexistentes.
 
