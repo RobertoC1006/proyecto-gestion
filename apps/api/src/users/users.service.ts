@@ -23,7 +23,7 @@ export class UsersService {
     role: CampusRole;
     active: boolean;
     teamId: string | null;
-    team?: { id: string; code: string; name: string } | null;
+    team: { id: string; code: string; name: string } | null;
     accessVersion: number;
     createdAt: Date;
     updatedAt: Date;
