@@ -48,10 +48,22 @@ un cambio posterior requiere otra migración y otra entrada.
   de las 12 tablas: UUID/rol/fechas/auditoría conservados; sesiones/PKCE existentes
   vinculados a la instalación poseedora de su clave. No crear perfiles duplicados.
 - La aplicación de Roberto pasó a Supabase; se detuvo PostgreSQL local conservando
-  su volumen. Invitaciones y entrega privada a Johan/Jasmine aplazadas hasta correos.
+  su volumen. En ese punto inicial las invitaciones se aplazaron hasta recibir
+  correos; ver la actualización posterior de organización y colaboradores debajo.
 
 Cifrado obligatorio activado en Database Settings → Enforce SSL on incoming
 connections; reinicio de Supabase completado. Comprobación desde la conexión real
 de API: rol campusitsm_api, esquema campusitsm, pg_stat_ssl.ssl=true y seis
 migraciones finalizadas. Salud y sesión real recuperadas después del reinicio.
 La URL Prisma exige TLS y verifica el certificado con la CA oficial incluida.
+
+## Actualización de organización y colaboradores — 2026-11-07
+
+Por autorización expresa de Roberto se creó la organización gratuita exclusiva
+CampusITSM (exhurkcxcrjlskvldchp) y se trasladó el proyecto existente
+npjibnlxepiwfermtcmo desde RobertoC1006. VEXOR permanece en la organización original.
+Invitaciones Developer enviadas a Johan/Jasmine y verificadas como INVITED;
+Roberto conserva Owner. No es una migración de tablas, no cambia Prisma ni suma
+entradas a _prisma_migrations. Salud y conteos de usuario/curso/evento y TLS verificados.
+Aceptar invitaciones y autorizar la nueva organización en los conectores sigue
+pendiente. Ver [COLABORADORES_SUPABASE.md](COLABORADORES_SUPABASE.md).

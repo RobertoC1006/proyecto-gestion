@@ -1,7 +1,7 @@
 ---
 responsable: Johan
 revision: 2026-11-07
-estado: base_supabase_conectada_accesos_equipo_pendientes
+estado: base_supabase_conectada_invitaciones_enviadas
 pantallas_asignadas: [P02, P03, P04, P05, P06, P07, P08]
 ---
 
@@ -16,6 +16,7 @@ está conectada, en la rama `base-compartida-supabase` (todavía sin integrar en
 Cada persona ejecuta su aplicación Docker; al recibir la conexión privada usará
 los mismos usuarios, roles, eventos y datos autorizados. Leer
 [OPERACION_SUPABASE.md](../docs/OPERACION_SUPABASE.md),
+[COLABORADORES_SUPABASE.md](../docs/COLABORADORES_SUPABASE.md),
 [COORDINACION_SUPABASE.md](../docs/COORDINACION_SUPABASE.md),
 [ESTADO_EQUIPO.md](../docs/ESTADO_EQUIPO.md) y
 [REGISTRO_CAMBIOS_BD.md](../docs/REGISTRO_CAMBIOS_BD.md).
@@ -23,11 +24,12 @@ los mismos usuarios, roles, eventos y datos autorizados. Leer
 | Área | Situación comprobada |
 | --- | --- |
 | Main | origin/main `02d10f5`; base visual/calendario integrados, identidad/transición aún en ramas locales |
-| Supabase | CampusITSM, esquema campusitsm: estructura y datos trasladados, UUID conservados y contenido comparado |
+| Supabase | Proyecto CampusITSM en organización gratuita exclusiva CampusITSM (exhurkcxcrjlskvldchp), esquema campusitsm; UUID/datos conservados |
 | Docker | web/api/predictions en localhost:8080; PostgreSQL local detenido con volumen conservado |
 | Migraciones | Manuales y separadas del arranque; un historial Prisma. La API verifica las migraciones requeridas sin aplicarlas |
 | Sesiones | Cifradas por instalación con claves propias; usuarios/permisos compartidos |
-| Johan/Jasmine | Invitaciones aplazadas hasta que Roberto reciba sus correos; conexión privada y alcance de acceso aún por entregar |
+| Johan/Jasmine | Invitaciones Developer enviadas, pendientes de aceptar; código/conexión privada por entregar. Roberto sigue Owner; VEXOR separado |
+| Conector del agente | Autorizar organización CampusITSM; el conector previo de este chat solo tenía RobertoC1006. Leer COLABORADORES_SUPABASE |
 | Correo externo | SMTP propio pendiente; no desactivar confirmación ni duplicar Auth |
 | Alcance | Mismos módulos/pantallas/semanas; no se iniciaron tickets, CSV, IA o predicción |
 

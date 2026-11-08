@@ -6,8 +6,9 @@ Frontend, backend y Python se ejecutan en la única instalación Docker de cada
 integrante, en [localhost:8080](http://localhost:8080).
 
 La transición está verificada para Roberto en `base-compartida-supabase`, basada
-en `identidad-supabase`. Ambas entregas siguen sin integrar en main. Accesos de
-Johan/Jasmine pendientes de sus correos y entrega privada de configuración.
+en `identidad-supabase`. Ambas entregas siguen sin integrar en main. Organización gratuita exclusiva CampusITSM; invitaciones Developer de
+Johan/Jasmine enviadas, pendientes de aceptación y configuración privada.
+Ver [colaboradores y conexión del agente](docs/COLABORADORES_SUPABASE.md).
 Leer AGENTS, MEMORIA_PROYECTO, plan personal y [estado](docs/ESTADO_EQUIPO.md).
 
 ## Preparación y arranque

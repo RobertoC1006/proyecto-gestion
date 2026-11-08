@@ -2,7 +2,7 @@
 
 Estado verificado el 7 de noviembre de 2026 en `base-compartida-supabase`.
 Proyecto [CampusITSM](https://supabase.com/dashboard/project/npjibnlxepiwfermtcmo),
-organización RobertoC1006, esquema de negocio **campusitsm**. Seleccionar ese
+organización exclusiva CampusITSM (exhurkcxcrjlskvldchp), esquema de negocio **campusitsm**. Seleccionar ese
 esquema en el Table Editor para ver tablas y datos. Auth mantiene sus usuarios
 en Authentication; AppUser conserva perfiles/roles con el mismo UUID.
 
@@ -29,9 +29,10 @@ sesiones de otra al cerrar sesión. Un cambio global de permisos/estado o
 recuperación de contraseña sí invalida los accesos correspondientes de la cuenta.
 Un evento común se ve al actualizar la pantalla; no se añadió tiempo real.
 
-Invitaciones de Johan/Jasmine aplazadas por Roberto hasta disponer de sus correos.
-Revisar el alcance de la organización antes de invitar: también contiene otro
-proyecto. No conceder acceso a otros proyectos ni contratar un plan por defecto.
+Proyecto trasladado a su organización gratuita exclusiva por autorización de Roberto.
+Invitaciones Developer de Johan/Jasmine enviadas, pendientes de aceptar. VEXOR
+permanece en RobertoC1006. Ver [COLABORADORES_SUPABASE.md](COLABORADORES_SUPABASE.md)
+para aceptación y autorización de la nueva organización en los conectores.
 El rol del panel Supabase es distinto del rol dentro de CampusITSM y de la
 credencial PostgreSQL de desarrollo. El SMTP de registro externo sigue pendiente.
 

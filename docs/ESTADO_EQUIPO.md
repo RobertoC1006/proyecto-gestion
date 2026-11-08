@@ -2,7 +2,8 @@
 
 ## Base de negocio trasladada y conectada para Roberto
 
-Supabase CampusITSM, organización RobertoC1006, esquema privado campusitsm.
+Supabase CampusITSM, organización exclusiva CampusITSM (exhurkcxcrjlskvldchp),
+esquema privado campusitsm; proyecto npjibnlxepiwfermtcmo conservado tras traslado.
 Se aplicaron las seis migraciones Prisma, se copiaron las 12 tablas con verificación
 de conteos/contenido, conservando UUID, permisos y sesiones de Roberto. Auth/storage
 no se sobrescribieron. Base local detenida y volumen conservado; respaldos privados
@@ -25,10 +26,11 @@ origin/main comprobado en 02d10f5. Estas ramas no están publicadas/integradas;
 no afirmar que main incluye todavía login o la transición. No fusionar sin
 la autorización de Roberto. front-vistas se conserva, sin modificar ramas ajenas.
 
-Johan/Jasmine: invitaciones aplazadas hasta recibir sus correos; no impiden que
-Roberto use Supabase. Falta entregarles código autorizado, conexión privada y
-revisar alcance de colaboradores: la organización también contiene otro proyecto.
-No conceder acceso a ese otro proyecto ni contratar un plan por defecto.
+Johan/Jasmine: invitaciones Developer enviadas en la organización gratuita
+exclusiva CampusITSM; Roberto sigue Owner. Pendientes de aceptación, código y
+configuración privada. VEXOR permanece en RobertoC1006. El conector de este chat
+aún necesita autorizar CampusITSM; panel y aplicación funcionan. Ver
+[COLABORADORES_SUPABASE.md](COLABORADORES_SUPABASE.md).
 
 SMTP para confirmaciones fuera del equipo Supabase pendiente; no desactivar
 confirmación ni crear cuentas ficticias. Consentimiento/auditoría global y P20/P21

@@ -18,8 +18,9 @@ se crea tras el primer login confirmado como estudiante. Permisos/asociaciones
 se consultan en la misma base. La administración de Roberto ya fue conservada;
 no repetir seed/bootstrap-admin en cada clon.
 
-Johan/Jasmine recibirán acceso/configuración cuando estén disponibles sus correos;
-no bloquear otras tareas por las invitaciones. Cada Docker conserva sus archivos.
+Johan/Jasmine ya tienen invitaciones Developer en la organización exclusiva
+CampusITSM, pendientes de aceptación y configuración privada. Ver
+[COLABORADORES_SUPABASE.md](COLABORADORES_SUPABASE.md). Cada Docker conserva sus archivos.
 Solo NestJS conecta a PostgreSQL y Auth; el navegador recibe cookies opacas.
 
 ## Registro, confirmación y recuperación
@@ -47,9 +48,10 @@ invalidan las sesiones de aplicación de la cuenta en todas las instalaciones. S
 Un solo flujo de correo activo por navegador; solicitar otro reemplaza el anterior.
 
 **Límite vigente:** el correo incluido de Supabase solo admite destinatarios miembros
-de su equipo y tiene límites reducidos. Para que Johan/Jasmine y otras personas
-puedan registrarse con correos externos hace falta un SMTP propio autorizado por
-Roberto. No resolverlo añadiéndolos como administradores de Supabase ni desactivando
+de su equipo y tiene límites reducidos. Tras aceptar las invitaciones, los correos
+de miembro de Johan/Jasmine pueden usarse para esas pruebas, todavía no realizadas
+en sus equipos. Para registrar personas ajenas al equipo hace falta SMTP propio
+autorizado por Roberto. No resolverlo añadiéndolas como administradores ni desactivando
 la confirmación. No se seleccionó ni contrató proveedor de correo.
 [Condiciones del correo de Supabase](https://supabase.com/docs/guides/auth/auth-smtp).
 

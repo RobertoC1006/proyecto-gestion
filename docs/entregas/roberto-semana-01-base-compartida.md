@@ -3,6 +3,11 @@
 Entrega del 7 de noviembre de 2026, solicitada por Roberto. No cierra toda la
 semana ni inicia CSV, IA, predicción o módulos de Johan/Jasmine.
 
+**Actualización posterior del mismo día:** proyecto trasladado a organización
+gratuita exclusiva CampusITSM; invitaciones Developer enviadas, aceptación pendiente.
+El apartado de pendientes de esta entrega conserva el estado previo a esa acción.
+Ver [colaboradores](../COLABORADORES_SUPABASE.md) para el estado vigente.
+
 ## Código y alcance
 
 - Rama: base-compartida-supabase; implementación `864413a`, desde identidad-supabase@13c6cc7.

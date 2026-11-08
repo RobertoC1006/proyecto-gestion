@@ -5,9 +5,10 @@ desarrollo en Supabase. Cada uno seguirá haciendo el frontend y backend de sus
 módulos en su Docker, conectados al mismo Supabase cuando reciban la configuración privada. Veremos los
 mismos usuarios, roles, eventos y datos autorizados.
 
-Les voy a dar acceso como colaboradores, revisando los permisos para CampusITSM.
-La base ya está trasladada y mi aplicación está conectada. Sus invitaciones quedan
-pendientes hasta tener sus correos; también les entregaré el código autorizado y
+Ya les envié invitaciones como Developer en la organización gratuita CampusITSM.
+Acepten con el correo al que les llegó; las invitaciones vencen en 24 horas. La
+base ya está conectada y VEXOR queda separado. Lean docs/COLABORADORES_SUPABASE.md
+y autoricen CampusITSM en la conexión Supabase de su agente. Les entregaré el código autorizado y
 la configuración por un medio privado. Generen su propia clave de cifrado: no copien
 mi .env completo. Leer docs/OPERACION_SUPABASE.md para el arranque actual.
 
