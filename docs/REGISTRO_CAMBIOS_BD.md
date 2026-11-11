@@ -10,11 +10,18 @@ ejecutor: agente de Roberto. Destino: CampusITSM / npjibnlxepiwfermtcmo /
 campusitsm. Cambio de identidad común por indicación de Roberto; contrato:
 [CONTRATO_ROLES_PERMISOS.md](CONTRATO_ROLES_PERMISOS.md).
 
-Validado en PostgreSQL descartable con 39 comprobaciones; seis migraciones
-remotas existentes verificadas con checksum coincidente, esquema/rol/TLS
-correctos y tablas nuevas todavía ausentes. Estado antes de ejecución: validado,
-pendiente de aplicar manualmente y registrar commit/resultado. No autoriza
-integración en main ni modifica las ramas de Jasmine/Johan.
+**Aplicado y verificado** mediante el comando manual migrador el 11 de noviembre.
+Archivo/servidor guardados en commit `9491eab`; SHA256 del SQL:
+`7da2032fcc4121373d66dc9e7ef63a37a462fbcda7e5c4dc1a16b27c9c7c384a`.
+Ejecutor: agente de Roberto. Antes de ejecutar se validó en PostgreSQL
+descartable con 39 comprobaciones y se verificaron las seis migraciones previas,
+esquema, rol API y TLS. Después: siete migraciones con checksum coincidente,
+RLS activo en las dos tablas nuevas, API con lectura/inserción y sin
+actualización/borrado en RolePermissionChange. Ambas tablas nuevas conservan
+cero registros: no se cambiaron permisos ni usuarios de la base compartida.
+Instalación campusitsm saludable tras reconstruir API/web. No integra main ni
+modifica las ramas de Jasmine/Johan. Ver
+[entrega](entregas/roberto-roles-permisos.md).
 
 Los compañeros deben recibir esta base común antes de utilizar configuraciones
 nuevas; sus versiones antiguas conservan valores fijos. La migración añade tablas

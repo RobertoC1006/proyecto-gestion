@@ -1,5 +1,32 @@
 # Estado del equipo — 11 de noviembre de 2026
 
+## Roles y permisos con casillas — roles-permisos
+
+Roberto pidió una matriz similar a su referencia de VEXOR y confirmó que debe
+guardar permisos reales por rol, conservando los cinco roles acordados. Esta
+rama parte del dashboard/acceso local `b54bed3`; backend/migración en `9491eab`.
+Pantalla `/admin/permisos`, accesible desde Permisos y el dashboard para
+administrador. Selector de roles, módulos desplegables, casillas individuales y
+agrupadas, búsqueda, motivo, protección de cambios sin guardar y conflictos.
+
+RoleAccess es la nueva fuente por institución/rol sobre los valores iniciales.
+RolePermissionChange guarda actor/motivo/antes/después de forma atómica. La
+sesión resuelve permisos efectivos en cada solicitud; el calendario deja de
+autorizar por una lista fija del rol. Usuarios/P20 sigue con Jasmine y su cambio
+de rol usa IdentityDirectory.changeAccess. Esta entrega concreta la matriz P21
+por solicitud de Roberto; no integra ni modifica la rama de Jasmine.
+
+Migración 20261111000100_role_permissions aplicada y verificada en la base
+compartida, tablas nuevas vacías, siete checksums coincidentes y RLS activo.
+No se cambiaron permisos de cuentas reales. 39 comprobaciones PostgreSQL
+aisladas y 33 de navegador aprobadas, con revisión visual escritorio/móvil.
+Instalación campusitsm saludable. Código solo local, sin publicar/integrar main;
+compartir la nueva base con Johan/Jasmine antes de utilizar configuraciones
+distintas, porque sus backends anteriores no las interpretan. Contrato:
+[CONTRATO_ROLES_PERMISOS.md](CONTRATO_ROLES_PERMISOS.md). Registro:
+[REGISTRO_CAMBIOS_BD.md](REGISTRO_CAMBIOS_BD.md). Ver
+[entrega](entregas/roberto-roles-permisos.md).
+
 ## Corrección local de acceso y navegación — acceso-navegacion
 
 Por el problema reportado por Roberto, se preparó desde main `f4a4457` una

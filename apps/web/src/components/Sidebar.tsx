@@ -58,7 +58,7 @@ export function Sidebar({ menuOpen = false }: { menuOpen?: boolean }) {
           )
         })}
         {adminLinks.length > 0 && <div className="sidebar__secondary" aria-label="Administración">
-          {adminLinks.map(({ label, icon: Icon }) => (
+          {adminLinks.map(({ label, icon: Icon, to }) => to ? <Link key={label} to={to} className={`nav-item ${pathname.startsWith(to) ? 'nav-item--active' : ''}`} aria-current={pathname.startsWith(to) ? 'page' : undefined}><Icon size={23} aria-hidden="true" />{label}</Link> : (
             <span
               className="nav-item nav-item--unavailable"
               key={label}

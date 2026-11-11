@@ -164,6 +164,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/role-permissions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["RolePermissionsController_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/role-permissions/{role}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["RolePermissionsController_update"];
+        trace?: never;
+    };
     "/api/v1/academic/courses": {
         parameters: {
             query?: never;
@@ -382,6 +414,37 @@ export interface components {
         PasswordDto: {
             /** Format: password */
             password: string;
+        };
+        RoleAccessDto: {
+            /** @enum {string} */
+            role: "estudiante" | "docente" | "ti_agente" | "ti_supervisor" | "administrador";
+            label: string;
+            permissions: string[];
+            version: number;
+            updatedAt: string | null;
+            allowedPermissions: string[];
+            protectedPermissions: string[];
+        };
+        PermissionItemDto: {
+            key: string;
+            module: string;
+            label: string;
+            /** @enum {string} */
+            action: "consultar" | "registrar" | "atender" | "asignar" | "administrar";
+            scope: string;
+            available: boolean;
+        };
+        RoleMatrixDto: {
+            roles: components["schemas"]["RoleAccessDto"][];
+            catalog: components["schemas"]["PermissionItemDto"][];
+            dependencies: {
+                [key: string]: string;
+            };
+        };
+        UpdateRolePermissionsDto: {
+            permissions: string[];
+            expectedVersion: number;
+            reason: string;
         };
         CourseDto: {
             /** Format: uuid */
@@ -1015,6 +1078,92 @@ export interface operations {
             };
             /** @description Supabase sin configurar o temporalmente no disponible. */
             503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    RolePermissionsController_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RoleMatrixDto"];
+                };
+            };
+            /** @description Necesitas una sesión válida. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Solo administradores con permissions:manage. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    RolePermissionsController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                role: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateRolePermissionsDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RoleAccessDto"];
+                };
+            };
+            /** @description Permisos, alcance o motivo inválidos. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Necesitas una sesión válida. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Solo administradores con permissions:manage. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Otra persona modificó el rol. */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };

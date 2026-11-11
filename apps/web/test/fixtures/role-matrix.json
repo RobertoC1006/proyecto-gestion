@@ -1,0 +1,235 @@
+{
+  "roles": [
+    {
+      "role": "estudiante",
+      "label": "Estudiante",
+      "permissions": [
+        "academic:read:self",
+        "tickets:create",
+        "tickets:read:self",
+        "certificates:request:self"
+      ],
+      "version": 0,
+      "updatedAt": null,
+      "allowedPermissions": [
+        "academic:read:self",
+        "tickets:create",
+        "tickets:read:self",
+        "certificates:request:self"
+      ],
+      "protectedPermissions": []
+    },
+    {
+      "role": "docente",
+      "label": "Docente",
+      "permissions": [
+        "academic:read:self",
+        "tickets:create",
+        "tickets:read:self",
+        "certificates:request:self"
+      ],
+      "version": 0,
+      "updatedAt": null,
+      "allowedPermissions": [
+        "academic:read:self",
+        "tickets:create",
+        "tickets:read:self",
+        "certificates:request:self"
+      ],
+      "protectedPermissions": []
+    },
+    {
+      "role": "ti_agente",
+      "label": "Agente TI",
+      "permissions": [
+        "academic:read:self",
+        "tickets:read:team",
+        "tickets:work:team"
+      ],
+      "version": 0,
+      "updatedAt": null,
+      "allowedPermissions": [
+        "academic:read:self",
+        "tickets:read:team",
+        "tickets:work:team"
+      ],
+      "protectedPermissions": []
+    },
+    {
+      "role": "ti_supervisor",
+      "label": "Supervisor TI",
+      "permissions": [
+        "academic:read:self",
+        "tickets:read:team",
+        "tickets:work:team",
+        "tickets:assign:team",
+        "reports:read:team"
+      ],
+      "version": 0,
+      "updatedAt": null,
+      "allowedPermissions": [
+        "academic:read:self",
+        "tickets:read:team",
+        "tickets:work:team",
+        "tickets:assign:team",
+        "reports:read:team"
+      ],
+      "protectedPermissions": []
+    },
+    {
+      "role": "administrador",
+      "label": "Administrador",
+      "permissions": [
+        "academic:read:self",
+        "academic:manage",
+        "users:manage",
+        "permissions:manage",
+        "reports:read:institution",
+        "audit:read:institution",
+        "configuration:manage"
+      ],
+      "version": 0,
+      "updatedAt": null,
+      "allowedPermissions": [
+        "academic:read:self",
+        "academic:manage",
+        "tickets:read:self",
+        "tickets:create",
+        "tickets:read:team",
+        "tickets:work:team",
+        "tickets:assign:team",
+        "certificates:request:self",
+        "reports:read:team",
+        "reports:read:institution",
+        "users:manage",
+        "permissions:manage",
+        "configuration:manage",
+        "audit:read:institution"
+      ],
+      "protectedPermissions": [
+        "users:manage",
+        "permissions:manage"
+      ]
+    }
+  ],
+  "catalog": [
+    {
+      "key": "academic:read:self",
+      "module": "Calendario académico",
+      "label": "Consultar mi calendario",
+      "action": "consultar",
+      "scope": "Institución y cursos propios",
+      "available": true
+    },
+    {
+      "key": "academic:manage",
+      "module": "Calendario académico",
+      "label": "Gestionar eventos, cursos y secciones",
+      "action": "administrar",
+      "scope": "Institución",
+      "available": true
+    },
+    {
+      "key": "tickets:read:self",
+      "module": "Incidencias",
+      "label": "Consultar mis incidencias",
+      "action": "consultar",
+      "scope": "Datos propios",
+      "available": false
+    },
+    {
+      "key": "tickets:create",
+      "module": "Incidencias",
+      "label": "Registrar incidencias",
+      "action": "registrar",
+      "scope": "Datos propios",
+      "available": false
+    },
+    {
+      "key": "tickets:read:team",
+      "module": "Atención de TI",
+      "label": "Consultar incidencias del equipo",
+      "action": "consultar",
+      "scope": "Equipo asignado",
+      "available": false
+    },
+    {
+      "key": "tickets:work:team",
+      "module": "Atención de TI",
+      "label": "Atender incidencias del equipo",
+      "action": "atender",
+      "scope": "Equipo asignado",
+      "available": false
+    },
+    {
+      "key": "tickets:assign:team",
+      "module": "Atención de TI",
+      "label": "Asignar incidencias del equipo",
+      "action": "asignar",
+      "scope": "Equipo asignado",
+      "available": false
+    },
+    {
+      "key": "certificates:request:self",
+      "module": "Constancias",
+      "label": "Solicitar mis constancias",
+      "action": "registrar",
+      "scope": "Datos propios",
+      "available": false
+    },
+    {
+      "key": "reports:read:team",
+      "module": "Reportes",
+      "label": "Consultar reportes del equipo",
+      "action": "consultar",
+      "scope": "Equipo asignado",
+      "available": false
+    },
+    {
+      "key": "reports:read:institution",
+      "module": "Reportes",
+      "label": "Consultar reportes de la institución",
+      "action": "consultar",
+      "scope": "Institución",
+      "available": false
+    },
+    {
+      "key": "users:manage",
+      "module": "Usuarios",
+      "label": "Administrar usuarios y sus roles",
+      "action": "administrar",
+      "scope": "Institución",
+      "available": false
+    },
+    {
+      "key": "permissions:manage",
+      "module": "Roles y permisos",
+      "label": "Administrar permisos por rol",
+      "action": "administrar",
+      "scope": "Institución",
+      "available": true
+    },
+    {
+      "key": "configuration:manage",
+      "module": "Configuración",
+      "label": "Administrar la configuración",
+      "action": "administrar",
+      "scope": "Institución",
+      "available": false
+    },
+    {
+      "key": "audit:read:institution",
+      "module": "Auditoría",
+      "label": "Consultar la auditoría",
+      "action": "consultar",
+      "scope": "Institución",
+      "available": false
+    }
+  ],
+  "dependencies": {
+    "tickets:create": "tickets:read:self",
+    "tickets:work:team": "tickets:read:team",
+    "tickets:assign:team": "tickets:read:team",
+    "academic:manage": "academic:read:self"
+  }
+}

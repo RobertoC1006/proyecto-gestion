@@ -15,6 +15,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import CalendarPage from './features/academic/CalendarPage'
 import EventForm from './features/academic/EventForm'
 import PersonalCalendar from './features/academic/PersonalCalendar'
+import RolePermissionsPage from './features/permissions/RolePermissionsPage'
 import { AuthProvider } from './features/auth/AuthContext'
 import { SessionBoundary, PermissionBoundary } from './features/auth/AccessBoundary'
 import { access } from './features/auth/access'
@@ -42,6 +43,7 @@ function App() {
     <RootLayout>
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/admin/permisos" element={<PermissionBoundary permissions={access.permissions}><RolePermissionsPage /></PermissionBoundary>} />
         <Route path="/calendario" element={<PermissionBoundary permissions={access.personalCalendar}><PersonalCalendar /></PermissionBoundary>} />
         <Route path="/admin/calendario" element={<PermissionBoundary permissions={access.manageCalendar}><CalendarPage /></PermissionBoundary>} />
         <Route path="/admin/calendario/nuevo" element={<PermissionBoundary permissions={access.manageCalendar}><EventForm /></PermissionBoundary>} />

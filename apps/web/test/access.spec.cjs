@@ -84,7 +84,7 @@ for (const role of Object.keys(permissions)) {
 
 test('Alumno: escribir la dirección administrativa o de TI no monta pantallas ni consulta sus datos', async ({ page }) => {
   const state = await fixture(page, sessionFor('estudiante'));
-  for (const url of ['/admin/calendario', '/admin/calendario/nuevo', '/admin/calendario/ejemplo/editar', '/ti/cola', '/ti/tickets/ejemplo']) {
+  for (const url of ['/admin/calendario', '/admin/calendario/nuevo', '/admin/calendario/ejemplo/editar', '/admin/permisos', '/ti/cola', '/ti/tickets/ejemplo']) {
     await page.goto(url);
     await expect(page.getByRole('alert')).toHaveText('No tienes permiso para acceder a este módulo.');
     await expect(page.getByRole('button', { name: 'Validar y guardar' })).toHaveCount(0);
@@ -168,7 +168,7 @@ test('Dashboard del administrador: recarga, login ya autenticado y capturas de e
   await expect(page).toHaveURL('http://localhost:8080/');
   await expect(page.getByRole('heading', { name: 'Hola, Roberto Carlos', exact: true })).toBeVisible();
   await expect(page.locator('.home-page').getByText('Usuarios', { exact: true })).toBeVisible();
-  await expect(page.locator('.home-page').getByRole('link')).toHaveCount(1);
+  await expect(page.locator('.home-page').getByRole('link')).toHaveCount(2);
   await page.screenshot({ path: path.join(screenshots, 'dashboard-admin-escritorio-fixture.png'), fullPage: true, animations: 'disabled' });
   await page.reload();
   await expect(page.getByRole('heading', { name: 'Hola, Roberto Carlos', exact: true })).toBeVisible();
