@@ -70,6 +70,30 @@ export class AcademicService {
     ]);
     return { items, total, page, pageSize };
   }
+  async personalCourses(actor: AcademicPrincipal, query: unknown) {
+    const { page, pageSize } = v.personalCatalogInput(query);
+    const where: Prisma.AcademicCourseWhereInput = {
+      institutionId: actor.institutionId,
+      sections: { some: { memberships: { some: { institutionId: actor.institutionId, subjectId: actor.id } } } },
+    };
+    const [items, total] = await this.db.$transaction([
+      this.db.academicCourse.findMany({ where, orderBy: [{ name: 'asc' }, { id: 'asc' }], skip: (page - 1) * pageSize, take: pageSize }),
+      this.db.academicCourse.count({ where }),
+    ]);
+    return { items, total, page, pageSize };
+  }
+  async personalSections(actor: AcademicPrincipal, query: unknown) {
+    const { page, pageSize, courseId } = v.personalCatalogInput(query, true);
+    const where: Prisma.AcademicSectionWhereInput = {
+      institutionId: actor.institutionId, courseId,
+      memberships: { some: { institutionId: actor.institutionId, subjectId: actor.id } },
+    };
+    const [items, total] = await this.db.$transaction([
+      this.db.academicSection.findMany({ where, orderBy: [{ code: 'asc' }, { id: 'asc' }], skip: (page - 1) * pageSize, take: pageSize }),
+      this.db.academicSection.count({ where }),
+    ]);
+    return { items, total, page, pageSize };
+  }
   async createSection(actor: AcademicPrincipal, input: unknown) {
     requireAdministrator(actor);
     const body = v.object(input), courseId = v.uuid(body.courseId, 'courseId'), code = v.text(body.code, 'code', 40), name = v.text(body.name, 'name'), reason = v.reason(body);

@@ -4,21 +4,25 @@ Rama `calendario-academico`, derivada de `196a2144aae253ca672eeeaf721c6220451624
 Entrega aprobada para integrar mediante PR #2. Semana 1: calendario manual P17/P18; CSV, configuración de
 factores/SLA y cálculo del factor corresponden a semana 2.
 
+Ampliación del 11 de noviembre en `cursos-propios`: consulta de cursos y secciones
+del titular para incidencias. Ver [CONTRATO_CURSOS_PROPIOS.md](CONTRATO_CURSOS_PROPIOS.md)
+y [ESTADO_EQUIPO.md](ESTADO_EQUIPO.md); no asumir su integración en main.
+
 ## Identidad y auditoría: dependencias explícitas
 
-La rama identidad-supabase conecta `AcademicIdentity` y `AcademicDirectory` a la
-sesión y perfiles canónicos reales de NestJS/Supabase. Esa entrega todavía no está
-integrada en main; comprobar el código base autorizado. `resolve(request)` devuelve
+Identidad y base compartida están integradas en main desde el 7 de noviembre.
+`AcademicIdentity` y `AcademicDirectory` usan la sesión y los perfiles canónicos
+reales de NestJS/Supabase. `resolve(request)` devuelve
 `{id,institutionId,role,csrfVerified}` y solo valida CSRF desde la protección del
 servidor. Sin sesión responde 401; no acepta identidad o permisos inventados en
 cabeceras/cookies/cuerpo del cliente. No añadir otro adaptador de administrador.
 
-Administración: rol administrador; otras cuentas solo consultan sus propios
-eventos con `/academic/me/events`. Identificadores UUID; institución del principal,
+Administración: rol administrador. Las consultas personales de eventos, cursos y
+secciones se limitan al titular. Identificadores UUID; institución del principal,
 nunca del cuerpo. Ver `CONTRATO_IDENTIDAD.md`. Las asociaciones se validan contra
 AppUser activo de la misma institución mediante el directorio común; no se crean
-usuarios paralelos. El destino acordado es una base Supabase de desarrollo común,
-pendiente de trasladar/conectar según [COORDINACION_SUPABASE.md](COORDINACION_SUPABASE.md).
+usuarios paralelos. La base Supabase común ya está trasladada y conectada para
+Roberto; accesos de compañeros según [COORDINACION_SUPABASE.md](COORDINACION_SUPABASE.md).
 
 Cada escritura guarda actor, fecha, origen manual, motivo y antes/después en
 `AcademicChange`, en la misma transacción. Es un registro pendiente de entrega al
@@ -36,9 +40,14 @@ de auditoría global. Su integración final queda pendiente.
 | GET/POST `events` | Listar/crear eventos; administrador |
 | GET/PATCH/DELETE `events/{id}` | Consultar/editar/eliminar evento; administrador |
 | GET `me/events` | Eventos institucionales y de cursos/secciones asociados al titular |
+| GET `me/courses` | Cursos asociados al titular, sin duplicados; ampliación en cursos-propios |
+| GET `me/sections?courseId=…` | Solo secciones propias del curso indicado; ampliación en cursos-propios |
 
 Listados de cursos/secciones: `page` (1), `pageSize` (100, máximo 100), respuesta
 `{items,total,page,pageSize}`. Secciones admiten `courseId`.
+Las consultas personales de catálogos tienen parámetros y reglas específicos
+en [CONTRATO_CURSOS_PROPIOS.md](CONTRATO_CURSOS_PROPIOS.md); `courseId` es obligatorio
+al consultar secciones propias.
 Eventos: mismos campos de paginación, `from` inclusivo y `to` exclusivo ISO con
 offset obligatorio, intervalo máximo 93 días; filtros `courseId`, `sectionId`,
 `type` (examen/entrega/matricula). Fuente única `manual` en esta etapa.

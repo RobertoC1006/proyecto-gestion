@@ -1046,6 +1046,124 @@
         ]
       }
     },
+    "/api/v1/academic/me/courses": {
+      "get": {
+        "operationId": "PersonalAcademicController_courses",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 100,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CoursePageDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Consulta inválida; code/message/fields."
+          },
+          "401": {
+            "description": "Sesión válida requerida."
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Calendario académico — titular"
+        ]
+      }
+    },
+    "/api/v1/academic/me/sections": {
+      "get": {
+        "operationId": "PersonalAcademicController_sections",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 100,
+              "type": "number"
+            }
+          },
+          {
+            "name": "courseId",
+            "required": true,
+            "in": "query",
+            "description": "Curso del titular cuyos grupos se consultan.",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SectionPageDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Consulta inválida; code/message/fields."
+          },
+          "401": {
+            "description": "Sesión válida requerida."
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Calendario académico — titular"
+        ]
+      }
+    },
     "/api/v1/academic/me/events": {
       "get": {
         "operationId": "PersonalAcademicController_events",
@@ -1131,6 +1249,9 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "Consulta inválida; code/message/fields."
           },
           "401": {
             "description": "Sesión válida requerida."

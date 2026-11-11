@@ -260,6 +260,38 @@ export interface paths {
         patch: operations["AcademicController_updateEvent"];
         trace?: never;
     };
+    "/api/v1/academic/me/courses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["PersonalAcademicController_courses"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/academic/me/sections": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["PersonalAcademicController_sections"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/academic/me/events": {
         parameters: {
             query?: never;
@@ -1634,6 +1666,80 @@ export interface operations {
             };
         };
     };
+    PersonalAcademicController_courses: {
+        parameters: {
+            query?: {
+                page?: number;
+                pageSize?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CoursePageDto"];
+                };
+            };
+            /** @description Consulta inválida; code/message/fields. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Sesión válida requerida. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PersonalAcademicController_sections: {
+        parameters: {
+            query: {
+                page?: number;
+                pageSize?: number;
+                /** @description Curso del titular cuyos grupos se consultan. */
+                courseId: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SectionPageDto"];
+                };
+            };
+            /** @description Consulta inválida; code/message/fields. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Sesión válida requerida. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     PersonalAcademicController_events: {
         parameters: {
             query: {
@@ -1658,6 +1764,13 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["EventPageDto"];
                 };
+            };
+            /** @description Consulta inválida; code/message/fields. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Sesión válida requerida. */
             401: {

@@ -4,6 +4,12 @@ Registro del equipo, no sustituto del historial de migraciones Prisma ni de la
 auditoría de aplicación. Aplicar el procedimiento de
 [COORDINACION_SUPABASE.md](COORDINACION_SUPABASE.md).
 
+11 de noviembre: `cursos-propios` añade consultas de cursos/secciones del titular
+sobre AcademicCourse/AcademicSection/AcademicMembership existentes. Sin cambios
+de esquema, migración, aplicación remota ni datos nuevos. Las escrituras de prueba
+se hicieron exclusivamente en PostgreSQL descartable. Ver
+[la entrega](entregas/roberto-semana-01-cursos-propios.md).
+
 Transición ejecutada por solicitud de Roberto el 7 de noviembre de 2026.
 Destino: CampusITSM / npjibnlxepiwfermtcmo / esquema campusitsm.
 Código de implementación: `864413a`, integrado en main con identidad `8b02d6f`

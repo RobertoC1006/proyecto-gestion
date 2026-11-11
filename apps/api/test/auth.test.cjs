@@ -54,12 +54,13 @@ test('Identidad: sesiones reales de aplicación con PostgreSQL y proveedor susti
   }
   const admin = { id: randomUUID(), email: `admin-${randomUUID()}@example.test`, displayName: 'Admin prueba' };
   const student = { id: randomUUID(), email: `student-${randomUUID()}@example.test`, displayName: 'Estudiante prueba' };
+  const teacher = { id: randomUUID(), email: `teacher-${randomUUID()}@example.test`, displayName: 'Docente prueba' };
   const outsider = { id: randomUUID(), email: `other-${randomUUID()}@example.test`, displayName: 'Otra institución' };
-  for (const u of [admin, student, outsider]) users.set(u.email, u);
+  for (const u of [admin, student, teacher, outsider]) users.set(u.email, u);
   let adminSession, studentSession;
   try {
     await db.institution.createMany({ data: [{ id: institutionId, code: 'AUTH-TEST', name: 'Identidad de prueba' }, { id: otherInstitution, code: `O-${otherInstitution}`, name: 'Otra institución' }] });
-    await db.appUser.createMany({ data: [{ ...admin, institutionId, role: 'administrador' }, { ...outsider, institutionId: otherInstitution, role: 'administrador' }] });
+    await db.appUser.createMany({ data: [{ ...admin, institutionId, role: 'administrador' }, { ...teacher, institutionId, role: 'docente' }, { ...outsider, institutionId: otherInstitution, role: 'administrador' }] });
     await t.test('Sin sesión o con cabeceras/roles inventados no hay acceso', async () => {
       assert.equal((await request('auth/me')).status, 401);
       assert.equal((await request('academic/courses', { headers: { 'x-role': 'administrador', cookie: 'role=administrador; campus_session=inventada' } })).status, 401);
@@ -103,6 +104,91 @@ test('Identidad: sesiones reales de aplicación con PostgreSQL y proveedor susti
       assert.equal((await request('academic/me/events?from=2026-11-07T00:00:00Z&to=2026-11-08T00:00:00Z', { session: outside })).body.total, 0);
       assert.throws(() => requireScope({ ...studentSession.body.user, active: true }, { institutionId: otherInstitution }, 'institution'));
     });
+    await t.test('Catálogos personales: sesión real, asociaciones y aislamiento PostgreSQL', async t => {
+      const course = await db.academicCourse.findUniqueOrThrow({ where: { institutionId_code: { institutionId, code: 'AUTH' } } });
+      const original = await db.academicSection.findUniqueOrThrow({ where: { courseId_code: { courseId: course.id, code: 'A' } } });
+      const ownSection = await db.academicSection.create({ data: { institutionId, courseId: course.id, code: 'B', name: 'Otro grupo propio' } });
+      const teacherSection = await db.academicSection.create({ data: { institutionId, courseId: course.id, code: 'C', name: 'Grupo del docente' } });
+      async function catalog(targetInstitution, code, name, subjectId) {
+        const row = await db.academicCourse.create({ data: { institutionId: targetInstitution, code, name } });
+        const section = await db.academicSection.create({ data: { institutionId: targetInstitution, courseId: row.id, code: 'A', name: 'Grupo A' } });
+        await db.academicMembership.create({ data: { institutionId: targetInstitution, courseId: row.id, sectionId: section.id, subjectId } });
+        return { course: row, section };
+      }
+      const mine = await catalog(institutionId, 'OWN', 'A · Segundo curso propio', student.id);
+      const theirs = await catalog(institutionId, 'OTHER', 'Z · Curso de otro usuario', teacher.id);
+      const foreign = await catalog(otherInstitution, 'FOREIGN', 'Curso de otra institución', outsider.id);
+      await db.academicMembership.createMany({ data: [
+        { institutionId, courseId: course.id, sectionId: ownSection.id, subjectId: student.id },
+        { institutionId, courseId: course.id, sectionId: teacherSection.id, subjectId: teacher.id },
+      ] });
+      const teacherSession = await login(teacher.email), outsiderSession = await login(outsider.email);
+      const courses = 'academic/me/courses';
+      const sections = `academic/me/sections?courseId=${course.id}`;
+      await t.test('Ambas rutas requieren sesión y rechazan identidad inventada', async () => {
+        for (const path of [courses, sections]) {
+          assert.equal((await request(path)).status, 401);
+          assert.equal((await request(path, { headers: { 'x-role': 'administrador', 'x-user-id': student.id, cookie: 'campus_session=inventada' } })).status, 401);
+        }
+      });
+      await t.test('Cursos propios sin duplicados, con paginación y sin datos personales', async () => {
+        const result = await request(courses, { session: studentSession });
+        assert.equal(result.status, 200); assert.equal(result.cache, 'no-store');
+        assert.equal(result.body.total, 2); assert.equal(result.body.page, 1); assert.equal(result.body.pageSize, 100);
+        assert.deepEqual(result.body.items.map(item => item.id), [mine.course.id, course.id]);
+        assert.deepEqual(Object.keys(result.body.items[0]).sort(), ['code', 'createdAt', 'id', 'institutionId', 'name']);
+        const one = await request(`${courses}?pageSize=1`, { session: studentSession });
+        const two = await request(`${courses}?page=2&pageSize=1`, { session: studentSession });
+        assert.equal(one.body.total, 2); assert.equal(one.body.items.length, 1);
+        assert.equal(two.body.items.length, 1); assert.equal(two.body.items[0].id, course.id);
+        assert.equal((await request(`${courses}?page=3&pageSize=1`, { session: studentSession })).body.items.length, 0);
+      });
+      await t.test('Secciones propias del curso, sin revelar grupos ajenos', async () => {
+        const result = await request(sections, { session: studentSession });
+        assert.equal(result.status, 200); assert.equal(result.cache, 'no-store');
+        assert.equal(result.body.total, 2);
+        assert.deepEqual(result.body.items.map(item => item.id), [original.id, ownSection.id]);
+        assert.deepEqual(Object.keys(result.body.items[0]).sort(), ['code', 'courseId', 'createdAt', 'id', 'institutionId', 'name']);
+        const second = await request(`${sections}&page=2&pageSize=1`, { session: studentSession });
+        assert.equal(second.body.total, 2); assert.equal(second.body.items[0].id, ownSection.id);
+        const teacherResult = await request(sections, { session: teacherSession });
+        assert.deepEqual(teacherResult.body.items.map(item => item.id), [teacherSection.id]);
+        assert.equal((await request(courses, { session: teacherSession })).body.total, 2);
+      });
+      await t.test('Usuarios sin asociación, cursos ajenos e institución ajena no amplían alcance', async () => {
+        const empty = await request(courses, { session: adminSession });
+        assert.deepEqual(empty.body, { items: [], total: 0, page: 1, pageSize: 100 });
+        assert.equal((await request(sections, { session: adminSession })).body.total, 0);
+        for (const courseId of [theirs.course.id, foreign.course.id, randomUUID()]) {
+          const result = await request(`academic/me/sections?courseId=${courseId}`, { session: studentSession });
+          assert.equal(result.status, 200); assert.equal(result.body.total, 0); assert.deepEqual(result.body.items, []);
+        }
+        const foreignCourses = await request(courses, { session: outsiderSession });
+        assert.deepEqual(foreignCourses.body.items.map(item => item.id), [foreign.course.id]);
+        assert.equal((await request(sections, { session: outsiderSession })).body.total, 0);
+      });
+      await t.test('Se rechazan curso ausente, UUID/paginación inválidos y selección de otra identidad', async () => {
+        for (const [path, field] of [
+          ['academic/me/sections', 'courseId'], ['academic/me/sections?courseId=', 'courseId'],
+          ['academic/me/sections?courseId=incorrecto', 'courseId'],
+          [`${sections}&courseId=${mine.course.id}`, 'courseId'],
+          [`${courses}?subjectId=${teacher.id}`, 'subjectId'],
+          [`${sections}&institutionId=${otherInstitution}`, 'institutionId'],
+          [`${courses}?page=1.5`, 'page'], [`${courses}?page=Infinity`, 'page'],
+          [`${courses}?page=0`, 'page'], [`${sections}&pageSize=101`, 'pageSize'],
+          [`${sections}&pageSize=2.5`, 'pageSize'],
+        ]) {
+          const result = await request(path, { session: studentSession });
+          assert.equal(result.status, 400, path); assert.ok(result.body.fields[field], path);
+        }
+      });
+      await t.test('Retirar asociaciones actualiza inmediatamente los catálogos personales', async () => {
+        await db.academicMembership.deleteMany({ where: { subjectId: student.id, sectionId: { in: [ownSection.id, mine.section.id] } } });
+        assert.deepEqual((await request(courses, { session: studentSession })).body.items.map(item => item.id), [course.id]);
+        assert.deepEqual((await request(sections, { session: studentSession })).body.items.map(item => item.id), [original.id]);
+        assert.equal((await request(`academic/me/sections?courseId=${mine.course.id}`, { session: studentSession })).body.total, 0);
+      });
+    });
     await t.test('Renovación simultánea desde dos procesos rota una sola vez', async () => {
       const id = digest(studentSession.cookie.split('=')[1]);
       await db.authSession.update({ where: { id }, data: { tokenExpiresAt: new Date(0) } });
@@ -136,6 +222,8 @@ test('Identidad: sesiones reales de aplicación con PostgreSQL y proveedor susti
       await directory.changeAccess(admin.id, student.id, { expectedVersion: 2, role: 'docente', active: false, teamId: null, reason: 'Desactivación de cuenta de prueba' });
       assert.equal((await request('auth/me', { session: studentSession })).status, 401);
       assert.equal((await request('auth/login', { method: 'POST', body: { email: student.email, password: 'Password-test-123' } })).status, 403);
+      assert.equal((await request('academic/me/courses', { session: studentSession })).status, 401);
+      assert.equal((await request(`academic/me/sections?courseId=${randomUUID()}`, { session: studentSession })).status, 401);
       await directory.changeAccess(admin.id, student.id, { expectedVersion: 3, role: 'estudiante', active: true, teamId: null, reason: 'Restablecer cuenta de prueba' });
     });
     await t.test('Caducidad absoluta, cookie reemplazada y cierre revocan la sesión en servidor', async () => {
