@@ -56,7 +56,8 @@ inicio de sesión real con contraseña del usuario.
 
 ## Coordinación y límites
 
-Interfaz local activa, cambios sin integrar ni publicar en main. No se modificaron
+Interfaz local activa y entrega integrada en la publicación conjunta autorizada
+del 11 de noviembre; ver [publicación](roberto-publicacion-acceso-roles.md). No se modificaron
 las ramas de Jasmine/Johan, roles de cuentas, esquema, migraciones ni credenciales.
 El directorio `outputs/` ya existía sin seguimiento y se conservó.
 

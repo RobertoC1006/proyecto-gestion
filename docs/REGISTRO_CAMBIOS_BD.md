@@ -19,8 +19,9 @@ esquema, rol API y TLS. Después: siete migraciones con checksum coincidente,
 RLS activo en las dos tablas nuevas, API con lectura/inserción y sin
 actualización/borrado en RolePermissionChange. Ambas tablas nuevas conservan
 cero registros: no se cambiaron permisos ni usuarios de la base compartida.
-Instalación campusitsm saludable tras reconstruir API/web. No integra main ni
-modifica las ramas de Jasmine/Johan. Ver
+Instalación campusitsm saludable tras reconstruir API/web. El código se integra
+en main por autorización posterior de Roberto, sin reaplicar esta migración ni
+modificar las ramas de Jasmine/Johan. Ver
 [entrega](entregas/roberto-roles-permisos.md).
 
 Los compañeros deben recibir esta base común antes de utilizar configuraciones
@@ -30,6 +31,17 @@ vacías, por lo que el comportamiento inicial no cambia.
 Registro del equipo, no sustituto del historial de migraciones Prisma ni de la
 auditoría de aplicación. Aplicar el procedimiento de
 [COORDINACION_SUPABASE.md](COORDINACION_SUPABASE.md).
+
+11 de noviembre, revisión `revision-incidencias`: dictamen favorable de
+`20261108000100_tickets_core` en `gestion-incidencias@90a2790`, probado en
+PostgreSQL descartable con 35 comprobaciones. Consulta remota solo de lectura:
+seis migraciones coincidentes y tablas de tickets aún ausentes. **No aplicado**
+por esta revisión; no se agrega una fila de migración aplicada. Antes de cargar
+evidencia se requiere otra migración para el máximo de 5242880 bytes.
+Ejecutor de revisión: agente de Roberto. Ver
+[dictamen](REVISION_MIGRACION_TICKETS.md) y
+[contrato de evidencias](CONTRATO_EVIDENCIAS.md). Bucket privado recomendado sin
+crear; no hubo cambios de infraestructura de Storage.
 
 11 de noviembre: `cursos-propios` añade consultas de cursos/secciones del titular
 sobre AcademicCourse/AcademicSection/AcademicMembership existentes. Sin cambios

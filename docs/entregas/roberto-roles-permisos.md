@@ -3,7 +3,9 @@
 11 de noviembre de 2026. Implementación solicitada por Roberto a partir de su
 captura de VEXOR y confirmación de cambiar/guardar permisos reales manteniendo
 los cinco roles. Rama roles-permisos desde acceso-navegacion@b54bed3.
-Backend y SQL: 9491eab. Sin publicación/integración en main.
+Backend y SQL: 9491eab; interfaz eead97b. Integración/publicación en main
+autorizada posteriormente por Roberto; ver
+[publicación conjunta](roberto-publicacion-acceso-roles.md).
 
 ## Resultado
 
@@ -61,7 +63,7 @@ Los volúmenes y outputs previos se conservan.
 
 ## Coordinación pendiente
 
-Código local sin integrar/publicar main. Johan/Jasmine deben recibir esta base
+Código incluido en la publicación conjunta autorizada. Johan/Jasmine deben recibir esta base
 antes de usar configuraciones nuevas: un backend anterior con permisos fijos
 no puede interpretarlas. La migración vacía conserva los valores iniciales para
 compatibilidad inicial. Las migraciones aplicadas no se revierten al volver de rama.

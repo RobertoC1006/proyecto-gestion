@@ -75,20 +75,23 @@ trabaja solo el módulo y la semana de tu plan que se soliciten.
 Este ZIP contiene documentación y referencias, no una copia ejecutable del proyecto.
 Obtén el código base autorizado por Roberto de
 https://github.com/RobertoC1006/proyecto-gestion y verifica rama/commit reales.
-Main revisado al actualizar los planes: 02d10f5; identidad implementada en la rama
-identidad-supabase, 8b02d6f, todavía sin integrar/publicar en main en esa revisión.
+Identidad y conexión compartida están publicadas en main. Consultar
+docs/ESTADO_EQUIPO.md para distinguir entregas publicadas de revisiones en rama;
+la existencia de un documento en este ZIP no acredita integración de su código.
 
 No recrear Docker ni el diseño compartido. Roberto asume P01/Supabase Auth y
 autorización común; Jasmine administra usuarios/permisos sobre esa base y conserva
-consentimiento/auditoría; Johan desarrolla incidencias. Identidad tiene un avance en
-su rama propia: revisar docs/ESTADO_EQUIPO.md y la entrega antes de consumirlo como main.
+consentimiento/auditoría; Johan desarrolla incidencias. Reutilizar la identidad
+común y comprobar las dependencias pendientes en docs/ESTADO_EQUIPO.md.
 Las capturas con fixture son ejemplos de prueba, no datos reales ni un login listo.
 
-ACUERDO NUEVO: los tres backend usarán una misma base de desarrollo en Supabase,
-con frontend/backend/Python en el Docker de cada uno. Traslado, conexiones y
-colaboradores todavía pendientes: este ZIP no los ejecuta ni acredita habilitación.
-El Compose actual sigue siendo local y ejecuta migraciones al arrancar; no apuntarlo
-unilateralmente a Supabase. PostgreSQL local queda para pruebas aisladas.
+Los tres backend usan una misma base de desarrollo en Supabase, con
+frontend/backend/Python en el Docker de cada uno. El traslado y la conexión de
+Roberto están verificados; comprobar los accesos actuales de los colaboradores.
+El Compose normal no inicia PostgreSQL ni ejecuta migraciones; el paso migrador
+es manual y usa credencial separada. PostgreSQL local queda para pruebas aisladas.
+Este ZIP no conecta instalaciones ni aplica migraciones. La base común tampoco
+comparte archivos: consultar el contrato de evidencias y su habilitación real.
 
 Una rama Git no aísla la base común. Tras habilitar el entorno, cada integrante puede
 crear tablas, columnas e índices nuevos de su módulo dentro del plan, compatibles
@@ -105,7 +108,9 @@ los documentos de este paquete ya estuvieran confirmados en ese commit.
 '''.encode('utf-8')
         manifest = {
             'responsable': person.title(),
-            'fecha_revision_planes': '2026-11-07',
+            'fecha_revision_planes': max(re.search(r'^revision: (\d{4}-\d{2}-\d{2})$',
+                (ROOT / 'planes' / f'PLAN_{name}.md').read_text(encoding='utf-8'), re.M).group(1)
+                for name in PEOPLE),
             'commit_checkout_al_generar': head,
             'origen_archivos': 'directorio_de_trabajo_verificado_por_sha256',
             'base_docker_main': '196a2144aae253ca672eeeaf721c62204516245a',
