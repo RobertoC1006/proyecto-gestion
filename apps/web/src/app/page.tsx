@@ -1,15 +1,42 @@
-import { ArrowRight, CheckCircle as CheckCircle2, Clock as Clock3, Plus } from '@phosphor-icons/react';
-import { tickets } from "../data/mock";
-import { PriorityBadge } from "../components/PriorityBadge";
+import { ArrowRight } from '@phosphor-icons/react'
+import { Link } from 'react-router-dom'
+import { Card, CardHeading, EmptyState, IconBubble, PageHeading } from '../components/ui'
+import { roleLabels, useAuth } from '../features/auth/AuthContext'
+import { navigationFor, type NavigationItem } from '../features/auth/navigation'
+import '../features/home/home.css'
+
+function ModuleList({ title, items }: { title: string; items: NavigationItem[] }) {
+  if (!items.length) return null
+  return <Card className="home-modules">
+    <CardHeading title={title} />
+    <ul className="home-module-list">
+      {items.map(item => {
+        const content = <>
+          <IconBubble icon={item.icon} small tone={item.to ? 'green' : 'gray'} />
+          <span className="home-module-copy"><strong>{item.label}</strong><span>{item.description}</span></span>
+          {item.to ? <ArrowRight className="home-module-arrow" size={20} aria-hidden="true" /> : <span className="home-module-status">Próximamente</span>}
+        </>
+        return <li key={item.label}>{item.to
+          ? <Link className="home-module" to={item.to}>{content}</Link>
+          : <div className="home-module home-module--pending" aria-disabled="true">{content}</div>}
+        </li>
+      })}
+    </ul>
+  </Card>
+}
 
 export default function HomePage() {
-  const resolved = tickets.filter((ticket) => ticket.status === "Resuelto").length;
-  return <section>
-    <div className="page-intro"><div><h2>Hola, Johan 👋</h2><p>Aquí tienes un resumen de tus solicitudes recientes.</p></div><a className="primary-button" href="/incidencias/nueva"><Plus size={17} />Nueva incidencia</a></div>
-    <div className="stats-grid">
-      <div className="stat-card"><span className="stat-icon blue"><Clock3 size={19} /></span><div><strong>{tickets.length}</strong><small>Incidencias registradas</small></div></div>
-      <div className="stat-card"><span className="stat-icon green"><CheckCircle2 size={19} /></span><div><strong>{resolved}</strong><small>Incidencias resueltas</small></div></div>
-    </div>
-    <div className="page-card"><div className="page-intro"><div><h2>Actividad reciente</h2><p>Consulta el estado de tus últimos reportes.</p></div><a className="text-link" href="/incidencias">Ver todas <ArrowRight size={14} /></a></div><div className="ticket-grid">{tickets.slice(0, 3).map((ticket) => <a className="ticket-row" href={`/incidencias/${ticket.id}`} key={ticket.id}><span className="ticket-id">{ticket.id}</span><div><div className="ticket-title">{ticket.title}</div><span className="ticket-meta">{ticket.createdAt} · {ticket.category}</span></div><PriorityBadge priority={ticket.priority} /><span className={`status status-${ticket.status === "Resuelto" ? "resuelto" : ticket.status === "En atención" ? "atencion" : "espera"}`}>{ticket.status}</span><ArrowRight size={17} className="row-arrow" /></a>)}</div></div>
-  </section>;
+  const { user } = useAuth()
+  if (!user) return null
+  const modules = navigationFor(user)
+  const primary = modules.primary.filter(item => item.to !== '/')
+  return <div className="content-stack home-page">
+    <PageHeading title={`Hola, ${user.displayName}`} subtitle="Elige una herramienta para continuar con tus actividades." illustration={false}
+      action={<span className="badge home-role">{roleLabels[user.role]}</span>}>
+      <span className="home-eyebrow">Tu espacio en CampusITSM</span>
+    </PageHeading>
+    <ModuleList title="Tus herramientas" items={primary} />
+    <ModuleList title="Administración" items={modules.administration} />
+    {!primary.length && !modules.administration.length && <Card><EmptyState title="Todavía no tienes herramientas asignadas" description="Contacta con administración para revisar los accesos de tu cuenta." /></Card>}
+  </div>
 }

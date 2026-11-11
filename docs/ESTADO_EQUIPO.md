@@ -1,5 +1,29 @@
 # Estado del equipo — 11 de noviembre de 2026
 
+## Corrección local de acceso y navegación — acceso-navegacion
+
+Por el problema reportado por Roberto, se preparó desde main `f4a4457` una
+corrección de P01 y del layout compartido. Sin sesión, la entrada y las rutas
+privadas llevan a `/login` antes de montar el panel. Menú y pantallas usan los
+permisos efectivos enviados por la API; el alumno no ve administración ni TI.
+La entrada `127.0.0.1` redirige a `localhost`, conservando puerto/ruta/parámetros,
+para respetar APP_ORIGIN sin relajar la comprobación de origen del servidor.
+
+Por indicación posterior de Roberto se recuperó el dashboard privado como
+destino tras el login y en `/`. Muestra el nombre de la sesión y los accesos
+del rol, sin contadores ni tickets de ejemplo. Comparte el catálogo de navegación
+filtrado con Sidebar; las secciones pendientes mantienen su estado no disponible.
+Usuarios/P20 y Permisos/P21 conservan su responsable Jasmine; este paso no los
+implementa ni integra su rama.
+
+La interfaz está reconstruida y activa en la única instalación `campusitsm`
+de Roberto. Compilación y 25 pruebas de navegador aprobadas; la entrada sin
+sesión también se comprobó contra la API real. Los roles se comprobaron con
+respuestas de prueba del navegador, sin cambiar cuentas de la base compartida.
+Sin migraciones ni integración/publicación en main. Jasmine/Johan deben conservar
+estos controles al conectar sus pantallas. Ver
+[entrega](entregas/roberto-acceso-navegacion.md).
+
 ## Consulta de cursos propios — punto 1 integrado en main
 
 Roberto autorizó implementar únicamente este punto y después publicar e integrar

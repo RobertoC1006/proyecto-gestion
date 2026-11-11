@@ -16,6 +16,9 @@ import CalendarPage from './features/academic/CalendarPage'
 import EventForm from './features/academic/EventForm'
 import PersonalCalendar from './features/academic/PersonalCalendar'
 import { AuthProvider } from './features/auth/AuthContext'
+import { SessionBoundary, PermissionBoundary } from './features/auth/AccessBoundary'
+import { access } from './features/auth/access'
+import { Notice } from './components/ui'
 import './features/academic/academic.css'
 import { IconContext } from '@phosphor-icons/react'
 import '@fontsource/dm-sans/latin-400.css'
@@ -30,33 +33,29 @@ const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: false, refetchOnWindowFocus: false } },
 })
 
-function ViewRouter() {
-  const path = useLocation().pathname
-
-  if (path === '/login') return <LoginPage />
-  if (path === '/incidencias') return <IncidenciasPage />
-  if (path === '/incidencias/nueva') return <NuevaIncidenciaPage />
-  if (path.startsWith('/incidencias/')) return <IncidenciaDetailPage />
-  if (path === '/constancias') return <ConstanciasPage />
-  if (path.startsWith('/verificar/')) return <VerifyCertificatePage />
-  if (path === '/ti/cola') return <TiQueuePage />
-  if (path.startsWith('/ti/tickets/')) return <TiTicketDetailPage />
-  return <HomePage />
-}
-
 function App() {
   const { pathname } = useLocation()
   if (pathname === '/login') return <LoginPage />
+  if (/^\/verificar\/[^/]+\/?$/.test(pathname)) return <main className="legacy-view"><VerifyCertificatePage /></main>
   return (
+    <SessionBoundary>
     <RootLayout>
       <Routes>
-        <Route path="/calendario" element={<PersonalCalendar />} />
-        <Route path="/admin/calendario" element={<CalendarPage />} />
-        <Route path="/admin/calendario/nuevo" element={<EventForm />} />
-        <Route path="/admin/calendario/:id/editar" element={<EventForm />} />
-        <Route path="*" element={<ViewRouter />} />
+        <Route path="/" element={<HomePage />} />
+        <Route path="/calendario" element={<PermissionBoundary permissions={access.personalCalendar}><PersonalCalendar /></PermissionBoundary>} />
+        <Route path="/admin/calendario" element={<PermissionBoundary permissions={access.manageCalendar}><CalendarPage /></PermissionBoundary>} />
+        <Route path="/admin/calendario/nuevo" element={<PermissionBoundary permissions={access.manageCalendar}><EventForm /></PermissionBoundary>} />
+        <Route path="/admin/calendario/:id/editar" element={<PermissionBoundary permissions={access.manageCalendar}><EventForm /></PermissionBoundary>} />
+        <Route path="/incidencias" element={<PermissionBoundary permissions={access.personalTickets}><IncidenciasPage /></PermissionBoundary>} />
+        <Route path="/incidencias/nueva" element={<PermissionBoundary permissions={access.createTicket}><NuevaIncidenciaPage /></PermissionBoundary>} />
+        <Route path="/incidencias/:id" element={<PermissionBoundary permissions={access.personalTickets}><IncidenciaDetailPage /></PermissionBoundary>} />
+        <Route path="/constancias" element={<PermissionBoundary permissions={access.certificates}><ConstanciasPage /></PermissionBoundary>} />
+        <Route path="/ti/cola" element={<PermissionBoundary permissions={access.teamTickets}><TiQueuePage /></PermissionBoundary>} />
+        <Route path="/ti/tickets/:id" element={<PermissionBoundary permissions={access.teamTickets}><TiTicketDetailPage /></PermissionBoundary>} />
+        <Route path="*" element={<Notice tone="amber" role="alert">Esta página no está disponible.</Notice>} />
       </Routes>
     </RootLayout>
+    </SessionBoundary>
   )
 }
 

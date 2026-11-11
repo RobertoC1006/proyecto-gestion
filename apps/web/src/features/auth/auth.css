@@ -26,3 +26,4 @@
 .personal-event { padding: 18px 20px; border-left: 3px solid var(--green); display: grid; gap: 6px; }
 @media (max-width: 950px) { .auth-page { padding: 28px; } .auth-content { gap: 40px; } .auth-intro h1 { font-size: 36px; } }
 @media (max-width: 700px) { .auth-page { padding: 24px 20px; } .auth-content { grid-template-columns: 1fr; gap: 24px; margin: 28px auto; max-width: 450px; } .auth-intro .support-illustration, .auth-intro .notice, .auth-intro > p, .auth-eyebrow { display: none; } .auth-intro h1 { font-size: 25px; letter-spacing: -.7px; margin: 0; } .auth-intro h1 br { display: none; } .auth-card { padding: 24px; } .auth-card__heading h2 { font-size: 23px; } .auth-footer { flex-direction: column; text-align: center; } }
+.session-status { min-height: 100dvh; display: grid; place-content: center; padding: 24px; }
