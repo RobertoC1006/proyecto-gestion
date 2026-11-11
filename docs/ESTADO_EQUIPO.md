@@ -1,5 +1,29 @@
 # Estado del equipo — 11 de noviembre de 2026
 
+## Revisión de tickets y contrato de evidencias — rama revision-incidencias
+
+Roberto solicitó revisar la migración de Johan y definir evidencias. Trabajo
+preparado en `revision-incidencias`, desde main `f4a4457`; no integrado en main
+ni aplicado remotamente. Dictamen:
+[REVISION_MIGRACION_TICKETS.md](REVISION_MIGRACION_TICKETS.md).
+Contrato para Johan: [CONTRATO_EVIDENCIAS.md](CONTRATO_EVIDENCIAS.md).
+
+- Revisión favorable del núcleo y metadatos en `gestion-incidencias@90a2790`:
+  35 comprobaciones SQL en PostgreSQL aislado y Prisma válido. Se mantienen los
+  once servicios existentes y el código INC-año UTC-24 dígitos hexadecimales.
+- Consulta remota de solo lectura: seis migraciones con checksums iguales al
+  código, doce tablas de negocio; Ticket/TicketAttachment todavía ausentes.
+  Rol API, esquema y SSL verificados. No se aplicó migración ni se escribieron
+  datos de prueba en la base compartida.
+- Antes de habilitar carga, Johan debe añadir en otra migración el máximo de
+  5242880 bytes. El SQL inicial solo limita el tamaño a valores positivos.
+- Contrato definido: un archivo opcional PNG/JPEG/PDF, hasta 5 MiB; JSON/Base64
+  con protección actual, descarga autorizada por NestJS y PUT idempotente.
+  Supabase Storage privado común es la recomendación concreta; no se creó
+  el bucket ni se entregó una credencial de servidor. Falta su habilitación.
+- Las ramas de compañeros no se modificaron. Consentimiento/auditoría conservan
+  su responsable; esta revisión no implementa sus módulos ni inicia semana 2.
+
 ## Consulta de cursos propios — punto 1 integrado en main
 
 Roberto autorizó implementar únicamente este punto y después publicar e integrar
@@ -11,7 +35,8 @@ por asociaciones propias e institución. No hay tablas ni migraciones nuevas.
 
 Contrato para Johan: [CONTRATO_CURSOS_PROPIOS.md](CONTRATO_CURSOS_PROPIOS.md).
 Le corresponde conectar el selector de su formulario y conservar General sin
-curso. Adjuntos y revisión/aplicación de su migración siguen pendientes;
+curso. La revisión de migración y el contrato de adjuntos están preparados en
+la rama indicada arriba; la implementación de archivos y aplicación remota siguen pendientes;
 consentimiento/auditoría global mantienen su responsable. Este punto no cierra
 la semana 1 del equipo ni inicia CSV/SLA/predicción.
 

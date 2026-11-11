@@ -1,13 +1,32 @@
 ---
 responsable: Roberto
-revision: 2026-11-07
-estado: base_supabase_conectada_invitaciones_enviadas
+revision: 2026-11-11
+estado: revision_tickets_evidencias_preparada_en_rama
 pantallas_asignadas: [P01, P13, P14, P16, P17, P18, P19, P24]
 ---
 
 # Plan de implementación de CampusITSM para Roberto
 
-Este plan está dirigido exclusivamente a Roberto y su agente. Tu base Docker y el calendario manual ya tienen entregas verificadas. Identidad tiene una entrega en rama; la base de negocio ya está en Supabase; las invitaciones Developer ya se enviaron en su organización gratuita exclusiva; faltan aceptación y entrega de código/configuración. Ejecuta solo la etapa solicitada y no implementes las cuatro semanas de golpe.
+Este plan está dirigido exclusivamente a Roberto y su agente. Tu base Docker y el calendario manual ya tienen entregas verificadas. Identidad y conexión de la base compartida están publicadas en main. Las invitaciones Developer se enviaron en la organización exclusiva; comprobar los accesos actuales en vez de asumir su aceptación. Ejecuta solo la etapa solicitada y no implementes las cuatro semanas de golpe.
+
+## Reanudación actual — 11 de noviembre de 2026
+
+- Cursos propios `498d410` publicados en main `f4a4457`; Johan incorpora esa
+  base y conecta su selector. No repetir identidad, calendario o esas consultas.
+- Revisión de tickets y definición de evidencias solicitadas por Roberto,
+  preparadas en `revision-incidencias` desde esa base, sin integrar todavía
+  este trabajo en main. Ver [dictamen](../docs/REVISION_MIGRACION_TICKETS.md),
+  [contrato de archivos](../docs/CONTRATO_EVIDENCIAS.md) y
+  [estado del equipo](../docs/ESTADO_EQUIPO.md).
+- SQL de Johan `90a2790` con revisión favorable y 35 comprobaciones SQL
+  aprobadas; migración aún sin aplicar en la base compartida. Conservar el
+  catálogo de servicios y código público del módulo. Antes de cargar bytes,
+  añadir mediante nueva migración el tamaño máximo de 5 MiB.
+- Habilitación de almacenamiento común privado y entrega de credencial de
+  servidor pendientes; la recomendación concreta es Supabase Storage del mismo
+  proyecto. El contrato define carga/descarga, protección y reintentos, pero no
+  acredita implementación ni autoriza publicaciones posteriores en main.
+- Esta revisión no inicia CSV, factores/SLA, predicción ni módulos de compañeros.
 
 ## Estado vigente y punto de partida — 7 de noviembre de 2026
 

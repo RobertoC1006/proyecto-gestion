@@ -20,6 +20,12 @@ según [CONTRATO_IDENTIDAD.md](CONTRATO_IDENTIDAD.md), con integración en main 
 
 ## Disponible
 
+Revisión del 11 de noviembre preparada en `revision-incidencias`, sin integrar
+todavía en main: [dictamen de la migración de tickets](REVISION_MIGRACION_TICKETS.md)
+y [contrato de evidencias](CONTRATO_EVIDENCIAS.md). El núcleo de Johan tiene
+revisión favorable; la carga de archivos y el bucket recomendado siguen sin
+implementar/habilitar. Las rutas de archivos descritas son contrato futuro.
+
 Origen único del navegador: `http://localhost:8080`, prefijo `/api/v1`.
 Contrato generado por NestJS: `/api/openapi.json`, interfaz `/api/docs`.
 Los contratos futuros se generan desde DTO OpenAPI, sin copiar modelos Prisma al navegador.
