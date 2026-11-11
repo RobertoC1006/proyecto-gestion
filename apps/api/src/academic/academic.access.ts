@@ -6,6 +6,7 @@ export interface AcademicPrincipal {
   id: string;
   institutionId: string;
   role: CampusRole;
+  permissions: readonly string[];
   csrfVerified: boolean;
 }
 
@@ -31,7 +32,7 @@ export class AcademicSessionGuard implements CanActivate {
     if (!principal || !uuidPattern.test(principal.id) || !uuidPattern.test(principal.institutionId)) {
       throw new UnauthorizedException({ code: 'SESSION_REQUIRED', message: 'Necesitas una sesión válida para consultar el calendario.' });
     }
-    if (!Object.hasOwn(rolePermissions, principal.role)) {
+    if (!Object.hasOwn(rolePermissions, principal.role) || !principal.permissions?.includes('academic:read:self')) {
       throw new ForbiddenException({ code: 'FORBIDDEN', message: 'No tienes acceso al calendario.' });
     }
     if (!['GET', 'HEAD'].includes(request.method) && principal.csrfVerified !== true) {
@@ -43,7 +44,11 @@ export class AcademicSessionGuard implements CanActivate {
 }
 
 export function requireAdministrator(principal: AcademicPrincipal) {
-  if (!rolePermissions[principal.role]?.includes('academic:manage')) {
-    throw new ForbiddenException({ code: 'ADMIN_REQUIRED', message: 'Solo administración puede gestionar el calendario.' });
+  if (!principal.permissions.includes('academic:manage')) {
+    throw new ForbiddenException({ code: 'ADMIN_REQUIRED', message: 'No tienes permiso para gestionar el calendario.' });
   }
+}
+
+export function requireAcademicRead(principal: AcademicPrincipal) {
+  if (!principal.permissions.includes('academic:read:self')) throw new ForbiddenException({ code: 'FORBIDDEN', message: 'No tienes permiso para consultar el calendario.' });
 }

@@ -1,5 +1,25 @@
 # Coordinación de cambios en la base compartida
 
+## Permisos por rol — 11 de noviembre de 2026
+
+Roberto solicitó y confirmó guardar permisos reales por rol mediante casillas,
+manteniendo cinco roles. Rama roles-permisos, migración
+20261111000100_role_permissions/migration.sql: nuevas tablas RoleAccess y
+RolePermissionChange, sin modificar tablas ni datos existentes. Responsable y
+ejecutor: agente de Roberto. Destino: CampusITSM / npjibnlxepiwfermtcmo /
+campusitsm. Cambio de identidad común por indicación de Roberto; contrato:
+[CONTRATO_ROLES_PERMISOS.md](CONTRATO_ROLES_PERMISOS.md).
+
+Validado en PostgreSQL descartable con 39 comprobaciones; seis migraciones
+remotas existentes verificadas con checksum coincidente, esquema/rol/TLS
+correctos y tablas nuevas todavía ausentes. Estado antes de ejecución: validado,
+pendiente de aplicar manualmente y registrar commit/resultado. No autoriza
+integración en main ni modifica las ramas de Jasmine/Johan.
+
+Los compañeros deben recibir esta base común antes de utilizar configuraciones
+nuevas; sus versiones antiguas conservan valores fijos. La migración añade tablas
+vacías, por lo que el comportamiento inicial no cambia.
+
 Registro del equipo, no sustituto del historial de migraciones Prisma ni de la
 auditoría de aplicación. Aplicar el procedimiento de
 [COORDINACION_SUPABASE.md](COORDINACION_SUPABASE.md).

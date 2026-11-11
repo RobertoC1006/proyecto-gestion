@@ -17,6 +17,8 @@ model Institution {
   courses   AcademicCourse[]
   events    AcademicEvent[]
   users     AppUser[]
+  roleAccess RoleAccess[]
+  rolePermissionChanges RolePermissionChange[]
 }
 
 enum AcademicEventType {
@@ -129,6 +131,31 @@ enum CampusRole {
   ti_agente
   ti_supervisor
   administrador
+}
+
+model RoleAccess {
+  institutionId String @db.Uuid
+  role          CampusRole
+  permissions   String[]
+  version       Int @default(1)
+  updatedAt     DateTime @updatedAt @db.Timestamptz(3)
+  institution   Institution @relation(fields: [institutionId], references: [id], onDelete: Restrict)
+
+  @@id([institutionId, role])
+}
+
+model RolePermissionChange {
+  id            String @id @default(uuid()) @db.Uuid
+  institutionId String @db.Uuid
+  role          CampusRole
+  actorId       String @db.Uuid
+  reason        String @db.VarChar(500)
+  before        Json
+  after         Json
+  createdAt     DateTime @default(now()) @db.Timestamptz(3)
+  institution   Institution @relation(fields: [institutionId], references: [id], onDelete: Restrict)
+
+  @@index([institutionId, createdAt])
 }
 
 model AppUser {

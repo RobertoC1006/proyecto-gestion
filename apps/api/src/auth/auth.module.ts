@@ -5,8 +5,10 @@ import { AuthService } from './auth.service';
 import { AuthProvider, SupabaseAuthProvider } from './auth.provider';
 import { IdentityDirectory } from './auth.directory';
 import { CampusSessionGuard } from './auth.guard';
+import { RolePermissionsService } from './role-permissions.service';
+import { RolePermissionsController } from './role-permissions.controller';
 
-@Module({ controllers: [AuthController], providers: [AuthConfig, AuthService, IdentityDirectory, CampusSessionGuard,
+@Module({ controllers: [AuthController, RolePermissionsController], providers: [AuthConfig, AuthService, IdentityDirectory, RolePermissionsService, CampusSessionGuard,
   { provide: AuthProvider, useClass: SupabaseAuthProvider }],
-  exports: [AuthService, IdentityDirectory, CampusSessionGuard] })
+  exports: [AuthService, IdentityDirectory, RolePermissionsService, CampusSessionGuard] })
 export class AuthModule {}

@@ -1,7 +1,7 @@
 import { ConflictException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../database/prisma.service';
-import { AcademicDirectory, AcademicPrincipal, requireAdministrator } from './academic.access';
+import { AcademicDirectory, AcademicPrincipal, requireAdministrator, requireAcademicRead } from './academic.access';
 import * as v from './academic.validation';
 
 const missing = () => new NotFoundException({ code: 'NOT_FOUND', message: 'El recurso no existe o no está disponible.' });
@@ -71,6 +71,7 @@ export class AcademicService {
     return { items, total, page, pageSize };
   }
   async personalCourses(actor: AcademicPrincipal, query: unknown) {
+    requireAcademicRead(actor);
     const { page, pageSize } = v.personalCatalogInput(query);
     const where: Prisma.AcademicCourseWhereInput = {
       institutionId: actor.institutionId,
@@ -83,6 +84,7 @@ export class AcademicService {
     return { items, total, page, pageSize };
   }
   async personalSections(actor: AcademicPrincipal, query: unknown) {
+    requireAcademicRead(actor);
     const { page, pageSize, courseId } = v.personalCatalogInput(query, true);
     const where: Prisma.AcademicSectionWhereInput = {
       institutionId: actor.institutionId, courseId,
@@ -141,6 +143,7 @@ export class AcademicService {
     return this.eventList(actor, query, false);
   }
   async applicableEvents(actor: AcademicPrincipal, query: unknown) {
+    requireAcademicRead(actor);
     return this.eventList(actor, query, true);
   }
   private async eventList(actor: AcademicPrincipal, query: unknown, personal: boolean) {
