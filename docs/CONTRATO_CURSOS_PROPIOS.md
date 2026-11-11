@@ -2,7 +2,8 @@
 
 11 de noviembre de 2026. Responsable: Roberto. Implementación en la rama
 `cursos-propios`, desde `main@69a6907fb0b8ecf5fd5148e584aabb37c05b8895`.
-Consultar [ESTADO_EQUIPO.md](ESTADO_EQUIPO.md) antes de asumir publicación o integración.
+Implementación `498d410`, integrada en main por autorización de Roberto el mismo día.
+Estado de entrega: [ESTADO_EQUIPO.md](ESTADO_EQUIPO.md).
 
 Este contrato resuelve la consulta académica solicitada por Johan en su corte 3.
 Reutiliza AcademicCourse, AcademicSection y AcademicMembership, la identidad y la

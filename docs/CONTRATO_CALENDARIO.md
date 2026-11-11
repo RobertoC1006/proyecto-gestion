@@ -4,9 +4,10 @@ Rama `calendario-academico`, derivada de `196a2144aae253ca672eeeaf721c6220451624
 Entrega aprobada para integrar mediante PR #2. Semana 1: calendario manual P17/P18; CSV, configuración de
 factores/SLA y cálculo del factor corresponden a semana 2.
 
-Ampliación del 11 de noviembre en `cursos-propios`: consulta de cursos y secciones
+Ampliación del 11 de noviembre, implementada en `cursos-propios` e integrada en
+main por autorización de Roberto: consulta de cursos y secciones
 del titular para incidencias. Ver [CONTRATO_CURSOS_PROPIOS.md](CONTRATO_CURSOS_PROPIOS.md)
-y [ESTADO_EQUIPO.md](ESTADO_EQUIPO.md); no asumir su integración en main.
+y [ESTADO_EQUIPO.md](ESTADO_EQUIPO.md).
 
 ## Identidad y auditoría: dependencias explícitas
 

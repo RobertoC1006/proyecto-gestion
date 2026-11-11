@@ -6,8 +6,9 @@ académico de Johan. No inicia el resto de semana 2.
 - Responsable: Roberto.
 - Rama: `cursos-propios`, creada desde main/origin/main
   `69a6907fb0b8ecf5fd5148e584aabb37c05b8895` tras consultar GitHub.
-- Código disponible en la rama de trabajo; publicación e integración en main
-  pendientes. No se modificaron las ramas de los compañeros.
+- Implementación `498d410`, integrada en main por avance directo, conservando su
+  historia, por autorización expresa de Roberto del 11 de noviembre.
+  No se modificaron las ramas de los compañeros.
 - Johan: `gestion-incidencias@90a2790fe0dd644b7170410103476e71e21ac259`;
   Jasmine: `administracion-usuarios@15ef96ba54cf3fe4bbd712efb8e3de3e4431c94c`.
   Revisadas para comprobar dependencias y evitar duplicar modelos.
@@ -62,3 +63,22 @@ aparezcan rutas que aún no tiene en Git.
 Siguen pendientes almacenamiento/evidencias y revisión de la migración de tickets;
 consentimiento y auditoría dependen de Jasmine. La semana 1 conjunta no se marca
 como cerrada. No se envió ningún mensaje externo al equipo.
+
+## Publicación en main — 11 de noviembre de 2026
+
+Roberto solicitó «haz el paso 1»: publicar e integrar cursos propios en main.
+Se comprobó GitHub antes de integrar: main seguía en `69a6907`; Johan en
+`gestion-incidencias@90a2790` y Jasmine había avanzado a
+`administracion-usuarios@a5a8059`. Se conservan las ramas ajenas y `front-vistas`.
+
+- Compilación API y compilación TypeScript/Vite web aprobadas nuevamente.
+- `scripts/verify-auth.ps1`: 29 pruebas aprobadas, 0 fallos. PostgreSQL
+  descartable aislado; recursos de prueba retirados al terminar.
+- Sin nuevas migraciones, cambios de estructura ni datos de prueba en Supabase.
+- Publicación de main sin reescribir historia. Comprobar igualdad de main y
+  origin/main y presencia de `498d410` antes de retirar la rama local integrada.
+- Johan obtiene esta entrega actualizando main e incorporándolo en su rama,
+  conservando sus avances; después conecta el selector y actualiza su aplicación.
+
+Esta publicación cierra la entrega de cursos propios; adjuntos, migración de
+tickets, consentimiento y auditoría mantienen los pendientes indicados arriba.

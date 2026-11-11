@@ -24,7 +24,7 @@ Origen único del navegador: `http://localhost:8080`, prefijo `/api/v1`.
 Contrato generado por NestJS: `/api/openapi.json`, interfaz `/api/docs`.
 Los contratos futuros se generan desde DTO OpenAPI, sin copiar modelos Prisma al navegador.
 
-Ampliación del 11 de noviembre en la rama `cursos-propios`: GET
+Ampliación del 11 de noviembre, implementada en `cursos-propios` e integrada en main: GET
 `/academic/me/courses` y `/academic/me/sections?courseId=…`, con sesión y alcance
 del titular. Reutilizan el esquema existente, sin migración. Contrato para Johan:
 [CONTRATO_CURSOS_PROPIOS.md](CONTRATO_CURSOS_PROPIOS.md). Su disponibilidad en main

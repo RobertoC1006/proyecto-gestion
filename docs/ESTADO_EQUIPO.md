@@ -1,10 +1,11 @@
 # Estado del equipo — 11 de noviembre de 2026
 
-## Consulta de cursos propios — punto 1 implementado en rama
+## Consulta de cursos propios — punto 1 integrado en main
 
-Roberto autorizó implementar únicamente este punto. Rama local `cursos-propios`,
-desde main `69a6907fb0b8ecf5fd5148e584aabb37c05b8895`; sin integrar ni publicar en
-main. Se añadieron GET `/academic/me/courses` y
+Roberto autorizó implementar únicamente este punto y después publicar e integrar
+su entrega en main el 11 de noviembre. Implementación `498d410`, desde main
+`69a6907fb0b8ecf5fd5148e584aabb37c05b8895`, integrada conservando su historia.
+Se añadieron GET `/academic/me/courses` y
 `/academic/me/sections?courseId=…`, con identidad de sesión, paginación y filtrado
 por asociaciones propias e institución. No hay tablas ni migraciones nuevas.
 
@@ -18,10 +19,11 @@ Verificación: 29 pruebas de identidad/calendario aprobadas en PostgreSQL
 descartable, compilación API y tipos web aprobados. Detalle y estado de revisión
 local en [la entrega](entregas/roberto-semana-01-cursos-propios.md).
 
-Ramas de compañeros consultadas el 11 de noviembre: Johan
-`gestion-incidencias@90a2790`, Jasmine `administracion-usuarios@15ef96b`;
-sin cambios sobre las versiones revisadas el 8. Sus entregas no están integradas
-en main. El estado de infraestructura y accesos del 7 de noviembre se conserva
+Ramas de compañeros comprobadas en GitHub antes de publicar el 11 de noviembre:
+Johan `gestion-incidencias@90a2790`, Jasmine `administracion-usuarios@a5a8059`.
+Jasmine tiene avances posteriores a la revisión inicial de cursos propios;
+esta publicación no los integra ni modifica sus ramas. Sus entregas no están
+integradas en main. El estado de infraestructura y accesos del 7 de noviembre se conserva
 debajo; no acredita por sí solo aceptaciones posteriores.
 
 ## Base de negocio trasladada y conectada para Roberto
