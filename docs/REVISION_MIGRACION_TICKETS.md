@@ -1,5 +1,10 @@
 # Revisión de Roberto — migración de tickets de Johan
 
+Prioridad posterior de Roberto, 11 de noviembre: adjuntos/Storage pospuestos para
+el primer avance. El núcleo sin evidencia puede avanzar con este dictamen;
+la condición de máximo de archivo solo aplica cuando se reactive la carga.
+Ver [PRIMER_AVANCE.md](PRIMER_AVANCE.md).
+
 11 de noviembre de 2026. Rama de revisión: `revision-incidencias`, desde
 `main@f4a44572ae3b259af23e9a313209d5845a4c3fe4`.
 Alcance solicitado por Roberto: revisar la migración y definir el contrato de

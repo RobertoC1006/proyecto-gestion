@@ -1,5 +1,18 @@
 # Estado del equipo — 11 de noviembre de 2026
 
+## Prioridad vigente — primer avance sin adjuntos
+
+Roberto pospone evidencias y Storage para concentrar la presentación en acceso,
+registro/consulta de incidencias, calendario manual y administración básica
+validada. Ver [PRIMER_AVANCE.md](PRIMER_AVANCE.md). Esta decisión actualiza la
+prioridad de la revisión conservada debajo: **el bucket y la carga de archivos
+no son una dependencia para avanzar el núcleo de tickets ni otros módulos.**
+
+Siguiente trabajo de coordinación de Roberto: preparar la utilización conjunta
+del núcleo de tickets y revisar la entrega de administración; Johan conecta sus
+cursos y prueba registro/listado/detalle sin adjuntos. No se ha aplicado una
+migración, integrado ramas ni completado el avance por actualizar este plan.
+
 ## Revisión de tickets y contrato de evidencias — rama revision-incidencias
 
 Roberto solicitó revisar la migración de Johan y definir evidencias. Trabajo

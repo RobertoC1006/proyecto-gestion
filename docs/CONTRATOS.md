@@ -20,6 +20,10 @@ según [CONTRATO_IDENTIDAD.md](CONTRATO_IDENTIDAD.md), con integración en main 
 
 ## Disponible
 
+Prioridad vigente del primer avance: acceso, registro/consulta de tickets,
+calendario manual y administración básica validada. Adjuntos/Storage pospuestos;
+no son requisito para avanzar el núcleo. Ver [PRIMER_AVANCE.md](PRIMER_AVANCE.md).
+
 Revisión del 11 de noviembre preparada en `revision-incidencias`, sin integrar
 todavía en main: [dictamen de la migración de tickets](REVISION_MIGRACION_TICKETS.md)
 y [contrato de evidencias](CONTRATO_EVIDENCIAS.md). El núcleo de Johan tiene

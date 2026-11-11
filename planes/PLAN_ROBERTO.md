@@ -1,7 +1,7 @@
 ---
 responsable: Roberto
 revision: 2026-11-11
-estado: revision_tickets_evidencias_preparada_en_rama
+estado: primer_avance_priorizado_sin_adjuntos
 pantallas_asignadas: [P01, P13, P14, P16, P17, P18, P19, P24]
 ---
 
@@ -11,6 +11,12 @@ Este plan está dirigido exclusivamente a Roberto y su agente. Tu base Docker y 
 
 ## Reanudación actual — 11 de noviembre de 2026
 
+- **Prioridad más reciente de Roberto:** preparar el primer avance con acceso,
+  registro/consulta de tickets, calendario manual y administración básica validada.
+  Adjuntos y habilitación de Storage quedan pospuestos y no bloquean ese corte.
+  Ver [PRIMER_AVANCE.md](../docs/PRIMER_AVANCE.md). El siguiente trabajo propio es
+  coordinar el núcleo compartido de tickets y revisar la entrega de Jasmine.
+  No iniciar otra semana ni implementar archivos por leer el contrato anterior.
 - Cursos propios `498d410` publicados en main `f4a4457`; Johan incorpora esa
   base y conecta su selector. No repetir identidad, calendario o esas consultas.
 - Revisión de tickets y definición de evidencias solicitadas por Roberto,
@@ -23,7 +29,7 @@ Este plan está dirigido exclusivamente a Roberto y su agente. Tu base Docker y 
   catálogo de servicios y código público del módulo. Antes de cargar bytes,
   añadir mediante nueva migración el tamaño máximo de 5 MiB.
 - Habilitación de almacenamiento común privado y entrega de credencial de
-  servidor pendientes; la recomendación concreta es Supabase Storage del mismo
+  servidor pospuestas para después del primer avance; la recomendación anterior es Supabase Storage del mismo
   proyecto. El contrato define carga/descarga, protección y reintentos, pero no
   acredita implementación ni autoriza publicaciones posteriores en main.
 - Esta revisión no inicia CSV, factores/SLA, predicción ni módulos de compañeros.

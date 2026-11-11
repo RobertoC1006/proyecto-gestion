@@ -1,5 +1,12 @@
 # Evidencias de incidencias — contrato de implementación
 
+**Prioridad actualizada el 11 de noviembre:** Roberto pospone este flujo para
+después del primer avance. No habilitar Storage ni esperar archivos para avanzar
+registro/consulta de tickets. Ver [PRIMER_AVANCE.md](PRIMER_AVANCE.md).
+El diseño y sus límites se conservan como referencia para retomar, sin afirmar
+que están implementados. La alternativa de 20 archivos de 1 MB comentada después
+fue una propuesta; tampoco se implementó ni se convirtió en requisito del corte.
+
 11 de noviembre de 2026. Coordinación: Roberto. Implementación de P03,
 controladores, validación, Prisma y pruebas: Johan, en su módulo de incidencias.
 Base: su Corte 3 `90a2790` y main con cursos propios `f4a4457`.
