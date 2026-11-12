@@ -1,6 +1,30 @@
 # Memoria de CampusITSM
 
-Actualizada el 7 de noviembre de 2026 tras la transición a Supabase solicitada por Roberto; organización exclusiva CampusITSM creada, proyecto trasladado e invitaciones Developer enviadas (aceptación pendiente). Este archivo conserva acuerdos y puntos de reanudación; el código y las ramas deben revisarse de nuevo antes de implementar.
+Actualizada el 11 de noviembre de 2026 con la integración autorizada de acceso, dashboard, roles/permisos y la documentación del primer avance. Este archivo conserva acuerdos y puntos de reanudación; el código y las ramas deben revisarse de nuevo antes de implementar.
+
+## Reanudación vigente — publicación conjunta del 11 de noviembre
+
+Roberto autorizó integrar en main todos los avances propios preparados:
+`b54bed3` acceso/dashboard, `9491eab` permisos efectivos, `eead97b` matriz con
+casillas y `810cfe0`/`38c9a1e` revisión/primer avance. Se conserva la historia.
+No confundir esta publicación con la integración de ramas de compañeros.
+
+La aplicación exige login antes del panel. Dashboard usa nombre/permisos de
+sesión y no cifras de ejemplo; `/admin/permisos` guarda permisos reales por
+institución/rol con motivo/versiones/historial. El calendario usa capacidades
+efectivas. Se mantienen cinco roles, alcances y protección de administración.
+La migración RoleAccess/RolePermissionChange ya está aplicada y verificada;
+son siete migraciones. No repetir su aplicación ni modificarla. La publicación
+no cambia permisos de cuentas reales. Validación vigente: 39 comprobaciones de
+servidor y 33 de navegador aprobadas. Única instalación campusitsm saludable.
+
+Johan/Jasmine incorporan este main en sus ramas y reconstruyen su instalación
+para usar la nueva fuente de permisos. Jasmine mantiene P20/Usuarios; esta parte
+P21 fue entregada por solicitud de Roberto. Código de tickets de Johan pendiente
+de integrar/aplicar; revisión favorable conservada. Primer avance sin adjuntos:
+Storage/evidencias siguen pospuestos. No iniciar CSV/IA/pronóstico por esta
+publicación. Consultar ESTADO_EQUIPO, PRIMER_AVANCE, CONTRATO_ROLES_PERMISOS
+y REGISTRO_CAMBIOS_BD; los apartados antiguos debajo conservan su fecha.
 
 ## Proyecto y fuentes de trabajo
 

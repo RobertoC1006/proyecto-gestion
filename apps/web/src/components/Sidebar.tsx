@@ -1,46 +1,15 @@
 import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../features/auth/AuthContext'
+import { navigationFor } from '../features/auth/navigation'
 import {
-  Pulse as Activity,
-  BookOpen,
   Buildings,
-  CalendarDots,
-  ChartBar,
-  ClipboardText,
-  Gear,
   GraduationCap,
-  House,
-  Key,
-  LockKey,
-  ShieldCheck,
-  Users,
-  type Icon,
 } from '@phosphor-icons/react'
-
-const navigation: { label: string; icon: Icon; to?: string }[] = [
-  { label: 'Dashboard', icon: House, to: '/' },
-  { label: 'Tickets', icon: ClipboardText, to: '/incidencias' },
-  {
-    label: 'Calendario académico',
-    icon: CalendarDots,
-    to: '/admin/calendario',
-  },
-  { label: 'Reportes', icon: ChartBar },
-  { label: 'Modelos', icon: Activity },
-  { label: 'Operaciones de TI', icon: ShieldCheck, to: '/ti/cola' },
-]
-const administration: { label: string; icon: Icon }[] = [
-  { label: 'Usuarios', icon: Users },
-  { label: 'Permisos', icon: Key },
-  { label: 'Configuración', icon: Gear },
-  { label: 'Privacidad', icon: LockKey },
-  { label: 'Auditoría', icon: BookOpen },
-]
 
 export function Sidebar({ menuOpen = false }: { menuOpen?: boolean }) {
   const { pathname } = useLocation()
   const { user } = useAuth()
-  const links = navigation.map(item => item.to === '/admin/calendario' && user && !user.permissions.includes('academic:manage') ? { ...item, to: '/calendario' } : item)
+  const { primary: links, administration: adminLinks } = navigationFor(user)
   return (
     <aside
       id="app-navigation"
@@ -88,8 +57,8 @@ export function Sidebar({ menuOpen = false }: { menuOpen?: boolean }) {
             </span>
           )
         })}
-        <div className="sidebar__secondary" aria-label="Administración">
-          {administration.map(({ label, icon: Icon }) => (
+        {adminLinks.length > 0 && <div className="sidebar__secondary" aria-label="Administración">
+          {adminLinks.map(({ label, icon: Icon, to }) => to ? <Link key={label} to={to} className={`nav-item ${pathname.startsWith(to) ? 'nav-item--active' : ''}`} aria-current={pathname.startsWith(to) ? 'page' : undefined}><Icon size={23} aria-hidden="true" />{label}</Link> : (
             <span
               className="nav-item nav-item--unavailable"
               key={label}
@@ -100,7 +69,7 @@ export function Sidebar({ menuOpen = false }: { menuOpen?: boolean }) {
               {label}
             </span>
           ))}
-        </div>
+        </div>}
       </nav>
       <div className="sidebar__note">
         CampusITSM<small>Soporte a la comunidad universitaria</small>

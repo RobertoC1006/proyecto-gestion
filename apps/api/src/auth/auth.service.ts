@@ -3,7 +3,7 @@ import { PrismaService } from '../database/prisma.service';
 import { AuthConfig } from './auth.config';
 import { csrfToken, decrypt, digest, encrypt, equalSecret, opaqueToken } from './auth.crypto';
 import { AuthProvider, ProviderTokens } from './auth.provider';
-import { IdentityDirectory, principalFor } from './auth.directory';
+import { IdentityDirectory } from './auth.directory';
 import { CampusPrincipal } from './auth.policy';
 
 export interface AuthRequest {
@@ -90,7 +90,7 @@ export class AuthService {
         tokens: encrypt(this.config.key, id, tokens), tokenExpiresAt: new Date(tokens.expiresAt * 1000), expiresAt: new Date(Date.now() + 8 * 3600000) } });
     });
     this.setCookie(response, cookie);
-    return this.sessionResult(principalFor(user, true), cookie);
+    return this.sessionResult(await this.directory.principal(user, true), cookie);
   }
   private sessionResult(principal: CampusPrincipal, cookie: string) {
     const { accessVersion, csrfVerified, ...user } = principal;
@@ -118,7 +118,7 @@ export class AuthService {
         }
         const identity = await this.provider.validate(tokens.access);
         if (identity.id !== session.userId) return discard();
-        return { principal: principalFor(session.user, writing) };
+        return { principal: await this.directory.principal(session.user, writing, tx) };
       } catch (error) {
         if (error instanceof UnauthorizedException) return discard();
         // Confirmar tokens ya rotados aun si getUser falla temporalmente después del refresh.

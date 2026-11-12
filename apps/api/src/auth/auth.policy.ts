@@ -1,7 +1,8 @@
 import { ForbiddenException } from '@nestjs/common';
 import { CampusRole } from '@prisma/client';
 
-// Capacidades comunes. Cada módulo comprueba además titular, institución y equipo.
+// Valores iniciales. Tras autenticar, IdentityDirectory resuelve RoleAccess en la BD.
+// Cada módulo comprueba además titular, institución y equipo, sin inferir permisos del rol.
 const own = ['academic:read:self', 'tickets:create', 'tickets:read:self', 'certificates:request:self'];
 export const rolePermissions: Record<CampusRole, readonly string[]> = {
   estudiante: own,

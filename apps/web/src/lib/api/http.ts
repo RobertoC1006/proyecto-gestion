@@ -15,6 +15,7 @@ export async function request<T>(path: string, options: RequestInit = {}): Promi
   if (writing && csrfToken && !headers.has('X-CSRF-Token')) headers.set('X-CSRF-Token', csrfToken)
   const response = await fetch(`/api/v1/${path}`, { ...options, headers, credentials: 'same-origin', cache: 'no-store' })
   if (!response.ok) {
+    if (response.status === 403 && path !== 'auth/me' && !publicWrites.has(path)) window.dispatchEvent(new Event('campus:access-changed'))
     if (response.status === 401) {
       csrfToken = null
       if (path !== 'auth/me' && !publicWrites.has(path)) window.dispatchEvent(new Event('campus:session-expired'))

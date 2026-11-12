@@ -374,6 +374,95 @@
         ]
       }
     },
+    "/api/v1/role-permissions": {
+      "get": {
+        "operationId": "RolePermissionsController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoleMatrixDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Necesitas una sesión válida."
+          },
+          "403": {
+            "description": "Solo administradores con permissions:manage."
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Roles y permisos"
+        ]
+      }
+    },
+    "/api/v1/role-permissions/{role}": {
+      "patch": {
+        "operationId": "RolePermissionsController_update",
+        "parameters": [
+          {
+            "name": "role",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateRolePermissionsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoleAccessDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Permisos, alcance o motivo inválidos."
+          },
+          "401": {
+            "description": "Necesitas una sesión válida."
+          },
+          "403": {
+            "description": "Solo administradores con permissions:manage."
+          },
+          "409": {
+            "description": "Otra persona modificó el rol."
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Roles y permisos"
+        ]
+      }
+    },
     "/api/v1/academic/courses": {
       "get": {
         "operationId": "AcademicController_courses",
@@ -1046,6 +1135,124 @@
         ]
       }
     },
+    "/api/v1/academic/me/courses": {
+      "get": {
+        "operationId": "PersonalAcademicController_courses",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 100,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CoursePageDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Consulta inválida; code/message/fields."
+          },
+          "401": {
+            "description": "Sesión válida requerida."
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Calendario académico — titular"
+        ]
+      }
+    },
+    "/api/v1/academic/me/sections": {
+      "get": {
+        "operationId": "PersonalAcademicController_sections",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 100,
+              "type": "number"
+            }
+          },
+          {
+            "name": "courseId",
+            "required": true,
+            "in": "query",
+            "description": "Curso del titular cuyos grupos se consultan.",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SectionPageDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Consulta inválida; code/message/fields."
+          },
+          "401": {
+            "description": "Sesión válida requerida."
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Calendario académico — titular"
+        ]
+      }
+    },
     "/api/v1/academic/me/events": {
       "get": {
         "operationId": "PersonalAcademicController_events",
@@ -1131,6 +1338,9 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "Consulta inválida; code/message/fields."
           },
           "401": {
             "description": "Sesión válida requerida."
@@ -1386,6 +1596,149 @@
         },
         "required": [
           "password"
+        ]
+      },
+      "RoleAccessDto": {
+        "type": "object",
+        "properties": {
+          "role": {
+            "type": "string",
+            "enum": [
+              "estudiante",
+              "docente",
+              "ti_agente",
+              "ti_supervisor",
+              "administrador"
+            ]
+          },
+          "label": {
+            "type": "string"
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "version": {
+            "type": "number"
+          },
+          "updatedAt": {
+            "type": "string",
+            "nullable": true
+          },
+          "allowedPermissions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "protectedPermissions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "role",
+          "label",
+          "permissions",
+          "version",
+          "updatedAt",
+          "allowedPermissions",
+          "protectedPermissions"
+        ]
+      },
+      "PermissionItemDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "module": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "consultar",
+              "registrar",
+              "atender",
+              "asignar",
+              "administrar"
+            ]
+          },
+          "scope": {
+            "type": "string"
+          },
+          "available": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "key",
+          "module",
+          "label",
+          "action",
+          "scope",
+          "available"
+        ]
+      },
+      "RoleMatrixDto": {
+        "type": "object",
+        "properties": {
+          "roles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RoleAccessDto"
+            }
+          },
+          "catalog": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PermissionItemDto"
+            }
+          },
+          "dependencies": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "roles",
+          "catalog",
+          "dependencies"
+        ]
+      },
+      "UpdateRolePermissionsDto": {
+        "type": "object",
+        "properties": {
+          "permissions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "expectedVersion": {
+            "type": "number",
+            "minimum": 0
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 500
+          }
+        },
+        "required": [
+          "permissions",
+          "expectedVersion",
+          "reason"
         ]
       },
       "CourseDto": {

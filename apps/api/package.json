@@ -10,7 +10,7 @@
     "db:deploy": "node prisma/deploy.cjs",
     "db:seed": "node prisma/seed.cjs",
     "test:academic": "node --test test/academic.test.cjs",
-    "test:auth": "node --test test/auth.test.cjs test/auth.provider.test.cjs",
+    "test:auth": "node --test --test-concurrency=1 test/auth.test.cjs test/auth.provider.test.cjs test/role-permissions.test.cjs",
     "api:export": "node prisma/export-openapi.cjs"
   },
   "dependencies": {

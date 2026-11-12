@@ -1,5 +1,16 @@
 # Identidad, Supabase Auth y autorización — rama identidad-supabase
 
+**Actualización del 11 de noviembre de 2026:** Roberto solicitó permisos
+configurables por rol con guardado real. RoleAccess amplía esta fuente común;
+IdentityDirectory resuelve los permisos guardados en cada solicitud, conservando
+valores iniciales cuando no hay configuración. Se mantiene el contrato del
+principal y los cinco roles. La pantalla y el servicio común de esta parte P21
+se entregaron en roles-permisos; P20/Usuarios sigue con Jasmine. Leer
+[CONTRATO_ROLES_PERMISOS.md](CONTRATO_ROLES_PERMISOS.md) antes de consumir la
+autorización. Cambiar una matriz no obliga a cerrar sesión: los permisos
+efectivos se comprueban de nuevo en la siguiente solicitud. Los cambios
+individuales de rol/estado/equipo conservan accessVersion y su revocación.
+
 Decisión expresa de Roberto, 6 de noviembre de 2026: Roberto asume login,
 autenticación con Supabase Auth y la base común de roles/permisos. P01 pasa a
 Roberto. Jasmine conserva P20/P21, consentimiento, auditoría, constancias y

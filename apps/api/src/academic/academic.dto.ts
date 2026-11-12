@@ -36,6 +36,9 @@ export class PageQueryDto {
 export class SectionQueryDto extends PageQueryDto {
   @ApiPropertyOptional({ type: String, format: 'uuid' }) courseId?: string;
 }
+export class PersonalSectionsQueryDto extends PageQueryDto {
+  @ApiProperty({ type: String, format: 'uuid', description: 'Curso del titular cuyos grupos se consultan.' }) courseId!: string;
+}
 export class EventsQueryDto extends SectionQueryDto {
   @ApiProperty({ type: String, format: 'date-time' }) from!: string;
   @ApiProperty({ type: String, format: 'date-time' }) to!: string;

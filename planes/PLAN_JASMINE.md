@@ -1,11 +1,28 @@
 ---
 responsable: Jasmine
-revision: 2026-11-07
+revision: 2026-11-11
 estado: base_supabase_conectada_invitaciones_enviadas
 pantallas_asignadas: [P09, P10, P11, P12, P15, P20, P21, P22, P23]
 ---
 
 # Plan de implementación de CampusITSM para Jasmine
+
+## Base común publicada — 11 de noviembre de 2026
+
+Roberto autorizó la integración en main de acceso/dashboard, permisos efectivos
+y matriz P21 con casillas, junto con la revisión documental del primer avance.
+Leer [la publicación](../docs/entregas/roberto-publicacion-acceso-roles.md) y
+[el contrato](../docs/CONTRATO_ROLES_PERMISOS.md). Incorporar origin/main en la
+rama propia sin descartar avances y reconstruir la instalación habitual.
+
+El principal autenticado resuelve permisos vigentes desde RoleAccess; comprobar
+principal.permissions y el alcance del objeto, sin autorizar con una lista fija
+del rol. La migración de permisos ya está aplicada en la base compartida: no
+repetirla ni modificarla. P20/Usuarios sigue con Jasmine; esta parte P21 ya fue
+entregada por solicitud de Roberto y se reutiliza. Tickets de Johan siguen en su
+rama pendiente de integración/aplicación. Adjuntos/Storage permanecen pospuestos
+para el primer avance; esta publicación no inicia otras semanas.
+
 
 Este plan está dirigido exclusivamente a Jasmine y su agente. Eres responsable del frontend y backend de administración de usuarios/permisos, consentimiento, constancias, privacidad, auditoría y reportes. Roberto asume P01, Supabase Auth y la autorización común. Ejecuta únicamente la semana que Jasmine indique.
 
@@ -295,8 +312,9 @@ trabajo remoto de Jasmine que borrar o renombrar sin revisar su estado real.
 ### Pantallas
 
 Completar P20 básico con la base visual ya publicada. P01 pertenece a Roberto.
-P21 se completa en semana 3 mostrando permisos efectivos del servicio común,
-sin otro catálogo o motor de permisos independiente.
+Reutilizar la matriz P21 publicada por Roberto por su solicitud del 11 de noviembre;
+muestra y guarda permisos efectivos del servicio común. No crear otro catálogo
+o motor de permisos independiente.
 Registrar rutas nuevas sin estilos provisionales `.legacy-view` y reutilizar los
 componentes que ya usan P17/P18. La cabecera muestra el rol validado por el servidor.
 
@@ -353,7 +371,7 @@ P09 separa elegibles de emitidas y muestra claramente por qué un caso aún no p
 
 ### Gobierno y privacidad
 
-- Completar P20 y P21 con permisos efectivos, alcance propio/equipo/global autorizado y cambios registrados.
+- Completar P20 sobre los permisos efectivos y reutilizar P21 publicada, conservando alcance propio/equipo/institución y cambios registrados.
 - Respetar el contrato de autorización que consumen compañeros; no sustituirlo por comprobaciones diferentes en cada pantalla.
 - Completar P22: consulta de aceptaciones/versiones y preparación de un conjunto analítico sin identificadores directos.
 - Excluir nombres, correos, adjuntos y texto libre identificable del conjunto usado para conteos/predicción. Conservar solo variables necesarias, agregadas cuando sea posible.
