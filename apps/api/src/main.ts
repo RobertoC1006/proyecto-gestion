@@ -16,7 +16,8 @@ async function bootstrap() {
   await app.listen(3000, '0.0.0.0');
 }
 
-bootstrap().catch(() => {
-  console.error('No se pudo iniciar la API; revisar configuración y dependencias.');
+bootstrap().catch((error) => {
+  console.error('No se pudo iniciar la API. Error detallado:');
+  console.error(error);
   process.exit(1);
 });
