@@ -1355,6 +1355,248 @@
           "Calendario académico — titular"
         ]
       }
+    },
+    "/api/v1/users": {
+      "get": {
+        "operationId": "UsersController_listUsers",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100000,
+              "default": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "integer"
+            }
+          },
+          {
+            "name": "role",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "estudiante",
+                "docente",
+                "ti_agente",
+                "ti_supervisor",
+                "administrador"
+              ]
+            }
+          },
+          {
+            "name": "active",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "teamId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Búsqueda por nombre o correo",
+            "schema": {
+              "maxLength": 100,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista paginada de usuarios de la institución.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsersPageDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "VALIDATION_ERROR: revisa los campos, identificadores y paginación."
+          },
+          "401": {
+            "description": "Sesión no disponible o inválida."
+          },
+          "403": {
+            "description": "Requiere rol administrador activo con permiso users:manage."
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Usuarios — administración"
+        ]
+      }
+    },
+    "/api/v1/users/teams": {
+      "get": {
+        "operationId": "UsersController_listTeams",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Catálogo de equipos de soporte de la institución.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SupportTeamItemDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "VALIDATION_ERROR: revisa los campos, identificadores y paginación."
+          },
+          "401": {
+            "description": "Sesión no disponible o inválida."
+          },
+          "403": {
+            "description": "Requiere rol administrador activo con permiso users:manage."
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Usuarios — administración"
+        ]
+      }
+    },
+    "/api/v1/users/{id}": {
+      "get": {
+        "operationId": "UsersController_getUser",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detalle de un usuario de la institución.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserItemDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "VALIDATION_ERROR: revisa los campos, identificadores y paginación."
+          },
+          "401": {
+            "description": "Sesión no disponible o inválida."
+          },
+          "403": {
+            "description": "Requiere rol administrador activo con permiso users:manage."
+          },
+          "404": {
+            "description": "No se encontró el usuario en la institución."
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Usuarios — administración"
+        ]
+      }
+    },
+    "/api/v1/users/{id}/access": {
+      "patch": {
+        "operationId": "UsersController_updateAccess",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserAccessDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Acceso actualizado con registro de auditoría.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserItemDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos de validación inválidos o equipo ajeno a la institución."
+          },
+          "401": {
+            "description": "Sesión no disponible o inválida."
+          },
+          "403": {
+            "description": "Requiere rol administrador activo con permiso users:manage."
+          },
+          "409": {
+            "description": "Conflicto por versión de acceso concurrente (CONFLICT) o protección del último administrador (LAST_ADMINISTRATOR)."
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Usuarios — administración"
+        ]
+      }
     }
   },
   "info": {
@@ -2259,6 +2501,181 @@
           }
         },
         "required": [
+          "reason",
+          "expectedVersion"
+        ]
+      },
+      "SupportTeamItemDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "d3b07384-d113-494b-9c8e-aa7f4e912345"
+          },
+          "code": {
+            "type": "string",
+            "example": "TI-MESA"
+          },
+          "name": {
+            "type": "string",
+            "example": "Mesa de Ayuda Presencial"
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "name"
+        ]
+      },
+      "UserItemDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "e2b17384-d113-494b-9c8e-aa7f4e912345"
+          },
+          "institutionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "email": {
+            "type": "string",
+            "example": "estudiante@tallan.edu.pe"
+          },
+          "displayName": {
+            "type": "string",
+            "example": "Ana Torres"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "estudiante",
+              "docente",
+              "ti_agente",
+              "ti_supervisor",
+              "administrador"
+            ],
+            "example": "estudiante"
+          },
+          "active": {
+            "type": "boolean",
+            "example": true
+          },
+          "teamId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true,
+            "example": null
+          },
+          "team": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/SupportTeamItemDto"
+              }
+            ]
+          },
+          "accessVersion": {
+            "type": "number",
+            "example": 1
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "institutionId",
+          "email",
+          "displayName",
+          "role",
+          "active",
+          "teamId",
+          "team",
+          "accessVersion",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "UsersPageDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserItemDto"
+            }
+          },
+          "total": {
+            "type": "number",
+            "example": 25
+          },
+          "page": {
+            "type": "number",
+            "example": 1
+          },
+          "pageSize": {
+            "type": "number",
+            "example": 20
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "page",
+          "pageSize"
+        ]
+      },
+      "UpdateUserAccessDto": {
+        "type": "object",
+        "properties": {
+          "role": {
+            "type": "string",
+            "enum": [
+              "estudiante",
+              "docente",
+              "ti_agente",
+              "ti_supervisor",
+              "administrador"
+            ],
+            "example": "docente"
+          },
+          "active": {
+            "type": "boolean",
+            "example": true
+          },
+          "teamId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true,
+            "example": null,
+            "description": "UUID del equipo de soporte asignado, o null si no se asigna equipo."
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 500,
+            "example": "Asignación de rol docente para el periodo 2026-II."
+          },
+          "expectedVersion": {
+            "type": "number",
+            "minimum": 1,
+            "example": 1,
+            "description": "Versión actual del acceso (control de concurrencia optimista)"
+          }
+        },
+        "required": [
+          "role",
+          "active",
+          "teamId",
           "reason",
           "expectedVersion"
         ]

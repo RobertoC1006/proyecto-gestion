@@ -18,6 +18,7 @@ import { SupportTeamItemDto, UpdateUserAccessDto, UserItemDto, UsersPageDto, Use
 @ApiCookieAuth('campus_session')
 @ApiUnauthorizedResponse({ description: 'Sesión no disponible o inválida.' })
 @ApiForbiddenResponse({ description: 'Requiere rol administrador activo con permiso users:manage.' })
+@ApiBadRequestResponse({ description: 'VALIDATION_ERROR: revisa los campos, identificadores y paginación.' })
 @UseGuards(CampusSessionGuard)
 @RequirePermissions('users:manage')
 @Controller('users')
@@ -51,4 +52,3 @@ export class UsersController {
     return this.usersService.updateAccess(req.campusPrincipal!, id, body);
   }
 }
-

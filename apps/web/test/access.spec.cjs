@@ -168,7 +168,7 @@ test('Dashboard del administrador: recarga, login ya autenticado y capturas de e
   await expect(page).toHaveURL('http://localhost:8080/');
   await expect(page.getByRole('heading', { name: 'Hola, Roberto Carlos', exact: true })).toBeVisible();
   await expect(page.locator('.home-page').getByText('Usuarios', { exact: true })).toBeVisible();
-  await expect(page.locator('.home-page').getByRole('link')).toHaveCount(2);
+  await expect(page.locator('.home-page').getByRole('link', { name: /^Usuarios/ })).toHaveAttribute('href', '/admin/usuarios');
   await page.screenshot({ path: path.join(screenshots, 'dashboard-admin-escritorio-fixture.png'), fullPage: true, animations: 'disabled' });
   await page.reload();
   await expect(page.getByRole('heading', { name: 'Hola, Roberto Carlos', exact: true })).toBeVisible();

@@ -1,64 +1,20 @@
 import { request, type ApiError } from './http'
 
-export type CampusRole = 'estudiante' | 'docente' | 'ti_agente' | 'ti_supervisor' | 'administrador'
+import type { components, operations } from './schema'
+import { roleLabels } from '../../features/auth/AuthContext'
+
+export { roleLabels }
+export type UserItem = components['schemas']['UserItemDto']
+export type CampusRole = UserItem['role']
 export type UserStatusFilter = 'all' | 'active' | 'inactive'
-
-export type SupportTeam = {
-  id: string
-  code: string
-  name: string
-}
-
-export type UserItem = {
-  id: string
-  institutionId: string
-  email: string
-  displayName: string
-  role: CampusRole
-  active: boolean
-  teamId: string | null
-  team: SupportTeam | null
-  accessVersion: number
-  createdAt: string
-  updatedAt: string
-}
-
-export type UsersPage = {
-  items: UserItem[]
-  total: number
-  page: number
-  pageSize: number
-}
-
-export type UsersQuery = {
-  page: number
-  pageSize: number
-  role?: CampusRole
-  active?: boolean
-  teamId?: string
-  search?: string
-}
-
-export type UpdateUserAccess = {
-  role: CampusRole
-  active: boolean
-  teamId: string | null
-  reason: string
-  expectedVersion: number
-}
-
-export const roleLabels: Record<CampusRole, string> = {
-  estudiante: 'Estudiante',
-  docente: 'Docente',
-  ti_agente: 'Agente TI',
-  ti_supervisor: 'Supervisor TI',
-  administrador: 'Administrador',
-}
-
-export const roles: CampusRole[] = ['estudiante', 'docente', 'ti_agente', 'ti_supervisor', 'administrador']
+export type SupportTeam = components['schemas']['SupportTeamItemDto']
+export type UsersPage = components['schemas']['UsersPageDto']
+export type UsersQuery = NonNullable<operations['UsersController_listUsers']['parameters']['query']>
+export type UpdateUserAccess = components['schemas']['UpdateUserAccessDto']
+export const roles = Object.keys(roleLabels) as CampusRole[]
 
 export async function listUsers(query: UsersQuery): Promise<UsersPage> {
-  const params = new URLSearchParams({ page: String(query.page), pageSize: String(query.pageSize) })
+  const params = new URLSearchParams({ page: String(query.page ?? 1), pageSize: String(query.pageSize ?? 20) })
   if (query.role) params.set('role', query.role)
   if (query.active !== undefined) params.set('active', String(query.active))
   if (query.teamId) params.set('teamId', query.teamId)

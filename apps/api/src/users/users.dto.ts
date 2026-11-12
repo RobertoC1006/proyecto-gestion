@@ -62,10 +62,10 @@ export class UsersPageDto {
 }
 
 export class UsersQueryDto {
-  @ApiPropertyOptional({ type: Number, minimum: 1, default: 1 })
+  @ApiPropertyOptional({ type: 'integer', minimum: 1, maximum: 100000, default: 1 })
   page?: number;
 
-  @ApiPropertyOptional({ type: Number, minimum: 1, maximum: 100, default: 20 })
+  @ApiPropertyOptional({ type: 'integer', minimum: 1, maximum: 100, default: 20 })
   pageSize?: number;
 
   @ApiPropertyOptional({ enum: CampusRole })
@@ -77,7 +77,7 @@ export class UsersQueryDto {
   @ApiPropertyOptional({ type: String, format: 'uuid' })
   teamId?: string;
 
-  @ApiPropertyOptional({ type: String, description: 'Búsqueda por nombre o correo' })
+  @ApiPropertyOptional({ type: String, maxLength: 100, description: 'Búsqueda por nombre o correo' })
   search?: string;
 }
 

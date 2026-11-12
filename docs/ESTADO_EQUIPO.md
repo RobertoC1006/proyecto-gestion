@@ -1,5 +1,22 @@
 # Estado del equipo — 11 de noviembre de 2026
 
+## P20 en revisión de Roberto — usuarios-modal-correcciones
+
+Por solicitud de Roberto, rama creada directamente desde la entrega de Jasmine
+`administracion-usuarios@7ab1ed7`. Se conserva su historia y su rama remota.
+Listado a ancho completo y edición en el Modal compartido: tarjetas para un rol
+y un equipo, switch activo/inactivo, motivo y protección de cambios sin guardar.
+Se corrigen UUID/paginación/filtros inválidos y se publican OpenAPI/tipos en esta
+rama. No hay nuevas tablas ni migraciones. P20 figura disponible en el catálogo.
+
+Compilaciones aprobadas; 50 comprobaciones PostgreSQL aisladas y ocho recorridos
+de Usuarios aprobados, más las 33 comprobaciones de pantallas comunes realizadas
+durante la regresión. La única instalación campusitsm funciona desde esta rama
+en localhost:8080 para revisión visual de Roberto. No se modificaron cuentas
+reales para probar guardado. Main y las ramas de los compañeros permanecen
+intactos; falta la revisión de Roberto antes de integrar en main. Alcance y
+operación: [CONTRATO_USUARIOS.md](CONTRATO_USUARIOS.md).
+
 ## Publicación conjunta autorizada en main — 11 de noviembre
 
 Roberto autorizó integrar todos los avances propios preparados. Main incorpora

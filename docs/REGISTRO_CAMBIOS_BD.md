@@ -1,5 +1,14 @@
 # Coordinación de cambios en la base compartida
 
+## P20 / usuarios-modal-correcciones — revisión local
+
+Desde `administracion-usuarios@7ab1ed7`, correcciones y rediseño pedidos por
+Roberto. Reutiliza AppUser, SupportTeam e IdentityDirectory/IdentityChange.
+Sin tablas, columnas, índices o migraciones nuevos; no se aplicó SQL a Supabase.
+Las escrituras de validación se realizaron solo en PostgreSQL descartable,
+retirado al finalizar. La instalación de trabajo conserva la base compartida y
+sus volúmenes. Ver [CONTRATO_USUARIOS.md](CONTRATO_USUARIOS.md).
+
 ## Permisos por rol — 11 de noviembre de 2026
 
 Roberto solicitó y confirmó guardar permisos reales por rol mediante casillas,

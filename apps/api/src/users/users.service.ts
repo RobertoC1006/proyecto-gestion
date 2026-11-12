@@ -4,6 +4,8 @@ import { PrismaService } from '../database/prisma.service';
 import { IdentityDirectory } from '../auth/auth.directory';
 import { CampusPrincipal } from '../auth/auth.policy';
 import { SupportTeamItemDto, UpdateUserAccessDto, UserItemDto, UsersPageDto, UsersQueryDto } from './users.dto';
+import { uuid } from '../academic/academic.validation';
+import { usersQuery } from './users.validation';
 
 const missingUser = () =>
   new NotFoundException({ code: 'NOT_FOUND', message: 'No se encontró el usuario solicitado.' });
@@ -44,9 +46,7 @@ export class UsersService {
   }
 
   async listUsers(actor: CampusPrincipal, query: UsersQueryDto): Promise<UsersPageDto> {
-    // Coerción y validación defensiva de paginación (según convención de academic):
-    const page = Math.max(1, Number(query.page) || 1);
-    const pageSize = Math.min(100, Math.max(1, Number(query.pageSize) || 20));
+    const { page, pageSize, role, active, teamId, search } = usersQuery(query);
     const skip = (page - 1) * pageSize;
 
     // Aislamiento multi-institucional obligatorio:
@@ -55,40 +55,13 @@ export class UsersService {
       institutionId: actor.institutionId,
     };
 
-    // Filtro por rol si es un valor válido del enum
-    if (query.role && Object.values(CampusRole).includes(query.role)) {
-      where.role = query.role;
-    }
-
-    // Coerción y validación del filtro booleano 'active'
-    if (query.active !== undefined && query.active !== null) {
-      const activeStr = String(query.active).toLowerCase().trim();
-      if (activeStr === 'true' || activeStr === '1') {
-        where.active = true;
-      } else if (activeStr === 'false' || activeStr === '0') {
-        where.active = false;
-      }
-    }
-
-    // Filtro por teamId validando formato UUID
-    if (
-      query.teamId &&
-      typeof query.teamId === 'string' &&
-      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(query.teamId.trim())
-    ) {
-      where.teamId = query.teamId.trim().toLowerCase();
-    }
-
-    // Filtro de búsqueda textual en displayName o email
-    if (query.search && typeof query.search === 'string') {
-      const term = query.search.trim().slice(0, 100);
-      if (term.length > 0) {
-        where.OR = [
-          { displayName: { contains: term, mode: 'insensitive' } },
-          { email: { contains: term, mode: 'insensitive' } },
-        ];
-      }
-    }
+    if (role !== undefined) where.role = role;
+    if (active !== undefined) where.active = active;
+    if (teamId !== undefined) where.teamId = teamId;
+    if (search) where.OR = [
+      { displayName: { contains: search, mode: 'insensitive' } },
+      { email: { contains: search, mode: 'insensitive' } },
+    ];
 
     // Transacción atómica de lectura en paralelo (registros y total)
     const [rows, total] = await this.db.$transaction([
@@ -110,8 +83,9 @@ export class UsersService {
   }
 
   async getUser(actor: CampusPrincipal, id: string): Promise<UserItemDto> {
+    const userId = uuid(id, 'id');
     const user = await this.db.appUser.findFirst({
-      where: { id, institutionId: actor.institutionId },
+      where: { id: userId, institutionId: actor.institutionId },
       include: {
         team: { select: { id: true, code: true, name: true } },
       },
@@ -125,10 +99,11 @@ export class UsersService {
   }
 
   async updateAccess(actor: CampusPrincipal, id: string, dto: UpdateUserAccessDto): Promise<UserItemDto> {
+    const userId = uuid(id, 'id');
     // Delegación obligatoria al servicio común de Roberto:
     // Aplica validaciones de tipos, concurrencia (expectedVersion),
     // protección inquebrantable del último administrador y auditoría atómica en IdentityChange.
-    await this.identityDirectory.changeAccess(actor.id, id, {
+    await this.identityDirectory.changeAccess(actor.id, userId, {
       expectedVersion: dto.expectedVersion,
       role: dto.role,
       active: dto.active,
@@ -137,7 +112,7 @@ export class UsersService {
     });
 
     // Retorna el registro fresco con los cambios aplicados y version incrementada
-    return this.getUser(actor, id);
+    return this.getUser(actor, userId);
   }
 
   async listSupportTeams(actor: CampusPrincipal): Promise<SupportTeamItemDto[]> {
