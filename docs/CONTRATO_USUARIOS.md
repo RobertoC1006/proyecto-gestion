@@ -1,8 +1,9 @@
 # Administración básica de usuarios — P20
 
-Preparado para revisión de Roberto en `usuarios-modal-correcciones`, rama creada
-directamente desde `administracion-usuarios@7ab1ed7`. Conserva la entrega de
-Jasmine y añade las correcciones solicitadas. No acredita integración en main.
+Integrado en main por autorización expresa de Roberto después de revisar
+la pantalla. Preparado en `usuarios-modal-correcciones`, creada directamente
+desde `administracion-usuarios@7ab1ed7`; conserva la historia de Jasmine y añade
+la corrección `8350650`. Ver [publicación](entregas/roberto-publicacion-usuarios.md).
 
 ## Alcance y autorización
 
@@ -77,7 +78,7 @@ solo aparece al consultar una cuenta seleccionada. El listado usa todo el ancho.
 
 Las pruebas de persistencia nunca apuntan a Supabase. Se retiraron los recursos
 descartables de campusitsm-users-modal-check al terminar. La instalación habitual
-campusitsm se reconstruye desde esta rama, con API/web/Python y los volúmenes
+campusitsm usa el mismo código integrado en main, con API/web/Python y los volúmenes
 conservados. **Guardar desde la aplicación de trabajo modifica cuentas reales.**
 
 No hay cambios de esquema ni migraciones nuevas. No se modificaron cuentas

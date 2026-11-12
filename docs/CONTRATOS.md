@@ -1,10 +1,11 @@
 # Contratos compartidos — base v1
 
-P20 preparado para revisión en `usuarios-modal-correcciones`, desde la entrega
+P20 integrado en main por autorización de Roberto, preparado en
+`usuarios-modal-correcciones` desde la entrega
 de Jasmine `administracion-usuarios@7ab1ed7`: listado y edición modal con
 tarjetas de rol/equipo, switch de acceso y validación de entradas. Contrato:
 [CONTRATO_USUARIOS.md](CONTRATO_USUARIOS.md). Conserva la identidad común,
-sin migraciones nuevas ni integración en main por esta preparación.
+sin migraciones nuevas. Ver [publicación](entregas/roberto-publicacion-usuarios.md).
 
 Coordinación vigente: base de desarrollo común Supabase, traslado y
 conexión de Roberto verificados, accesos de compañeros pendientes. Leer [COORDINACION_SUPABASE.md](COORDINACION_SUPABASE.md).

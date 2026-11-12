@@ -1,9 +1,10 @@
 # Coordinación de cambios en la base compartida
 
-## P20 / usuarios-modal-correcciones — revisión local
+## P20 / usuarios-modal-correcciones — publicación autorizada en main
 
 Desde `administracion-usuarios@7ab1ed7`, correcciones y rediseño pedidos por
-Roberto. Reutiliza AppUser, SupportTeam e IdentityDirectory/IdentityChange.
+Roberto y código `8350650`, integrado en main por su autorización posterior.
+Reutiliza AppUser, SupportTeam e IdentityDirectory/IdentityChange.
 Sin tablas, columnas, índices o migraciones nuevos; no se aplicó SQL a Supabase.
 Las escrituras de validación se realizaron solo en PostgreSQL descartable,
 retirado al finalizar. La instalación de trabajo conserva la base compartida y
