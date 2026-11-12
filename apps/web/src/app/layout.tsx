@@ -8,7 +8,7 @@ import './globals.css'
 export default function RootLayout({ children }: { children: ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const { pathname, key } = useLocation()
-  const sharedView = pathname === '/' || pathname.startsWith('/admin/calendario') || pathname === '/calendario' || pathname === '/admin/permisos' || pathname === '/admin/usuarios'
+  const sharedView = pathname === '/' || pathname.startsWith('/admin/calendario') || pathname === '/calendario' || pathname === '/admin/permisos' || pathname === '/admin/usuarios' || pathname === '/admin/privacidad'
   useEffect(() => {
     setMenuOpen(false)
     window.scrollTo({ top: 0, behavior: 'instant' })

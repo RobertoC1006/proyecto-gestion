@@ -19,6 +19,7 @@ model Institution {
   users     AppUser[]
   roleAccess RoleAccess[]
   rolePermissionChanges RolePermissionChange[]
+  consentAcceptances ConsentAcceptance[]
 }
 
 enum AcademicEventType {
@@ -173,6 +174,7 @@ model AppUser {
   institution   Institution @relation(fields: [institutionId], references: [id], onDelete: Restrict)
   team          SupportTeam? @relation(fields: [institutionId, teamId], references: [institutionId, id], onDelete: Restrict)
   sessions      AuthSession[]
+  consentAcceptances ConsentAcceptance[]
 
   @@unique([institutionId, id])
   @@index([institutionId, role, active])
@@ -221,4 +223,32 @@ model IdentityChange {
   after         Json
   createdAt     DateTime @default(now()) @db.Timestamptz(3)
   @@index([institutionId, createdAt])
+}
+
+model ConsentVersion {
+  id          String              @id @default(uuid()) @db.Uuid
+  version     String              @unique @db.VarChar(40)
+  title       String              @db.VarChar(160)
+  summary     String              @db.VarChar(1000)
+  effectiveAt DateTime            @db.Timestamptz(3)
+  active      Boolean             @default(true)
+  createdAt   DateTime            @default(now()) @db.Timestamptz(3)
+  acceptances ConsentAcceptance[]
+
+  @@index([active, effectiveAt])
+}
+
+model ConsentAcceptance {
+  id             String        @id @default(uuid()) @db.Uuid
+  institutionId  String        @db.Uuid
+  userId         String        @db.Uuid
+  consentVersionId String      @db.Uuid
+  acceptedAt     DateTime      @default(now()) @db.Timestamptz(3)
+  institution    Institution   @relation(fields: [institutionId], references: [id], onDelete: Restrict)
+  user           AppUser       @relation(fields: [userId], references: [id], onDelete: Restrict)
+  consentVersion ConsentVersion @relation(fields: [consentVersionId], references: [id], onDelete: Restrict)
+
+  @@unique([userId, consentVersionId])
+  @@index([institutionId, acceptedAt])
+  @@index([institutionId, userId, acceptedAt])
 }

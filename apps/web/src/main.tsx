@@ -17,6 +17,7 @@ import EventForm from './features/academic/EventForm'
 import PersonalCalendar from './features/academic/PersonalCalendar'
 import RolePermissionsPage from './features/permissions/RolePermissionsPage'
 import UsersPage from './features/users/UsersPage'
+import PrivacyPage from './features/privacy/PrivacyPage'
 import { AuthProvider } from './features/auth/AuthContext'
 import { SessionBoundary, PermissionBoundary } from './features/auth/AccessBoundary'
 import { access } from './features/auth/access'
@@ -46,6 +47,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/admin/permisos" element={<PermissionBoundary permissions={access.permissions}><RolePermissionsPage /></PermissionBoundary>} />
         <Route path="/admin/usuarios" element={<PermissionBoundary permissions={access.users}><UsersPage /></PermissionBoundary>} />
+        <Route path="/admin/privacidad" element={<PermissionBoundary permissions={access.privacy}><PrivacyPage /></PermissionBoundary>} />
         <Route path="/calendario" element={<PermissionBoundary permissions={access.personalCalendar}><PersonalCalendar /></PermissionBoundary>} />
         <Route path="/admin/calendario" element={<PermissionBoundary permissions={access.manageCalendar}><CalendarPage /></PermissionBoundary>} />
         <Route path="/admin/calendario/nuevo" element={<PermissionBoundary permissions={access.manageCalendar}><EventForm /></PermissionBoundary>} />
