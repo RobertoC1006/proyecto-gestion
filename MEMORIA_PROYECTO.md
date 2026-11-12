@@ -1,5 +1,21 @@
 # Memoria de CampusITSM
 
+## Reanudación más reciente — integración autorizada de P20
+
+Roberto solicitó corregir la entrega de Jasmine y sustituir su panel lateral por
+edición modal con tarjetas para rol/equipo y switch de acceso. Por su corrección
+expresa, `usuarios-modal-correcciones` parte directamente de
+`administracion-usuarios@7ab1ed7`, conserva su historia y no modifica esa rama.
+Incluye validación de UUID/paginación/filtros, OpenAPI/tipos actualizados y pruebas.
+50 comprobaciones PostgreSQL aisladas y ocho recorridos del nuevo modal
+aprobados; pantallas comunes comprobadas durante la regresión. Sin migraciones
+nuevas ni cambios de cuentas reales para pruebas. La instalación campusitsm en
+localhost:8080 conserva esta versión verificada. Roberto revisó la pantalla y
+autorizó integrar y publicar P20 en main; se conserva la historia de Jasmine y
+la corrección `8350650`. Sin reaplicar migraciones. Consultar ESTADO_EQUIPO,
+CONTRATO_USUARIOS y la entrega de publicación de Usuarios.
+Las publicaciones de main descritas debajo conservan su fecha y alcance.
+
 Actualizada el 11 de noviembre de 2026 con la integración autorizada de acceso, dashboard, roles/permisos y la documentación del primer avance. Este archivo conserva acuerdos y puntos de reanudación; el código y las ramas deben revisarse de nuevo antes de implementar.
 
 ## Reanudación vigente — publicación conjunta del 11 de noviembre

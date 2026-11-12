@@ -5,7 +5,7 @@ import type { components } from '../../lib/api/schema'
 
 export type Session = components['schemas']['SessionDto']
 export type CurrentUser = Session['user']
-export const roleLabels: Record<string, string> = { estudiante: 'Estudiante', docente: 'Docente', ti_agente: 'Agente TI', ti_supervisor: 'Supervisor TI', administrador: 'Administrador' }
+export const roleLabels: Record<CurrentUser['role'], string> = { estudiante: 'Estudiante', docente: 'Docente', ti_agente: 'Agente TI', ti_supervisor: 'Supervisor TI', administrador: 'Administrador' }
 type AuthContextValue = { user: CurrentUser | null; loading: boolean; error: Error | null; refresh: () => void; logout: () => Promise<void> }
 const Context = createContext<AuthContextValue | null>(null)
 export function AuthProvider({ children }: { children: ReactNode }) {

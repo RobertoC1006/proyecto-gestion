@@ -18,7 +18,7 @@ const navigation: NavigationItem[] = [
   { label: 'Operaciones de TI', description: 'Accede a la cola de atención de tu equipo.', icon: ShieldCheck, to: '/ti/cola', permissions: access.teamTickets },
 ]
 const administration: NavigationItem[] = [
-  { label: 'Usuarios', description: 'Administra las cuentas, sus roles y su estado de acceso.', icon: Users, permissions: access.users },
+  { label: 'Usuarios', description: 'Administra las cuentas, sus roles y su estado de acceso.', icon: Users, to: '/admin/usuarios', permissions: access.users },
   { label: 'Permisos', description: 'Configura las capacidades y alcances de cada rol.', icon: Key, to: '/admin/permisos', permissions: access.permissions },
   { label: 'Configuración', description: 'Administra las opciones de la institución.', icon: Gear, permissions: access.configuration },
   { label: 'Auditoría', description: 'Consulta el registro de cambios y acciones.', icon: BookOpen, permissions: access.audit },

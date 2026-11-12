@@ -17,7 +17,7 @@ export const permissionCatalog = [
   definition('certificates:request:self', 'Constancias', 'Solicitar mis constancias', 'registrar', 'Datos propios'),
   definition('reports:read:team', 'Reportes', 'Consultar reportes del equipo', 'consultar', 'Equipo asignado'),
   definition('reports:read:institution', 'Reportes', 'Consultar reportes de la institución', 'consultar', 'Institución'),
-  definition('users:manage', 'Usuarios', 'Administrar usuarios y sus roles', 'administrar', 'Institución'),
+  definition('users:manage', 'Usuarios', 'Administrar usuarios y sus roles', 'administrar', 'Institución', true),
   definition('permissions:manage', 'Roles y permisos', 'Administrar permisos por rol', 'administrar', 'Institución', true),
   definition('configuration:manage', 'Configuración', 'Administrar la configuración', 'administrar', 'Institución'),
   definition('audit:read:institution', 'Auditoría', 'Consultar la auditoría', 'consultar', 'Institución'),

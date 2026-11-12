@@ -1,5 +1,26 @@
 # Estado del equipo — 11 de noviembre de 2026
 
+## P20 integrado por autorización de Roberto
+
+Por solicitud de Roberto, rama creada directamente desde la entrega de Jasmine
+`administracion-usuarios@7ab1ed7`. Se conserva su historia y su rama remota.
+Listado a ancho completo y edición en el Modal compartido: tarjetas para un rol
+y un equipo, switch activo/inactivo, motivo y protección de cambios sin guardar.
+Se corrigen UUID/paginación/filtros inválidos y se publican OpenAPI/tipos en esta
+rama. No hay nuevas tablas ni migraciones. P20 figura disponible en el catálogo.
+
+Compilaciones aprobadas; 50 comprobaciones PostgreSQL aisladas y ocho recorridos
+de Usuarios aprobados, más las 33 comprobaciones de pantallas comunes realizadas
+durante la regresión. Roberto revisó y autorizó integrar esta versión en main, conservando la historia
+de Jasmine y la corrección `8350650`. La única instalación campusitsm conserva
+este código verificado en localhost:8080, con sus volúmenes y base compartida.
+No se modificaron cuentas reales para probar guardado. Las ramas remotas de los
+compañeros se conservan: Jasmine continúa consentimiento/auditoría y Johan su
+núcleo de tickets. No se integra su rama de incidencias en esta publicación.
+Detalle: [publicación de Usuarios](entregas/roberto-publicacion-usuarios.md).
+Los compañeros incorporan el nuevo main antes de continuar, sin descartar su
+trabajo. Alcance y operación: [CONTRATO_USUARIOS.md](CONTRATO_USUARIOS.md).
+
 ## Publicación conjunta autorizada en main — 11 de noviembre
 
 Roberto autorizó integrar todos los avances propios preparados. Main incorpora

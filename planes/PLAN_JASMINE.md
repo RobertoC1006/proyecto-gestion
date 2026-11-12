@@ -7,6 +7,17 @@ pantallas_asignadas: [P09, P10, P11, P12, P15, P20, P21, P22, P23]
 
 # Plan de implementación de CampusITSM para Jasmine
 
+## P20/Usuarios publicado en main — 11 de noviembre de 2026
+
+Roberto autorizó integrar la entrega de Jasmine `7ab1ed7` y la corrección
+`8350650`: edición modal con tarjetas de rol/equipo, switch de acceso,
+validaciones y contrato actualizado. Sin nuevas migraciones. Leer la
+[publicación](../docs/entregas/roberto-publicacion-usuarios.md) y el
+[contrato de Usuarios](../docs/CONTRATO_USUARIOS.md). Incorporar origin/main
+en la rama propia sin descartar avances y reconstruir la instalación habitual.
+Las ramas de Jasmine/Johan se conservan; consentimiento, auditoría global y
+núcleo de tickets mantienen su alcance pendiente. Esta entrega no inicia otra semana.
+
 ## Base común publicada — 11 de noviembre de 2026
 
 Roberto autorizó la integración en main de acceso/dashboard, permisos efectivos

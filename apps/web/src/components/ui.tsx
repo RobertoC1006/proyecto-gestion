@@ -283,11 +283,15 @@ export function Modal({
   title,
   children,
   onClose,
+  className = '',
+  closeDisabled = false,
 }: {
   open: boolean
   title: string
   children: ReactNode
   onClose: () => void
+  className?: string
+  closeDisabled?: boolean
 }) {
   const ref = useRef<HTMLDialogElement>(null)
   useEffect(() => {
@@ -297,11 +301,11 @@ export function Modal({
   }, [open])
   return (
     <dialog
-      className="modal"
+      className={`modal ${className}`}
       ref={ref}
-      onCancel={onClose}
+      onCancel={event => { event.preventDefault(); if (!closeDisabled) onClose() }}
       onClick={(event) => {
-        if (event.target === event.currentTarget) {
+        if (!closeDisabled && event.target === event.currentTarget) {
           const r = event.currentTarget.getBoundingClientRect()
           if (
             event.clientX < r.left ||
@@ -320,6 +324,7 @@ export function Modal({
           className="icon-button"
           type="button"
           onClick={onClose}
+          disabled={closeDisabled}
           aria-label="Cerrar ventana"
         >
           <X size={22} />
