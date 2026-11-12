@@ -12,9 +12,11 @@ coincidentes, RLS y privilegios de las dos tablas comprobados. Ver
 La rama local de revisión `revision-incidencias-pantalla` conserva el código
 de Johan. API/web compilan, cinco pruebas de servicio sin red pasan, y la única
 instalación campusitsm está saludable en localhost:8080 con sus volúmenes.
-El navegador está abierto para acceder con una cuenta estudiante/docente y
-comprobar P02–P05; el recorrido autenticado real aún no se acredita. No se
-crearon tickets ni se cambiaron roles para esta comprobación. Main no se fusionó;
+Roberto inició sesión personalmente con la cuenta estudiante y se abrió P03
+con servicios reales y selector General/Curso. Se mostró el alcance Curso;
+no se enviaron reportes. Creación, persistencia y aislamiento HTTP entre dos
+cuentas siguen pendientes de comprobar. No se crearon tickets ni se cambiaron
+roles o permisos para esta revisión. Main no se fusionó;
 consentimiento/auditoría global y adjuntos siguen pospuestos por la priorización
 de Roberto conservada en `alcance-primer-avance@bb8df0a`. Esta sección actualiza
 los estados anteriores que indicaban `90a2790` o migración pendiente.
