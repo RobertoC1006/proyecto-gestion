@@ -1,4 +1,23 @@
-# Estado del equipo — 11 de noviembre de 2026
+# Estado del equipo — actualización del 12 de noviembre de 2026
+
+## Revisión en pantalla de incidencias — 12 de noviembre de 2026
+
+Johan publicó `gestion-incidencias@1667778`, que incorpora main `4855a10` y
+conecta P03 con cursos/secciones propios. Roberto pidió ver esta versión y
+autorizó expresamente aplicar su migración ya revisada. Se aplicó y verificó
+`20261108000100_tickets_core` en la base compartida: ocho migraciones y checksums
+coincidentes, RLS y privilegios de las dos tablas comprobados. Ver
+[REGISTRO_CAMBIOS_BD.md](REGISTRO_CAMBIOS_BD.md).
+
+La rama local de revisión `revision-incidencias-pantalla` conserva el código
+de Johan. API/web compilan, cinco pruebas de servicio sin red pasan, y la única
+instalación campusitsm está saludable en localhost:8080 con sus volúmenes.
+El navegador está abierto para acceder con una cuenta estudiante/docente y
+comprobar P02–P05; el recorrido autenticado real aún no se acredita. No se
+crearon tickets ni se cambiaron roles para esta comprobación. Main no se fusionó;
+consentimiento/auditoría global y adjuntos siguen pospuestos por la priorización
+de Roberto conservada en `alcance-primer-avance@bb8df0a`. Esta sección actualiza
+los estados anteriores que indicaban `90a2790` o migración pendiente.
 
 ## P20 integrado por autorización de Roberto
 

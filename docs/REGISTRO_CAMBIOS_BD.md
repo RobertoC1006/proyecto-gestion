@@ -1,5 +1,28 @@
 # Coordinación de cambios en la base compartida
 
+## Incidencias — aplicación autorizada para revisión en pantalla, 12 de noviembre de 2026
+
+Roberto autorizó expresamente aplicar la migración revisada y abrir el módulo
+de Johan en su instalación habitual. Fuente: `gestion-incidencias@1667778`;
+ejecutor: agente de Roberto, desde `revision-incidencias-pantalla`.
+Destino: CampusITSM / npjibnlxepiwfermtcmo / esquema campusitsm.
+
+Se aplicó únicamente `20261108000100_tickets_core/migration.sql` con el comando
+manual migrador. SHA256: `d0727f7f1eca862b3fe40da5859493419b98938e076e8c7741cb2466b4b4715a`,
+idéntico al dictamen y las 35 comprobaciones aisladas anteriores. Antes de
+aplicar: siete migraciones finalizadas y tablas de tickets ausentes.
+Después: ocho migraciones con checksums coincidentes; Ticket/TicketAttachment
+pertenecen a campusitsm_migrator, RLS activo, API con CRUD y sin lectura de
+anon/authenticated. Conexión API en campusitsm y TLS comprobados. Ambas tablas
+vacías al verificar; no se crearon tickets de prueba ni se cambiaron cuentas.
+
+API y web reconstruidas desde `1667778`, junto a Python saludables en la única
+instalación campusitsm, localhost:8080, con volúmenes conservados. Compilaciones
+API/web y cinco pruebas del servicio de tickets sin red aprobadas. No se integra
+la rama en main ni se aplica consentimiento/auditoría; adjuntos siguen pospuestos.
+Los compañeros deben incorporar el archivo exacto al consumir Tickets. Este
+registro conserva el aviso de coordinación en Git; no se enviaron mensajes al equipo.
+
 ## P20 / usuarios-modal-correcciones — publicación autorizada en main
 
 Desde `administracion-usuarios@7ab1ed7`, correcciones y rediseño pedidos por
