@@ -5,7 +5,7 @@ import type { components } from '../../lib/api/schema'
 
 export type Session = components['schemas']['SessionDto']
 export type CurrentUser = Session['user']
-export const roleLabels: Record<string, string> = { estudiante: 'Estudiante', docente: 'Docente', ti_agente: 'Agente TI', ti_supervisor: 'Supervisor TI', administrador: 'Administrador' }
+export const roleLabels: Record<CurrentUser['role'], string> = { estudiante: 'Estudiante', docente: 'Docente', ti_agente: 'Agente TI', ti_supervisor: 'Supervisor TI', administrador: 'Administrador' }
 type AuthContextValue = { user: CurrentUser | null; loading: boolean; error: Error | null; refresh: () => void; logout: () => Promise<void> }
 const Context = createContext<AuthContextValue | null>(null)
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -18,17 +18,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, retry: false, staleTime: 30000, refetchOnWindowFocus: true, refetchInterval: query => query.state.data ? 60000 : false })
   const previous = useRef<string | null>(null)
   const user = session.data?.user || null
+  const accessKey = user ? JSON.stringify([user.id, user.role, user.teamId, user.active, [...user.permissions].sort()]) : null
   useEffect(() => {
-    if (previous.current && previous.current !== user?.id) {
+    if (previous.current && previous.current !== accessKey) {
       void client.cancelQueries({ predicate: q => q.queryKey[0] !== 'auth' })
       client.removeQueries({ predicate: q => q.queryKey[0] !== 'auth' })
     }
-    previous.current = user?.id || null
-  }, [user?.id, client])
+    previous.current = accessKey
+  }, [accessKey, client])
   useEffect(() => {
     const expire = () => { void client.invalidateQueries({ queryKey: ['auth', 'session'] }) }
     window.addEventListener('campus:session-expired', expire)
-    return () => window.removeEventListener('campus:session-expired', expire)
+    window.addEventListener('campus:access-changed', expire)
+    return () => { window.removeEventListener('campus:session-expired', expire); window.removeEventListener('campus:access-changed', expire) }
   }, [client])
   async function logout() {
     const result = await request<{ message: string; providerRevoked: boolean }>('auth/logout', { method: 'POST', body: '{}' })

@@ -59,3 +59,11 @@ export function listInput(value: unknown, dates = false) {
   if (from && to && (to <= from || to.getTime() - from.getTime() > 93 * 86400000)) invalid('to', 'Consulta un intervalo de hasta 93 días, con fin posterior al inicio.');
   return { page, pageSize, courseId, sectionId, type: type as 'examen' | 'entrega' | 'matricula' | undefined, from, to };
 }
+export function personalCatalogInput(value: unknown, sections = false) {
+  const q = object(value);
+  const allowed = sections ? ['page', 'pageSize', 'courseId'] : ['page', 'pageSize'];
+  for (const key of Object.keys(q)) if (!allowed.includes(key)) invalid(key, 'Campo no admitido en la consulta personal.');
+  const { page, pageSize } = listInput(q);
+  const courseId = sections ? uuid(q.courseId, 'courseId') : undefined;
+  return { page, pageSize, courseId };
+}

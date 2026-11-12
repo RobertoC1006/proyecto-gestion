@@ -164,6 +164,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/role-permissions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["RolePermissionsController_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/role-permissions/{role}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["RolePermissionsController_update"];
+        trace?: never;
+    };
     "/api/v1/academic/courses": {
         parameters: {
             query?: never;
@@ -260,6 +292,38 @@ export interface paths {
         patch: operations["AcademicController_updateEvent"];
         trace?: never;
     };
+    "/api/v1/academic/me/courses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["PersonalAcademicController_courses"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/academic/me/sections": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["PersonalAcademicController_sections"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/academic/me/events": {
         parameters: {
             query?: never;
@@ -322,6 +386,70 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["UsersController_listUsers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/teams": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["UsersController_listTeams"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["UsersController_getUser"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/{id}/access": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["UsersController_updateAccess"];
         trace?: never;
     };
 }
@@ -398,6 +526,37 @@ export interface components {
         PasswordDto: {
             /** Format: password */
             password: string;
+        };
+        RoleAccessDto: {
+            /** @enum {string} */
+            role: "estudiante" | "docente" | "ti_agente" | "ti_supervisor" | "administrador";
+            label: string;
+            permissions: string[];
+            version: number;
+            updatedAt: string | null;
+            allowedPermissions: string[];
+            protectedPermissions: string[];
+        };
+        PermissionItemDto: {
+            key: string;
+            module: string;
+            label: string;
+            /** @enum {string} */
+            action: "consultar" | "registrar" | "atender" | "asignar" | "administrar";
+            scope: string;
+            available: boolean;
+        };
+        RoleMatrixDto: {
+            roles: components["schemas"]["RoleAccessDto"][];
+            catalog: components["schemas"]["PermissionItemDto"][];
+            dependencies: {
+                [key: string]: string;
+            };
+        };
+        UpdateRolePermissionsDto: {
+            permissions: string[];
+            expectedVersion: number;
+            reason: string;
         };
         CourseDto: {
             /** Format: uuid */
@@ -608,6 +767,80 @@ export interface components {
             total: number;
             page: number;
             pageSize: number;
+        };
+        SupportTeamItemDto: {
+            /**
+             * Format: uuid
+             * @example d3b07384-d113-494b-9c8e-aa7f4e912345
+             */
+            id: string;
+            /** @example TI-MESA */
+            code: string;
+            /** @example Mesa de Ayuda Presencial */
+            name: string;
+        };
+        UserItemDto: {
+            /**
+             * Format: uuid
+             * @example e2b17384-d113-494b-9c8e-aa7f4e912345
+             */
+            id: string;
+            /** Format: uuid */
+            institutionId: string;
+            /** @example estudiante@tallan.edu.pe */
+            email: string;
+            /** @example Ana Torres */
+            displayName: string;
+            /**
+             * @example estudiante
+             * @enum {string}
+             */
+            role: "estudiante" | "docente" | "ti_agente" | "ti_supervisor" | "administrador";
+            /** @example true */
+            active: boolean;
+            /**
+             * Format: uuid
+             * @example null
+             */
+            teamId: string | null;
+            team: components["schemas"]["SupportTeamItemDto"] | null;
+            /** @example 1 */
+            accessVersion: number;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        UsersPageDto: {
+            items: components["schemas"]["UserItemDto"][];
+            /** @example 25 */
+            total: number;
+            /** @example 1 */
+            page: number;
+            /** @example 20 */
+            pageSize: number;
+        };
+        UpdateUserAccessDto: {
+            /**
+             * @example docente
+             * @enum {string}
+             */
+            role: "estudiante" | "docente" | "ti_agente" | "ti_supervisor" | "administrador";
+            /** @example true */
+            active: boolean;
+            /**
+             * Format: uuid
+             * @description UUID del equipo de soporte asignado, o null si no se asigna equipo.
+             * @example null
+             */
+            teamId: string | null;
+            /** @example Asignación de rol docente para el periodo 2026-II. */
+            reason: string;
+            /**
+             * @description Versión actual del acceso (control de concurrencia optimista)
+             * @example 1
+             */
+            expectedVersion: number;
         };
     };
     responses: never;
@@ -1077,6 +1310,92 @@ export interface operations {
             };
             /** @description Supabase sin configurar o temporalmente no disponible. */
             503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    RolePermissionsController_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RoleMatrixDto"];
+                };
+            };
+            /** @description Necesitas una sesión válida. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Solo administradores con permissions:manage. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    RolePermissionsController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                role: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateRolePermissionsDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RoleAccessDto"];
+                };
+            };
+            /** @description Permisos, alcance o motivo inválidos. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Necesitas una sesión válida. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Solo administradores con permissions:manage. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Otra persona modificó el rol. */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -1728,6 +2047,80 @@ export interface operations {
             };
         };
     };
+    PersonalAcademicController_courses: {
+        parameters: {
+            query?: {
+                page?: number;
+                pageSize?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CoursePageDto"];
+                };
+            };
+            /** @description Consulta inválida; code/message/fields. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Sesión válida requerida. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    PersonalAcademicController_sections: {
+        parameters: {
+            query: {
+                page?: number;
+                pageSize?: number;
+                /** @description Curso del titular cuyos grupos se consultan. */
+                courseId: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SectionPageDto"];
+                };
+            };
+            /** @description Consulta inválida; code/message/fields. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Sesión válida requerida. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     PersonalAcademicController_events: {
         parameters: {
             query: {
@@ -1752,6 +2145,13 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["EventPageDto"];
                 };
+            };
+            /** @description Consulta inválida; code/message/fields. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Sesión válida requerida. */
             401: {
@@ -1959,6 +2359,200 @@ export interface operations {
             };
             /** @description Ticket ajeno o inexistente. */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    UsersController_listUsers: {
+        parameters: {
+            query?: {
+                page?: number;
+                pageSize?: number;
+                role?: "estudiante" | "docente" | "ti_agente" | "ti_supervisor" | "administrador";
+                active?: boolean;
+                teamId?: string;
+                /** @description Búsqueda por nombre o correo */
+                search?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Lista paginada de usuarios de la institución. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UsersPageDto"];
+                };
+            };
+            /** @description VALIDATION_ERROR: revisa los campos, identificadores y paginación. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Sesión no disponible o inválida. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Requiere rol administrador activo con permiso users:manage. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    UsersController_listTeams: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Catálogo de equipos de soporte de la institución. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SupportTeamItemDto"][];
+                };
+            };
+            /** @description VALIDATION_ERROR: revisa los campos, identificadores y paginación. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Sesión no disponible o inválida. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Requiere rol administrador activo con permiso users:manage. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    UsersController_getUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Detalle de un usuario de la institución. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserItemDto"];
+                };
+            };
+            /** @description VALIDATION_ERROR: revisa los campos, identificadores y paginación. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Sesión no disponible o inválida. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Requiere rol administrador activo con permiso users:manage. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No se encontró el usuario en la institución. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    UsersController_updateAccess: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateUserAccessDto"];
+            };
+        };
+        responses: {
+            /** @description Acceso actualizado con registro de auditoría. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserItemDto"];
+                };
+            };
+            /** @description Datos de validación inválidos o equipo ajeno a la institución. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Sesión no disponible o inválida. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Requiere rol administrador activo con permiso users:manage. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Conflicto por versión de acceso concurrente (CONFLICT) o protección del último administrador (LAST_ADMINISTRATOR). */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };

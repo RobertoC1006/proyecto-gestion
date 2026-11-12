@@ -2,18 +2,22 @@ import { BadRequestException, ConflictException, ForbiddenException, Injectable,
 import { AppUser, CampusRole, Prisma } from '@prisma/client';
 import { PrismaService } from '../database/prisma.service';
 import { AuthConfig } from './auth.config';
-import { CampusPrincipal, rolePermissions } from './auth.policy';
+import { CampusPrincipal } from './auth.policy';
 import { ProviderIdentity } from './auth.provider';
+import { RolePermissionsService } from './role-permissions.service';
 
-export const principalFor = (user: AppUser, csrfVerified: boolean): CampusPrincipal => ({
+const principalFor = (user: AppUser, csrfVerified: boolean, permissions: readonly string[]): CampusPrincipal => ({
   id: user.id, institutionId: user.institutionId, email: user.email, displayName: user.displayName,
   role: user.role, active: user.active, teamId: user.teamId, accessVersion: user.accessVersion,
-  permissions: rolePermissions[user.role], csrfVerified,
+  permissions, csrfVerified,
 });
 
 @Injectable()
 export class IdentityDirectory {
-  constructor(private readonly db: PrismaService, private readonly config: AuthConfig) {}
+  constructor(private readonly db: PrismaService, private readonly config: AuthConfig, private readonly roles: RolePermissionsService) {}
+  async principal(user: AppUser, csrfVerified: boolean, tx: Pick<Prisma.TransactionClient, 'roleAccess'> = this.db) {
+    return principalFor(user, csrfVerified, await this.roles.effective(user.institutionId, user.role, tx));
+  }
   async provision(identity: ProviderIdentity) {
     // Solo se llama tras getUser con credenciales verificadas; metadata nunca concede roles.
     const existing = await this.db.appUser.findUnique({ where: { id: identity.id } });
@@ -44,7 +48,7 @@ export class IdentityDirectory {
       // Serializa cambios de acceso por institución, incluido el último administrador.
       await tx.$queryRaw`SELECT "id" FROM "Institution" WHERE "id" = ${candidate.institutionId}::uuid FOR UPDATE`;
       const actor = await tx.appUser.findUnique({ where: { id: actorId } });
-      if (!actor?.active || actor.role !== 'administrador') throw new ForbiddenException({ code: 'ADMIN_REQUIRED', message: 'Solo administración puede cambiar permisos.' });
+      if (!actor?.active || actor.role !== 'administrador' || !(await this.roles.effective(actor.institutionId, actor.role, tx)).includes('users:manage')) throw new ForbiddenException({ code: 'ADMIN_REQUIRED', message: 'Solo administración puede cambiar permisos.' });
       const subject = await tx.appUser.findFirst({ where: { id: subjectId, institutionId: actor.institutionId } });
       if (!subject) throw new NotFoundException({ code: 'NOT_FOUND', message: 'No se encontró el usuario.' });
       if (subject.accessVersion !== input.expectedVersion) throw new ConflictException({ code: 'CONFLICT', message: 'El acceso cambió. Actualiza antes de continuar.' });
@@ -62,7 +66,7 @@ export class IdentityDirectory {
       const snapshot = (u: AppUser): Prisma.InputJsonObject => ({ role: u.role, active: u.active, teamId: u.teamId, accessVersion: u.accessVersion });
       await tx.identityChange.create({ data: { institutionId: actor.institutionId, actorId, subjectId,
         reason: input.reason.trim(), before: snapshot(subject), after: snapshot(updated) } });
-      return principalFor(updated, false);
+      return this.principal(updated, false, tx);
     });
   }
 }

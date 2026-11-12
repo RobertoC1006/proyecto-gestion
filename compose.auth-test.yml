@@ -8,7 +8,7 @@ services:
       context: .
       dockerfile: apps/api/Dockerfile
       target: test
-    command: [node, --test, test/academic.test.cjs, test/auth.test.cjs, test/auth.provider.test.cjs, test/connection.test.cjs]
+    command: [node, --test, --test-concurrency=1, test/academic.test.cjs, test/auth.test.cjs, test/auth.provider.test.cjs, test/connection.test.cjs, test/role-permissions.test.cjs, test/users.test.cjs]
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER:-campusitsm}:${POSTGRES_PASSWORD:-campusitsm_local_only}@db:5432/${POSTGRES_DB:-campusitsm}?schema=public
       APP_ORIGIN: http://localhost:8080

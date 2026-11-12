@@ -11,9 +11,9 @@ const { PrismaService } = require('../dist/database/prisma.service');
 test('Calendario manual: integración PostgreSQL y permisos', async t => {
   let app, closedApp;
   const institutionId = randomUUID(), otherInstitution = randomUUID();
-  const admin = { id: randomUUID(), institutionId, role: 'administrador', csrfVerified: true };
-  const studentA = { id: randomUUID(), institutionId, role: 'estudiante', csrfVerified: true };
-  const studentB = { id: randomUUID(), institutionId, role: 'docente', csrfVerified: true };
+  const admin = { id: randomUUID(), institutionId, role: 'administrador', permissions: ['academic:read:self', 'academic:manage'], csrfVerified: true };
+  const studentA = { id: randomUUID(), institutionId, role: 'estudiante', permissions: ['academic:read:self'], csrfVerified: true };
+  const studentB = { id: randomUUID(), institutionId, role: 'docente', permissions: ['academic:read:self'], csrfVerified: true };
   const otherAdmin = { ...admin, institutionId: otherInstitution };
   const principals = { admin, studentA, studentB, otherAdmin, unsafe: { ...admin, csrfVerified: false } };
   const builder = Test.createTestingModule({ imports: [AppModule] });

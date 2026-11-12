@@ -107,12 +107,18 @@ test('Editar, manejar conflicto de versión y eliminar con motivo', async ({ pag
   expect(state.writes.at(-1).body.expectedVersion).toBe(2);
 });
 test('Sin sesión: no revela eventos ni permite guardar', async ({ page }) => {
+  let academicRequests = 0;
+  await page.route('**/api/v1/auth/me', route => route.fulfill({ status: 401, contentType: 'application/json', body: JSON.stringify({ code: 'SESSION_REQUIRED' }) }));
+  await page.route('**/api/v1/academic/**', route => { academicRequests++; return route.fulfill({ status: 401, contentType: 'application/json', body: '{}' }); });
   await page.goto('/admin/calendario');
-  await expect(page.getByRole('alert')).toContainText('Necesitas una sesión válida');
+  await expect(page).toHaveURL(/\/login$/);
+  await expect(page.getByRole('heading', { name: 'Ingresa a CampusITSM' })).toBeVisible();
+  await expect(page.locator('.sidebar')).toHaveCount(0);
   await expect(page.locator('.calendar-event')).toHaveCount(0);
   await page.goto('/admin/calendario/nuevo');
-  await expect(page.getByRole('button', { name: 'Validar y guardar' })).toBeDisabled();
-  await capture(page, 'p18-casos-acceso-real.png');
+  await expect(page).toHaveURL(/\/login$/);
+  await expect(page.getByRole('button', { name: 'Validar y guardar' })).toHaveCount(0);
+  expect(academicRequests).toBe(0);
 });
 test('P17/P18 móvil 390 × 844: agenda sin desbordamiento y formulario', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });

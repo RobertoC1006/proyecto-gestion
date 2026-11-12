@@ -52,8 +52,8 @@ test('P01: errores, sesión del servidor y logout; sin tokens en almacenamiento 
   await page.getByRole('button', { name: 'Mostrar contraseña' }).click();
   await expect(page.locator('input[autocomplete="current-password"]')).toHaveAttribute('type', 'text');
   await page.getByRole('button', { name: 'Iniciar sesión', exact: true }).click();
-  await expect(page).toHaveURL(/\/calendario$/);
-  await expect(page.getByRole('heading', { name: 'Mi calendario académico' })).toBeVisible();
+  await expect(page).toHaveURL('http://localhost:8080/');
+  await expect(page.getByRole('heading', { name: 'Hola, Prueba visual', exact: true })).toBeVisible();
   await expect(page.locator('.profile-button__name')).toHaveText('Prueba visual');
   expect(await page.evaluate(() => ({ local: Object.keys(localStorage), session: Object.keys(sessionStorage) }))).toEqual({ local: [], session: [] });
   await page.getByLabel('Opciones de cuenta, Prueba visual').click();

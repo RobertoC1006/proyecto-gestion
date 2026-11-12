@@ -16,6 +16,8 @@ const json = (route, data, status = 200) => route.fulfill({ status, contentType:
 async function fixture(page, onCreate = async route => json(route, ticket, 201)) {
   await page.route('**/api/v1/auth/me', route => json(route, { user, csrfToken: 'fixture-csrf' }));
   await page.route('**/api/v1/academic/me/events?*', route => json(route, { items: [], total: 0, page: 1, pageSize: 100 }));
+  await page.route('**/api/v1/academic/me/courses?*', route => json(route, { items: [], total: 0, page: 1, pageSize: 100 }));
+  await page.route('**/api/v1/academic/me/sections?*', route => json(route, { items: [], total: 0, page: 1, pageSize: 100 }));
   await page.route('**/api/v1/tickets**', async route => {
     const url = new URL(route.request().url());
     if (url.pathname.endsWith('/services')) return json(route, [{ id: 'correo', label: 'Correo institucional' }]);
@@ -25,6 +27,51 @@ async function fixture(page, onCreate = async route => json(route, ticket, 201))
     return json(route, { code: 'NOT_FOUND', message: 'No se encontró el ticket.' }, 404);
   });
 }
+
+test('General no consulta cursos y envía los campos académicos nulos', async ({ page }) => {
+  let courseLookups = 0;
+  let body;
+  await fixture(page, async route => { body = route.request().postDataJSON(); return json(route, ticket, 201); });
+  await page.route('**/api/v1/academic/me/courses?*', route => { courseLookups++; return json(route, { items: [], total: 0, page: 1, pageSize: 100 }); });
+  await page.goto('/incidencias/nueva');
+  await page.getByRole('textbox', { name: /Descripción del problema/ }).fill(ticket.description);
+  await page.getByRole('combobox', { name: /Servicio afectado/ }).selectOption('correo');
+  await page.getByRole('button', { name: 'Enviar incidencia' }).click();
+  await expect(page).toHaveURL(new RegExp(`/incidencias/registrada/${id}$`));
+  expect(courseLookups).toBe(0);
+  expect(body).toMatchObject({ scope: 'general', courseId: null, sectionId: null });
+  expect(Object.keys(body).sort()).toEqual(['courseId', 'description', 'scope', 'sectionId', 'service']);
+});
+
+test('Curso usa asociaciones propias y limpia la sección al cambiar de curso', async ({ page }) => {
+  const courseA = { id: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa', code: 'C1', name: 'Curso uno' };
+  const courseB = { id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb', code: 'C2', name: 'Curso dos' };
+  const sectionA = { id: 'cccccccc-cccc-4ccc-8ccc-cccccccccccc', courseId: courseA.id, code: 'A', name: 'Sección A' };
+  const sectionB = { id: 'dddddddd-dddd-4ddd-8ddd-dddddddddddd', courseId: courseB.id, code: 'B', name: 'Sección B' };
+  let body;
+  await fixture(page, async route => { body = route.request().postDataJSON(); return json(route, ticket, 201); });
+  await page.route('**/api/v1/academic/me/courses?*', route => json(route, { items: [courseA, courseB], total: 2, page: 1, pageSize: 100 }));
+  await page.route('**/api/v1/academic/me/sections?*', route => {
+    const url = new URL(route.request().url());
+    const items = url.searchParams.get('courseId') === courseA.id ? [sectionA] : [sectionB];
+    return json(route, { items, total: items.length, page: 1, pageSize: 100 });
+  });
+  await page.goto('/incidencias/nueva');
+  await page.getByRole('textbox', { name: /Descripción del problema/ }).fill(ticket.description);
+  await page.getByRole('combobox', { name: /Servicio afectado/ }).selectOption('correo');
+  await page.getByRole('combobox', { name: /Alcance del reporte/ }).selectOption('curso');
+  const course = page.getByRole('combobox', { name: 'Curso' });
+  await expect(course.locator('option')).toHaveCount(3);
+  await course.selectOption(courseA.id);
+  const section = page.getByRole('combobox', { name: 'Sección' });
+  await section.selectOption(sectionA.id);
+  await course.selectOption(courseB.id);
+  await expect(section).toHaveValue('');
+  await expect(section.locator('option')).toContainText(['Sin sección específica', 'B · Sección B']);
+  await page.getByRole('button', { name: 'Enviar incidencia' }).click();
+  await expect(page).toHaveURL(new RegExp(`/incidencias/registrada/${id}$`));
+  expect(body).toMatchObject({ scope: 'curso', courseId: courseB.id, sectionId: null });
+});
 
 test('P02–P05 muestran un ticket real, sin prioridad ni clasificación inventadas', async ({ page }) => {
   let calls = 0;

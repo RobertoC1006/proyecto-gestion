@@ -1,11 +1,39 @@
 ---
 responsable: Johan
-revision: 2026-11-07
+revision: 2026-11-11
 estado: base_supabase_conectada_invitaciones_enviadas
 pantallas_asignadas: [P02, P03, P04, P05, P06, P07, P08]
 ---
 
 # Plan de implementación de CampusITSM para Johan
+
+## P20/Usuarios publicado en main — 11 de noviembre de 2026
+
+Roberto autorizó integrar la entrega de Jasmine `7ab1ed7` y la corrección
+`8350650`: edición modal con tarjetas de rol/equipo, switch de acceso,
+validaciones y contrato actualizado. Sin nuevas migraciones. Leer la
+[publicación](../docs/entregas/roberto-publicacion-usuarios.md) y el
+[contrato de Usuarios](../docs/CONTRATO_USUARIOS.md). Incorporar origin/main
+en la rama propia sin descartar avances y reconstruir la instalación habitual.
+Las ramas de Jasmine/Johan se conservan; consentimiento, auditoría global y
+núcleo de tickets mantienen su alcance pendiente. Esta entrega no inicia otra semana.
+
+## Base común publicada — 11 de noviembre de 2026
+
+Roberto autorizó la integración en main de acceso/dashboard, permisos efectivos
+y matriz P21 con casillas, junto con la revisión documental del primer avance.
+Leer [la publicación](../docs/entregas/roberto-publicacion-acceso-roles.md) y
+[el contrato](../docs/CONTRATO_ROLES_PERMISOS.md). Incorporar origin/main en la
+rama propia sin descartar avances y reconstruir la instalación habitual.
+
+El principal autenticado resuelve permisos vigentes desde RoleAccess; comprobar
+principal.permissions y el alcance del objeto, sin autorizar con una lista fija
+del rol. La migración de permisos ya está aplicada en la base compartida: no
+repetirla ni modificarla. P20/Usuarios sigue con Jasmine; esta parte P21 ya fue
+entregada por solicitud de Roberto y se reutiliza. Tickets de Johan siguen en su
+rama pendiente de integración/aplicación. Adjuntos/Storage permanecen pospuestos
+para el primer avance; esta publicación no inicia otras semanas.
+
 
 Este plan está dirigido exclusivamente a Johan y su agente. Eres responsable del frontend y backend de incidencias y de los componentes visuales compartidos. No eres responsable de todo el frontend ni de un backend separado. Ejecuta solo la semana que Johan indique.
 

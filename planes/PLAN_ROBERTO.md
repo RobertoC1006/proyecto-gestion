@@ -1,13 +1,67 @@
 ---
 responsable: Roberto
-revision: 2026-11-07
-estado: base_supabase_conectada_invitaciones_enviadas
+revision: 2026-11-11
+estado: primer_avance_priorizado_sin_adjuntos
 pantallas_asignadas: [P01, P13, P14, P16, P17, P18, P19, P24]
 ---
 
 # Plan de implementación de CampusITSM para Roberto
 
-Este plan está dirigido exclusivamente a Roberto y su agente. Tu base Docker y el calendario manual ya tienen entregas verificadas. Identidad tiene una entrega en rama; la base de negocio ya está en Supabase; las invitaciones Developer ya se enviaron en su organización gratuita exclusiva; faltan aceptación y entrega de código/configuración. Ejecuta solo la etapa solicitada y no implementes las cuatro semanas de golpe.
+## P20/Usuarios publicado en main — 11 de noviembre de 2026
+
+Roberto autorizó integrar la entrega de Jasmine `7ab1ed7` y la corrección
+`8350650`: edición modal con tarjetas de rol/equipo, switch de acceso,
+validaciones y contrato actualizado. Sin nuevas migraciones. Leer la
+[publicación](../docs/entregas/roberto-publicacion-usuarios.md) y el
+[contrato de Usuarios](../docs/CONTRATO_USUARIOS.md). Incorporar origin/main
+en la rama propia sin descartar avances y reconstruir la instalación habitual.
+Las ramas de Jasmine/Johan se conservan; consentimiento, auditoría global y
+núcleo de tickets mantienen su alcance pendiente. Esta entrega no inicia otra semana.
+
+## Base común publicada — 11 de noviembre de 2026
+
+Roberto autorizó la integración en main de acceso/dashboard, permisos efectivos
+y matriz P21 con casillas, junto con la revisión documental del primer avance.
+Leer [la publicación](../docs/entregas/roberto-publicacion-acceso-roles.md) y
+[el contrato](../docs/CONTRATO_ROLES_PERMISOS.md). Incorporar origin/main en la
+rama propia sin descartar avances y reconstruir la instalación habitual.
+
+El principal autenticado resuelve permisos vigentes desde RoleAccess; comprobar
+principal.permissions y el alcance del objeto, sin autorizar con una lista fija
+del rol. La migración de permisos ya está aplicada en la base compartida: no
+repetirla ni modificarla. P20/Usuarios sigue con Jasmine; esta parte P21 ya fue
+entregada por solicitud de Roberto y se reutiliza. Tickets de Johan siguen en su
+rama pendiente de integración/aplicación. Adjuntos/Storage permanecen pospuestos
+para el primer avance; esta publicación no inicia otras semanas.
+
+
+Este plan está dirigido exclusivamente a Roberto y su agente. Tu base Docker y el calendario manual ya tienen entregas verificadas. Identidad y conexión de la base compartida están publicadas en main. Las invitaciones Developer se enviaron en la organización exclusiva; comprobar los accesos actuales en vez de asumir su aceptación. Ejecuta solo la etapa solicitada y no implementes las cuatro semanas de golpe.
+
+## Reanudación actual — 11 de noviembre de 2026
+
+- **Prioridad más reciente de Roberto:** preparar el primer avance con acceso,
+  registro/consulta de tickets, calendario manual y administración básica validada.
+  Adjuntos y habilitación de Storage quedan pospuestos y no bloquean ese corte.
+  Ver [PRIMER_AVANCE.md](../docs/PRIMER_AVANCE.md). El siguiente trabajo propio es
+  coordinar el núcleo compartido de tickets y revisar la entrega de Jasmine.
+  No iniciar otra semana ni implementar archivos por leer el contrato anterior.
+- Cursos propios `498d410` publicados en main `f4a4457`; Johan incorpora esa
+  base y conecta su selector. No repetir identidad, calendario o esas consultas.
+- Revisión de tickets y definición de evidencias solicitadas por Roberto,
+  preparadas en `revision-incidencias` desde esa base e integradas como
+  documentación en la publicación conjunta. La migración de tickets sigue
+  sin aplicar. Ver [dictamen](../docs/REVISION_MIGRACION_TICKETS.md),
+  [contrato de archivos](../docs/CONTRATO_EVIDENCIAS.md) y
+  [estado del equipo](../docs/ESTADO_EQUIPO.md).
+- SQL de Johan `90a2790` con revisión favorable y 35 comprobaciones SQL
+  aprobadas; migración aún sin aplicar en la base compartida. Conservar el
+  catálogo de servicios y código público del módulo. Antes de cargar bytes,
+  añadir mediante nueva migración el tamaño máximo de 5 MiB.
+- Habilitación de almacenamiento común privado y entrega de credencial de
+  servidor pospuestas para después del primer avance; la recomendación anterior es Supabase Storage del mismo
+  proyecto. El contrato define carga/descarga, protección y reintentos, pero no
+  acredita implementación ni autoriza publicaciones posteriores en main.
+- Esta revisión no inicia CSV, factores/SLA, predicción ni módulos de compañeros.
 
 ## Estado vigente y punto de partida — 7 de noviembre de 2026
 

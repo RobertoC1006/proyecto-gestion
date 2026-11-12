@@ -1,8 +1,63 @@
 # Coordinación de cambios en la base compartida
 
+## P20 / usuarios-modal-correcciones — publicación autorizada en main
+
+Desde `administracion-usuarios@7ab1ed7`, correcciones y rediseño pedidos por
+Roberto y código `8350650`, integrado en main por su autorización posterior.
+Reutiliza AppUser, SupportTeam e IdentityDirectory/IdentityChange.
+Sin tablas, columnas, índices o migraciones nuevos; no se aplicó SQL a Supabase.
+Las escrituras de validación se realizaron solo en PostgreSQL descartable,
+retirado al finalizar. La instalación de trabajo conserva la base compartida y
+sus volúmenes. Ver [CONTRATO_USUARIOS.md](CONTRATO_USUARIOS.md).
+
+## Permisos por rol — 11 de noviembre de 2026
+
+Roberto solicitó y confirmó guardar permisos reales por rol mediante casillas,
+manteniendo cinco roles. Rama roles-permisos, migración
+20261111000100_role_permissions/migration.sql: nuevas tablas RoleAccess y
+RolePermissionChange, sin modificar tablas ni datos existentes. Responsable y
+ejecutor: agente de Roberto. Destino: CampusITSM / npjibnlxepiwfermtcmo /
+campusitsm. Cambio de identidad común por indicación de Roberto; contrato:
+[CONTRATO_ROLES_PERMISOS.md](CONTRATO_ROLES_PERMISOS.md).
+
+**Aplicado y verificado** mediante el comando manual migrador el 11 de noviembre.
+Archivo/servidor guardados en commit `9491eab`; SHA256 del SQL:
+`7da2032fcc4121373d66dc9e7ef63a37a462fbcda7e5c4dc1a16b27c9c7c384a`.
+Ejecutor: agente de Roberto. Antes de ejecutar se validó en PostgreSQL
+descartable con 39 comprobaciones y se verificaron las seis migraciones previas,
+esquema, rol API y TLS. Después: siete migraciones con checksum coincidente,
+RLS activo en las dos tablas nuevas, API con lectura/inserción y sin
+actualización/borrado en RolePermissionChange. Ambas tablas nuevas conservan
+cero registros: no se cambiaron permisos ni usuarios de la base compartida.
+Instalación campusitsm saludable tras reconstruir API/web. El código se integra
+en main por autorización posterior de Roberto, sin reaplicar esta migración ni
+modificar las ramas de Jasmine/Johan. Ver
+[entrega](entregas/roberto-roles-permisos.md).
+
+Los compañeros deben recibir esta base común antes de utilizar configuraciones
+nuevas; sus versiones antiguas conservan valores fijos. La migración añade tablas
+vacías, por lo que el comportamiento inicial no cambia.
+
 Registro del equipo, no sustituto del historial de migraciones Prisma ni de la
 auditoría de aplicación. Aplicar el procedimiento de
 [COORDINACION_SUPABASE.md](COORDINACION_SUPABASE.md).
+
+11 de noviembre, revisión `revision-incidencias`: dictamen favorable de
+`20261108000100_tickets_core` en `gestion-incidencias@90a2790`, probado en
+PostgreSQL descartable con 35 comprobaciones. Consulta remota solo de lectura:
+seis migraciones coincidentes y tablas de tickets aún ausentes. **No aplicado**
+por esta revisión; no se agrega una fila de migración aplicada. Antes de cargar
+evidencia se requiere otra migración para el máximo de 5242880 bytes.
+Ejecutor de revisión: agente de Roberto. Ver
+[dictamen](REVISION_MIGRACION_TICKETS.md) y
+[contrato de evidencias](CONTRATO_EVIDENCIAS.md). Bucket privado recomendado sin
+crear; no hubo cambios de infraestructura de Storage.
+
+11 de noviembre: `cursos-propios` añade consultas de cursos/secciones del titular
+sobre AcademicCourse/AcademicSection/AcademicMembership existentes. Sin cambios
+de esquema, migración, aplicación remota ni datos nuevos. Las escrituras de prueba
+se hicieron exclusivamente en PostgreSQL descartable. Ver
+[la entrega](entregas/roberto-semana-01-cursos-propios.md).
 
 Transición ejecutada por solicitud de Roberto el 7 de noviembre de 2026.
 Destino: CampusITSM / npjibnlxepiwfermtcmo / esquema campusitsm.

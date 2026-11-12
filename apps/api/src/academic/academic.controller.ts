@@ -1,8 +1,8 @@
-import { Body, Controller, Delete, Get, Inject, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Header, Inject, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiBadRequestResponse, ApiConflictResponse, ApiCookieAuth, ApiCreatedResponse, ApiForbiddenResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { AcademicRequest, AcademicSessionGuard } from './academic.access';
 import { AcademicService } from './academic.service';
-import { CourseDto, CourseInputDto, CoursePageDto, DeletedDto, EventDeleteDto, EventDto, EventInputDto, EventPageDto, EventsQueryDto, EventUpdateDto, MembershipDto, PageQueryDto, ReasonDto, SectionDto, SectionInputDto, SectionPageDto, SectionQueryDto } from './academic.dto';
+import { CourseDto, CourseInputDto, CoursePageDto, DeletedDto, EventDeleteDto, EventDto, EventInputDto, EventPageDto, EventsQueryDto, EventUpdateDto, MembershipDto, PageQueryDto, PersonalSectionsQueryDto, ReasonDto, SectionDto, SectionInputDto, SectionPageDto, SectionQueryDto } from './academic.dto';
 
 @ApiTags('Calendario académico — administración')
 @ApiCookieAuth('campus_session')
@@ -42,10 +42,15 @@ export class AcademicController {
 @ApiTags('Calendario académico — titular')
 @ApiCookieAuth('campus_session')
 @ApiUnauthorizedResponse({ description: 'Sesión válida requerida.' })
+@ApiBadRequestResponse({ description: 'Consulta inválida; code/message/fields.' })
 @UseGuards(AcademicSessionGuard)
 @Controller('academic/me')
 export class PersonalAcademicController {
   constructor(@Inject(AcademicService) private readonly academic: AcademicService) {}
+  @Get('courses') @Header('Cache-Control', 'no-store') @ApiOkResponse({ type: CoursePageDto })
+  courses(@Req() r: AcademicRequest, @Query() q: PageQueryDto) { return this.academic.personalCourses(r.academicPrincipal!, q); }
+  @Get('sections') @Header('Cache-Control', 'no-store') @ApiOkResponse({ type: SectionPageDto })
+  sections(@Req() r: AcademicRequest, @Query() q: PersonalSectionsQueryDto) { return this.academic.personalSections(r.academicPrincipal!, q); }
   @Get('events') @ApiOkResponse({ type: EventPageDto })
   events(@Req() r: AcademicRequest, @Query() q: EventsQueryDto) { return this.academic.applicableEvents(r.academicPrincipal!, q); }
 }

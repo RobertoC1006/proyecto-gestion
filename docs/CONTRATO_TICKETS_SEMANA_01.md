@@ -272,8 +272,23 @@ END $block$;
 `ticket.created` es un evento de integración futura para Jasmine, con actor,
 institución, ID del ticket e instante, sin descripción ni archivo. No se añade
 tabla ni motor paralelo de auditoría y su ausencia no bloquea la creación.
-Roberto revisará el contrato, formato de código, catálogo inicial y almacenamiento
-antes de cualquier aplicación en la base compartida. La migración inicial de
-tickets deberá incluir restricciones de alcance, integridad, índices, revisión
-de `GRANT`/`REVOKE` y RLS condicional para `campusitsm_api`; se validará primero
-solo en PostgreSQL local.
+Roberto revisó favorablemente el contrato y la migración inicial exacta de tickets
+en [REVISION_MIGRACION_TICKETS.md](REVISION_MIGRACION_TICKETS.md). La migración
+incluye restricciones de alcance e integridad, índices, `GRANT`/`REVOKE` y RLS
+condicional para `campusitsm_api`. Su aplicación compartida y comprobación quedan
+bajo coordinación de Roberto; esta rama no la aplica a Supabase.
+
+### Estado de pendientes al continuar Semana 1
+
+`ticket.created` permanece como integración futura de Jasmine. Su ausencia no
+bloquea el alta y no se agrega un registro de auditoría paralelo en Tickets.
+El contrato de evidencia (`CONTRATO_EVIDENCIAS.md`) ya está publicado, pero el
+bucket privado compartido y su configuración de servidor todavía no están
+habilitados. Por eso P03 no carga ni descarga archivos; el formulario informa
+que esa capacidad está pendiente y el ticket puede registrarse sin adjunto.
+
+La migración inicial de tickets conserva el SQL aprobado en
+`REVISION_MIGRACION_TICKETS.md`. La validación de SQL/GRANT/REVOKE/RLS debe
+ejecutarse en PostgreSQL local aislado mediante `compose.local.yml`; no se aplica
+esta migración desde esta rama a Supabase. Roberto coordina la revisión final,
+aplicación compartida y comprobación cuando corresponda.

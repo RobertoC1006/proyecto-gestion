@@ -1,5 +1,12 @@
 # Contratos compartidos — base v1
 
+P20 integrado en main por autorización de Roberto, preparado en
+`usuarios-modal-correcciones` desde la entrega
+de Jasmine `administracion-usuarios@7ab1ed7`: listado y edición modal con
+tarjetas de rol/equipo, switch de acceso y validación de entradas. Contrato:
+[CONTRATO_USUARIOS.md](CONTRATO_USUARIOS.md). Conserva la identidad común,
+sin migraciones nuevas. Ver [publicación](entregas/roberto-publicacion-usuarios.md).
+
 Coordinación vigente: base de desarrollo común Supabase, traslado y
 conexión de Roberto verificados. Johan confirmó que aceptó su invitación
 Developer; los documentos del repositorio aún no verifican el acceso y la
@@ -25,9 +32,25 @@ requieren sesión. Identidad, directorio y roles comunes ya están en `main` seg
 
 ## Disponible
 
+Prioridad vigente del primer avance: acceso, registro/consulta de tickets,
+calendario manual y administración básica validada. Adjuntos/Storage pospuestos;
+no son requisito para avanzar el núcleo. Ver [PRIMER_AVANCE.md](PRIMER_AVANCE.md).
+
+Revisión del 11 de noviembre preparada en `revision-incidencias`, sin integrar
+todavía en main: [dictamen de la migración de tickets](REVISION_MIGRACION_TICKETS.md)
+y [contrato de evidencias](CONTRATO_EVIDENCIAS.md). El núcleo de Johan tiene
+revisión favorable; la carga de archivos y el bucket recomendado siguen sin
+implementar/habilitar. Las rutas de archivos descritas son contrato futuro.
+
 Origen único del navegador: `http://localhost:8080`, prefijo `/api/v1`.
 Contrato generado por NestJS: `/api/openapi.json`, interfaz `/api/docs`.
 Los contratos futuros se generan desde DTO OpenAPI, sin copiar modelos Prisma al navegador.
+
+Ampliación del 11 de noviembre, implementada en `cursos-propios` e integrada en main: GET
+`/academic/me/courses` y `/academic/me/sections?courseId=…`, con sesión y alcance
+del titular. Reutilizan el esquema existente, sin migración. Contrato para Johan:
+[CONTRATO_CURSOS_PROPIOS.md](CONTRATO_CURSOS_PROPIOS.md). Su disponibilidad en main
+se verifica en [ESTADO_EQUIPO.md](ESTADO_EQUIPO.md).
 
 `GET /api/v1/health` público, exclusivamente infraestructura:
 

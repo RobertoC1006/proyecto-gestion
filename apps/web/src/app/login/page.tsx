@@ -5,6 +5,7 @@ import { ArrowRight, EnvelopeSimple, Eye, EyeSlash, GraduationCap, LockKey, Shie
 import { Button, Card, Field, Notice, SupportIllustration } from '../../components/ui'
 import { ApiError, request } from '../../lib/api/http'
 import { useAuth, type Session } from '../../features/auth/AuthContext'
+import { HOME_PATH } from '../../features/auth/access'
 import '../../features/auth/auth.css'
 
 type Mode = 'login' | 'register' | 'recover' | 'reset'
@@ -27,8 +28,7 @@ export default function LoginPage() {
     const params = new URLSearchParams(location.search)
     return params.has('confirmed') ? 'Correo confirmado. Ya puedes iniciar sesión.' : params.has('link') ? 'El enlace venció o se abrió en otro navegador. Solicita otro enlace desde este navegador.' : params.get('closed') === 'local' ? 'Tu sesión local se cerró. El proveedor no pudo confirmar el cierre remoto.' : ''
   })
-  const next = auth.user?.role === 'administrador' ? '/admin/calendario' : '/calendario'
-  if (auth.user && mode !== 'reset') return <Navigate to={next} replace />
+  if (auth.user?.active && mode !== 'reset') return <Navigate to={HOME_PATH} replace />
   function changeMode(value: Mode) { setMode(value); setError(''); setFields({}); setMessage(''); setPassword('') }
   async function submit(event: FormEvent) {
     event.preventDefault(); if (busy) return
@@ -39,7 +39,7 @@ export default function LoginPage() {
       setPassword('')
       if (mode === 'login') {
         await client.cancelQueries(); client.removeQueries({ predicate: q => q.queryKey[0] !== 'auth' }); client.setQueryData(['auth', 'session'], result)
-        navigate(result.user.role === 'administrador' ? '/admin/calendario' : '/calendario', { replace: true })
+        navigate(HOME_PATH, { replace: true })
       } else {
         setMessage(result.message)
         if (mode === 'reset') { client.removeQueries({ predicate: q => q.queryKey[0] !== 'auth' }); client.setQueryData(['auth', 'session'], null); navigate('/login', { replace: true }) }
