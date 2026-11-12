@@ -68,7 +68,28 @@ test('Privacidad: consentimiento idempotente y auditoría aislada', async t => {
       assert.equal(first.body.items[0].after.email, undefined);
       assert.equal((await request('audit?actorId=' + foreign.id, { session: adminSession })).body.total, 0);
     });
+    await t.test('Auditoría elimina claves sensibles anidadas y motivos privados', async () => {
+      await db.rolePermissionChange.create({ data: {
+        institutionId, actorId: admin.id, role: 'estudiante',
+        reason: 'password=secreto; content=información privada',
+        before: { password: 'secreto', nested: { token: 'token-privado', safe: 'visible' }, values: ['privado'] },
+        after: { email: 'persona@example.test', authorization: 'Bearer secreto', nested: { safe: 'también visible' } },
+      } });
+      const result = await request('audit?action=permissions.change&objectType=RoleAccess', { session: adminSession });
+      assert.equal(result.status, 200);
+      assert.equal(result.body.total, 1);
+      const item = result.body.items[0];
+      assert.equal(item.reason, null);
+      assert.equal(item.before.password, undefined);
+      assert.equal(item.before.nested.token, undefined);
+      assert.equal(item.before.nested.safe, 'visible');
+      assert.equal(item.before.values, undefined);
+      assert.equal(item.after.email, undefined);
+      assert.equal(item.after.authorization, undefined);
+      assert.equal(item.after.nested.safe, 'también visible');
+    });
   } finally {
+    await db.rolePermissionChange.deleteMany({ where: { institutionId: { in: [institutionId, foreignInstitution] } } });
     await db.consentAcceptance.deleteMany({ where: { institutionId: { in: [institutionId, foreignInstitution] } } });
     await db.consentVersion.deleteMany({ where: { version: '1.0' } });
     await db.appUser.deleteMany({ where: { institutionId: { in: [institutionId, foreignInstitution] } } });
