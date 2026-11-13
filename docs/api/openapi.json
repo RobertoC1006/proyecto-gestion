@@ -697,6 +697,60 @@
       }
     },
     "/api/v1/academic/memberships": {
+      "get": {
+        "operationId": "AcademicController_memberships",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 100,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": "VALIDATION_ERROR; fields contiene el error de cada campo."
+          },
+          "401": {
+            "description": "Sesión no disponible o inválida."
+          },
+          "403": {
+            "description": "Requiere administrador y protección de escritura."
+          },
+          "404": {
+            "description": "Objeto no visible en la institución."
+          },
+          "409": {
+            "description": "Código duplicado o versión desactualizada."
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Calendario académico — administración"
+        ]
+      },
       "post": {
         "operationId": "AcademicController_associate",
         "parameters": [],
@@ -1135,6 +1189,31 @@
         ]
       }
     },
+    "/api/v1/academic/me/context": {
+      "get": {
+        "operationId": "PersonalAcademicController_context",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": "Consulta inválida; code/message/fields."
+          },
+          "401": {
+            "description": "Sesión válida requerida."
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Calendario académico — titular"
+        ]
+      }
+    },
     "/api/v1/academic/me/courses": {
       "get": {
         "operationId": "PersonalAcademicController_courses",
@@ -1465,7 +1544,9 @@
             "schema": {
               "type": "string",
               "enum": [
-                "registrado"
+                "registrado",
+                "en_atencion",
+                "resuelto"
               ]
             }
           },
@@ -1592,6 +1673,134 @@
         ],
         "tags": [
           "Incidencias — Semana 1"
+        ]
+      }
+    },
+    "/api/v1/operations/demo": {
+      "post": {
+        "operationId": "OperationsController_demoCase",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Atención y prioridad contextual"
+        ]
+      }
+    },
+    "/api/v1/operations/policy": {
+      "get": {
+        "operationId": "OperationsController_policy",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Atención y prioridad contextual"
+        ]
+      },
+      "patch": {
+        "operationId": "OperationsController_savePolicy",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Atención y prioridad contextual"
+        ]
+      }
+    },
+    "/api/v1/operations/tickets": {
+      "get": {
+        "operationId": "OperationsController_queue",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Atención y prioridad contextual"
+        ]
+      }
+    },
+    "/api/v1/operations/tickets/{id}": {
+      "get": {
+        "operationId": "OperationsController_detail",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Atención y prioridad contextual"
+        ]
+      },
+      "patch": {
+        "operationId": "OperationsController_action",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Atención y prioridad contextual"
         ]
       }
     },
@@ -2474,6 +2683,10 @@
       "EventDto": {
         "type": "object",
         "properties": {
+          "createdById": {
+            "type": "string",
+            "nullable": true
+          },
           "id": {
             "type": "string",
             "format": "uuid"
@@ -2557,6 +2770,7 @@
           }
         },
         "required": [
+          "createdById",
           "id",
           "institutionId",
           "title",
@@ -2843,19 +3057,58 @@
           "status": {
             "type": "string",
             "enum": [
-              "registrado"
+              "registrado",
+              "en_atencion",
+              "resuelto"
             ]
           },
           "classificationStatus": {
             "type": "string",
             "enum": [
-              "pendiente"
+              "pendiente",
+              "manual"
             ]
           },
           "priority": {
             "type": "string",
-            "nullable": true,
-            "example": null
+            "nullable": true
+          },
+          "version": {
+            "type": "number"
+          },
+          "academicContext": {
+            "type": "object",
+            "nullable": true
+          },
+          "academicFactor": {
+            "type": "number",
+            "nullable": true
+          },
+          "responseDueAt": {
+            "type": "string",
+            "nullable": true
+          },
+          "resolutionDueAt": {
+            "type": "string",
+            "nullable": true
+          },
+          "firstResponseAt": {
+            "type": "string",
+            "nullable": true
+          },
+          "resolvedAt": {
+            "type": "string",
+            "nullable": true
+          },
+          "solution": {
+            "type": "string",
+            "nullable": true
+          },
+          "failureConfirmed": {
+            "type": "boolean"
+          },
+          "isDemo": {
+            "type": "boolean"
           },
           "createdAt": {
             "type": "string",
@@ -2877,6 +3130,16 @@
           "status",
           "classificationStatus",
           "priority",
+          "version",
+          "academicContext",
+          "academicFactor",
+          "responseDueAt",
+          "resolutionDueAt",
+          "firstResponseAt",
+          "resolvedAt",
+          "solution",
+          "failureConfirmed",
+          "isDemo",
           "createdAt",
           "updatedAt"
         ]

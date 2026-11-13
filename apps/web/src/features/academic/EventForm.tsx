@@ -1,3 +1,4 @@
+import { useAuth } from '../auth/AuthContext'
 import { useEffect, useState, type FormEvent } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link, useNavigate, useParams } from 'react-router-dom'
@@ -60,6 +61,9 @@ const empty: Draft = {
 
 export default function EventForm() {
   const { id } = useParams()
+  const { user } = useAuth()
+  const managing = !!user?.permissions.includes('academic:manage')
+  const calendarPath = managing ? '/admin/calendario' : '/calendario'
   const navigate = useNavigate()
   const client = useQueryClient()
   const [form, setForm] = useState<Draft>(empty)
@@ -72,11 +76,11 @@ export default function EventForm() {
   })
   const courses = useQuery({
     queryKey: ['academic', 'courses'],
-    queryFn: () => allPages<Course>('courses'),
+    queryFn: () => allPages<Course>(managing ? 'courses' : 'me/courses'),
   })
   const sections = useQuery({
     queryKey: ['academic', 'sections', form.courseId],
-    queryFn: () => allPages<Section>(`sections?courseId=${form.courseId}`),
+    queryFn: () => allPages<Section>(`${managing ? 'sections' : 'me/sections'}?courseId=${form.courseId}`),
     enabled: !!form.courseId,
   })
   const current = useQuery({
@@ -119,7 +123,7 @@ export default function EventForm() {
       }),
     onSuccess: (row) => {
       void client.invalidateQueries({ queryKey: ['academic'] })
-      navigate(`/admin/calendario?date=${dayKey(row.startsAt)}`)
+      navigate(`${calendarPath}?date=${dayKey(row.startsAt)}`)
     },
     onError: (error) => {
       if (error instanceof ApiError) setFields(error.fields)
@@ -215,7 +219,7 @@ export default function EventForm() {
     <section className="academic-page">
       <Breadcrumbs
         items={[
-          { label: 'Calendario académico', to: '/admin/calendario' },
+          { label: 'Calendario académico', to: calendarPath },
           { label: id ? 'Editar evento' : 'Nuevo evento' },
         ]}
       />
@@ -275,7 +279,7 @@ export default function EventForm() {
                     value={form.type}
                     onChange={(e) => change('type', e.target.value)}
                   >
-                    {Object.entries(typeLabels).map(([type, label]) => (
+                    {Object.entries(typeLabels).filter(([type]) => managing || type !== 'matricula').map(([type, label]) => (
                       <option key={type} value={type}>
                         {label}
                       </option>
@@ -321,6 +325,7 @@ export default function EventForm() {
                   <Button
                     variant="ghost"
                     className="catalog-field__action"
+                    hidden={!managing}
                     disabled={form.scope === 'institution'}
                     onClick={() => {
                       createCatalog.reset()
@@ -355,6 +360,7 @@ export default function EventForm() {
                   <Button
                     variant="ghost"
                     className="catalog-field__action"
+                    hidden={!managing}
                     disabled={!form.courseId || form.scope !== 'section'}
                     onClick={() => {
                       createCatalog.reset()
@@ -433,7 +439,7 @@ export default function EventForm() {
               </Button>
             )}
             <div className="form-actions">
-              <ButtonLink variant="secondary" to="/admin/calendario">
+              <ButtonLink variant="secondary" to={calendarPath}>
                 Cancelar
               </ButtonLink>
               <Button

@@ -1,3 +1,6 @@
+import { api } from '../../../lib/api/academic'
+import type { Context } from '../../../lib/api/workflow'
+import '../../../features/tickets/workflow.css'
 import { useRef, useState, type FormEvent } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { ArrowLeft, PaperPlaneTilt } from '@phosphor-icons/react'
@@ -15,12 +18,13 @@ function ReportForm() {
   const { user } = useAuth()
   const [description, setDescription] = useState('')
   const [service, setService] = useState<CreateTicket['service'] | ''>('')
-  const [scope, setScope] = useState<CreateTicket['scope']>('general')
-  const [courseId, setCourseId] = useState('')
-  const [sectionId, setSectionId] = useState('')
+  const [scope, setScope] = useState<CreateTicket['scope']>(new URLSearchParams(location.search).has('courseId') ? 'curso' : 'general')
+  const [courseId, setCourseId] = useState(new URLSearchParams(location.search).get('courseId')??'')
+  const [sectionId, setSectionId] = useState(new URLSearchParams(location.search).get('sectionId')??'')
   const services = useQuery({ queryKey: ['tickets', 'services'], queryFn: ticketApi.services })
   const courses = useQuery({ queryKey: ['academic', user?.id, 'my-courses'], queryFn: () => allPages<Course>('me/courses'), enabled: !!user && scope === 'curso' })
   const sections = useQuery({ queryKey: ['academic', user?.id, 'my-sections', courseId], queryFn: () => allPages<Section>(`me/sections?courseId=${encodeURIComponent(courseId)}`), enabled: !!user && scope === 'curso' && !!courseId })
+  const context = useQuery({queryKey:['academic',user?.id,'context',scope,courseId,sectionId],queryFn:()=>api<Context>(`me/context?${new URLSearchParams(scope==='curso'?{courseId,...(sectionId?{sectionId}:{})}:{})}`),enabled:!!user&&(scope==='general'||!!courseId)})
   const [sending, setSending] = useState(false)
   const [error, setError] = useState('')
   const key = useRef<string | null>(null)
@@ -41,14 +45,14 @@ function ReportForm() {
       setError(cause instanceof ApiError && cause.fields && Object.values(cause.fields).length ? Object.values(cause.fields).join(' ') : cause instanceof Error ? cause.message : 'No se pudo enviar. Inténtalo de nuevo.')
     } finally { setSending(false) }
   }
-  return <div className="content-stack tickets-view">
+  return <div className="content-stack tickets-view workflow-page">
     <Link className="tickets-back" to="/incidencias"><ArrowLeft size={17} />Mis incidencias</Link>
     <PageHeading title="Reportar una incidencia" subtitle="Describe el problema para que TI pueda revisarlo." />
     <div className="ticket-form-layout"><Card><form onSubmit={event => void submit(event)} noValidate><h2>Información de la incidencia</h2>
-      <Field label="Descripción del problema" required><textarea className="input" value={description} minLength={20} maxLength={5000} onChange={event => { change(); setDescription(event.target.value) }} placeholder="Explica qué ocurre y desde cuándo…" /></Field>
+      <Field label="Descripción del problema" required hint={`${description.trim().length}/5000 caracteres · Mínimo 20`}><textarea className="input" value={description} minLength={20} maxLength={5000} onChange={event => { change(); setDescription(event.target.value) }} placeholder="¿Qué intentabas hacer? ¿Qué error apareció y desde cuándo ocurre?" /></Field>
       <Field label="Servicio afectado" required><Select value={service} onChange={event => { change(); setService(event.target.value as CreateTicket['service']) }} disabled={services.isPending || !!services.error}><option value="">Selecciona un servicio</option>{services.data?.map(item => <option key={item.id} value={item.id}>{item.label}</option>)}</Select></Field>
       {services.error && <Notice tone="amber" role="alert">No se pudo cargar la lista de servicios. <Button variant="ghost" onClick={() => void services.refetch()}>Reintentar</Button></Notice>}
-      <Field label="Alcance del reporte" required><Select value={scope} onChange={event => { change(); setScope(event.target.value as CreateTicket['scope']); if (event.target.value === 'general') { setCourseId(''); setSectionId('') } }}><option value="general">General</option><option value="curso">Curso</option></Select></Field>
+      <div><p className="field__label">¿Con qué se relaciona el problema?</p><div className="workflow-scope">{[['general','Problema general','Servicios y accesos de la universidad'],['curso','Un curso o actividad','Examen, entrega o actividad de mi curso']].map(([v,label,hint])=><button type="button" key={v} aria-pressed={scope===v} onClick={()=>{change();setScope(v as CreateTicket['scope']);setCourseId('');setSectionId('')}}><strong>{label}</strong><small>{hint}</small></button>)}</div></div>
       {courses.isError && <Notice tone="amber" role="alert">No se pudieron consultar tus asociaciones académicas. Puedes continuar con un reporte General. <Button variant="ghost" onClick={() => void courses.refetch()}>Reintentar</Button></Notice>}
       {!courses.isError && courses.isSuccess && courses.data.length === 0 && <Notice tone="amber">No tienes asociaciones académicas disponibles. Puedes enviar un reporte General.</Notice>}
       {scope === 'curso' && <>
@@ -57,10 +61,10 @@ function ReportForm() {
         {courseId && sections.isSuccess && sections.data.length === 0 && <Notice>No tienes secciones asociadas a este curso; puedes continuar sin seleccionar sección.</Notice>}
         <Field label="Sección" hint="Opcional"><Select value={sectionId} onChange={event => { change(); setSectionId(event.target.value) }} disabled={!courseId || sections.isPending || !!sections.error}><option value="">Sin sección específica</option>{sections.data?.map(section => <option key={section.id} value={section.id}>{section.code} · {section.name}</option>)}</Select></Field>
       </>}
-      <Notice tone="amber">Los archivos adjuntos estarán disponibles cuando se habilite el almacenamiento privado compartido.</Notice>
+      <Notice tone="amber">Los adjuntos aún no están disponibles. Puedes registrar el reporte sin archivos.</Notice>
       <FormError message={error} />
       <div className="ticket-form-actions"><Button type="submit" icon={PaperPlaneTilt} disabled={sending || services.isPending || !!services.error}>{sending ? 'Enviando…' : 'Enviar incidencia'}</Button></div>
-    </form></Card><Card><h2>¿Qué sucede después?</h2><ol className="ticket-steps"><li>Recibimos tu reporte y te damos un código.</li><li>La clasificación queda pendiente hasta que se realice.</li><li>Puedes consultar el estado en Mis incidencias.</li></ol></Card></div>
+    </form></Card><Card><span className="workflow-eyebrow">TU CONTEXTO ACADÉMICO</span><h2>{context.data?.event?'Actividad relacionada':'Tu reporte tendrá seguimiento'}</h2>{context.error&&<Notice tone="amber" role="alert">No se pudo consultar el contexto. TI podrá revisarlo al evaluar tu reporte.</Notice>}{context.data?.event&&<div className="workflow-context-banner"><div><strong>{context.data.event.title}</strong><p>{new Date(context.data.event.startsAt).toLocaleString('es-PE',{timeZone:'America/Lima'})}</p><small>Esta actividad será considerada en la evaluación de TI.</small></div></div>}<h3>¿Qué sucede después?</h3><ol className="ticket-steps"><li>Recibimos tu reporte y te damos un código.</li><li>TI evalúa el problema y su contexto académico.</li><li>Puedes consultar la atención y la solución en Mis incidencias.</li></ol></Card></div>
   </div>
 }
 export default function NuevaIncidenciaPage() { return <TicketAccess permission="tickets:create"><ReportForm /></TicketAccess> }

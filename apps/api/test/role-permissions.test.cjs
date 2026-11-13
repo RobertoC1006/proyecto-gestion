@@ -23,7 +23,7 @@ test('Permisos por rol: persistencia y autorización real en PostgreSQL aislado'
   };
   async function createApp() {
     const module = await Test.createTestingModule({ imports: [AppModule] }).overrideProvider(AuthProvider).useValue(provider).overrideProvider(AuthConfig).useValue(config).compile();
-    const app = module.createNestApplication({ logger: false }); app.setGlobalPrefix('api/v1'); await app.listen(0, '127.0.0.1'); return app;
+    const app = module.createNestApplication({ logger: ['error'] }); app.setGlobalPrefix('api/v1'); await app.listen(0, '127.0.0.1'); return app;
   }
   const app = await createApp(), second = await createApp(), db = app.get(PrismaService);
   const base = await app.getUrl(), secondBase = await second.getUrl();
@@ -46,9 +46,10 @@ test('Permisos por rol: persistencia y autorización real en PostgreSQL aislado'
       assert.equal((await update('estudiante', [], 0, student)).status, 403);
       assert.equal((await request('role-permissions', { headers: { 'x-role': 'administrador' } })).status, 401);
     });
-    await t.test('Cinco roles y catorce permisos: valores actuales e institución aislada', async () => {
+    await t.test('Tres roles visibles y capacidades del flujo: institución aislada', async () => {
       const r = await request('role-permissions', { session: admin }); assert.equal(r.status, 200);
-      assert.equal(r.body.roles.length, 5); assert.equal(r.body.catalog.length, 14);
+      assert.deepEqual(r.body.roles.map(x=>x.role).sort(), ['administrador','docente','estudiante']);
+      assert.equal(r.body.catalog.length, 17);
       const teacherRole = r.body.roles.find(role => role.role === 'docente');
       assert.equal(teacherRole.version, 0); assert.deepEqual(teacherRole.permissions, rolePermissions.docente);
     });
@@ -70,7 +71,7 @@ test('Permisos por rol: persistencia y autorización real en PostgreSQL aislado'
       assert.equal(await db.roleAccess.count({ where: { institutionId } }), 0);
     });
     await t.test('Guardar persiste, audita y cambia la misma sesión en dos servidores', async () => {
-      const selected = ['academic:read:self', 'tickets:read:self'];
+      const selected = ['academic:read:self', 'academic:teach', 'tickets:read:self'].sort();
       const r = await update('docente', selected, 0); assert.equal(r.status, 200); assert.equal(r.body.version, 1);
       for (const target of [base, secondBase]) {
         const me = await request('auth/me', { session: teacher, target }); assert.equal(me.status, 200);

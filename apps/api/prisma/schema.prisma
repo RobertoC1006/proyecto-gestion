@@ -7,7 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Base de instalación; los tickets de Johan reutilizan identidad y calendario.
+// Base de instalaciÃ³n; los tickets de Johan reutilizan identidad y calendario.
 model Institution {
   id        String        @id @default(uuid()) @db.Uuid
   code      String        @unique @db.VarChar(40)
@@ -68,7 +68,7 @@ model AcademicMembership {
   institutionId String @db.Uuid
   courseId      String @db.Uuid
   sectionId     String @db.Uuid
-  // Referencia opaca al módulo de identidad; no es una tabla alternativa de usuarios.
+  // Referencia opaca al mÃ³dulo de identidad; no es una tabla alternativa de usuarios.
   subjectId     String @db.Uuid
   section       AcademicSection @relation(fields: [institutionId, courseId, sectionId], references: [institutionId, courseId, id], onDelete: Restrict)
   createdAt     DateTime @default(now()) @db.Timestamptz(3)
@@ -88,6 +88,7 @@ model AcademicEvent {
   source        String @default("manual") @db.VarChar(20)
   startsAt      DateTime @db.Timestamptz(3)
   endsAt        DateTime @db.Timestamptz(3)
+  createdById   String? @db.Uuid
   version       Int @default(1)
   createdAt     DateTime @default(now()) @db.Timestamptz(3)
   updatedAt     DateTime @updatedAt @db.Timestamptz(3)
@@ -161,7 +162,7 @@ model RolePermissionChange {
 }
 
 model AppUser {
-  // UUID canónico = subject de Supabase. Las credenciales permanecen en Auth.
+  // UUID canÃ³nico = subject de Supabase. Las credenciales permanecen en Auth.
   id            String @id @db.Uuid
   institutionId String @db.Uuid
   email         String @db.VarChar(254)
@@ -213,7 +214,7 @@ model AuthFlow {
   @@index([instanceId, expiresAt])
 }
 
-// Cambios de autorización atómicos para entrega futura a auditoría de Jasmine.
+// Cambios de autorizaciÃ³n atÃ³micos para entrega futura a auditorÃ­a de Jasmine.
 model IdentityChange {
   id            String @id @default(uuid()) @db.Uuid
   institutionId String @db.Uuid
@@ -227,7 +228,7 @@ model IdentityChange {
 }
 
 // Identificadores iniciales aislados en incidencias. Si Roberto publica un
-// catálogo canónico, sustituir esta fuente mediante una migración coordinada.
+// catÃ¡logo canÃ³nico, sustituir esta fuente mediante una migraciÃ³n coordinada.
 enum TicketService {
   aula_virtual
   wifi_red
@@ -249,10 +250,13 @@ enum TicketScope {
 
 enum TicketStatus {
   registrado
+  en_atencion
+  resuelto
 }
 
 enum TicketClassificationStatus {
   pendiente
+  manual
 }
 
 model Ticket {
@@ -264,7 +268,7 @@ model Ticket {
   service              TicketService
   scope                TicketScope
   // SQL futuro: general => ambos nulos; curso => courseId obligatorio.
-  // NestJS comprueba la asociación del titular; las FK no la acreditan.
+  // NestJS comprueba la asociaciÃ³n del titular; las FK no la acreditan.
   courseId             String?                    @db.Uuid
   sectionId            String?                    @db.Uuid
   status               TicketStatus               @default(registrado)
@@ -276,6 +280,24 @@ model Ticket {
   owner                AppUser                    @relation(fields: [institutionId, ownerId], references: [institutionId, id], onDelete: Restrict)
   course               AcademicCourse?            @relation(fields: [institutionId, courseId], references: [institutionId, id], onDelete: Restrict)
   section              AcademicSection?           @relation(fields: [institutionId, courseId, sectionId], references: [institutionId, courseId, id], onDelete: Restrict)
+  version              Int @default(1)
+  urgency              Int?
+  impact               Int?
+  academicFactor       Float?
+  academicContext      Json?
+  technicalScore       Int?
+  score                Float?
+  priority             String? @db.VarChar(2)
+  policyVersion        Int?
+  responseDueAt        DateTime? @db.Timestamptz(3)
+  resolutionDueAt      DateTime? @db.Timestamptz(3)
+  firstResponseAt      DateTime? @db.Timestamptz(3)
+  resolvedAt           DateTime? @db.Timestamptz(3)
+  assigneeId           String? @db.Uuid
+  solution             String? @db.Text
+  failureConfirmed     Boolean @default(false)
+  isDemo               Boolean @default(false)
+  changes              TicketChange[]
   attachment           TicketAttachment?
 
   @@unique([institutionId, ownerId, idempotencyKey])
@@ -283,11 +305,11 @@ model Ticket {
   @@index([institutionId, ownerId, status, createdAt(sort: Desc), id(sort: Desc)])
 }
 
-// Metadatos opcionales; carga y descarga aún pendientes de contrato con Roberto.
-// SQL futuro: tamaño positivo, MIME PNG/JPG/PDF, SHA-256 hexadecimal y
+// Metadatos opcionales; carga y descarga aÃºn pendientes de contrato con Roberto.
+// SQL futuro: tamaÃ±o positivo, MIME PNG/JPG/PDF, SHA-256 hexadecimal y
 // storageKey opaca sin componentes de ruta. RLS para esta tabla y Ticket.
 // Los bytes privados locales nunca se guardan en PostgreSQL ni se comparten
-// automáticamente entre computadoras.
+// automÃ¡ticamente entre computadoras.
 model TicketAttachment {
   id           String   @id @default(uuid()) @db.Uuid
   ticketId     String   @unique @db.Uuid
@@ -298,4 +320,24 @@ model TicketAttachment {
   sha256       String   @db.Char(64)
   createdAt    DateTime @default(now()) @db.Timestamptz(3)
   ticket       Ticket   @relation(fields: [ticketId], references: [id], onDelete: Restrict)
+}
+
+model TicketChange {
+  id String @id @default(uuid()) @db.Uuid
+  ticketId String @db.Uuid
+  institutionId String @db.Uuid
+  actorId String @db.Uuid
+  action String @db.VarChar(40)
+  note String @db.VarChar(2000)
+  before Json?
+  after Json?
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  ticket Ticket @relation(fields: [ticketId], references: [id], onDelete: Restrict)
+  @@index([institutionId, ticketId, createdAt])
+}
+model WorkflowPolicy {
+  institutionId String @id @db.Uuid
+  rules Json
+  version Int @default(1)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
 }

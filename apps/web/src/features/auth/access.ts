@@ -7,7 +7,7 @@ export const access = {
   personalTickets: ['tickets:read:self'],
   createTicket: ['tickets:create'],
   certificates: ['certificates:request:self'],
-  teamTickets: ['tickets:read:team'],
+  teamTickets: ['tickets:read:institution'],
   reports: ['reports:read:team', 'reports:read:institution'],
   users: ['users:manage'],
   permissions: ['permissions:manage'],

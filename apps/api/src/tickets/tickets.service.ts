@@ -12,10 +12,15 @@ const labels: Record<TicketService, string> = {
   videoconferencia: 'Videoconferencia', sistemas_institucionales: 'Sistemas institucionales',
   almacenamiento_nube: 'Almacenamiento/nube', software_licencias: 'Software/licencias', otro: 'Otro servicio',
 };
-const response = (t: Ticket) => ({
+export const ticketResponse = (t: Ticket, operational = false) => ({
   id: t.id, code: t.code, description: t.description, service: t.service, scope: t.scope,
   courseId: t.courseId, sectionId: t.sectionId, status: t.status,
-  classificationStatus: t.classificationStatus, priority: null,
+  classificationStatus: t.classificationStatus, priority: t.priority ?? null,
+  version: t.version, academicContext: t.academicContext, academicFactor: t.academicFactor,
+  ...(operational ? { urgency:t.urgency, impact:t.impact, technicalScore:t.technicalScore, score:t.score } : {}),
+  responseDueAt:t.responseDueAt?.toISOString()??null, resolutionDueAt:t.resolutionDueAt?.toISOString()??null,
+  firstResponseAt:t.firstResponseAt?.toISOString()??null, resolvedAt:t.resolvedAt?.toISOString()??null,
+  solution:t.solution, failureConfirmed:t.failureConfirmed, assigneeId:t.assigneeId, isDemo:t.isDemo,
   createdAt: t.createdAt.toISOString(), updatedAt: t.updatedAt.toISOString(),
 });
 const uniqueOn = (error: unknown, field: string) => error instanceof Prisma.PrismaClientKnownRequestError &&
@@ -60,7 +65,7 @@ export class TicketsService {
       try {
         // Una inserción es atómica. Tras P2002 se consulta fuera de la transacción fallida.
         const ticket = await this.db.ticket.create({ data: { ...identity, ...input, code, requestHash } });
-        return { created: true, ticket: response(ticket) };
+        return { created: true, ticket: ticketResponse(ticket) };
       } catch (error) {
         if (uniqueOn(error, 'idempotencyKey')) {
           for (let read = 0; read < 3; read++) {
@@ -78,7 +83,7 @@ export class TicketsService {
   }
   private replayed(ticket: Ticket, requestHash: string) {
     if (ticket.requestHash !== requestHash) throw new ConflictException({ code: 'IDEMPOTENCY_CONFLICT', message: 'La clave ya se usó para otro contenido.' });
-    return { created: false, ticket: response(ticket) };
+    return { created: false, ticket: ticketResponse(ticket) };
   }
 
   async list(principal: CampusPrincipal, raw: unknown) {
@@ -91,13 +96,13 @@ export class TicketsService {
       this.db.ticket.findMany({ where, orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
         skip: (page - 1) * pageSize, take: pageSize }), this.db.ticket.count({ where }),
     ]);
-    return { items: items.map(response), total, page, pageSize };
+    return { items: items.map(t => ticketResponse(t)), total, page, pageSize };
   }
   async get(principal: CampusPrincipal, id: unknown) {
     const ticketId = uuid(id, 'id');
     const ticket = await this.db.ticket.findFirst({ where: { id: ticketId,
-      institutionId: principal.institutionId, ownerId: principal.id } });
+      institutionId: principal.institutionId, ownerId: principal.id }, include:{course:{select:{name:true}},changes:{orderBy:[{createdAt:'asc'},{id:'asc'}]}} });
     if (!ticket) throw new NotFoundException({ code: 'NOT_FOUND', message: 'No se encontró el ticket.' });
-    return response(ticket);
+    return {...ticketResponse(ticket),courseName:ticket.course?.name,changes:ticket.changes.map(c=>({id:c.id,action:c.action,note:c.note,createdAt:c.createdAt.toISOString()}))};
   }
 }

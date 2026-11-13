@@ -23,8 +23,18 @@ export class TicketDto {
   @ApiProperty({ type: String, format: 'uuid', nullable: true }) courseId!: string | null;
   @ApiProperty({ type: String, format: 'uuid', nullable: true }) sectionId!: string | null;
   @ApiProperty({ enum: TicketStatus }) status!: TicketStatus;
-  @ApiProperty({ enum: ['pendiente'] }) classificationStatus!: 'pendiente';
-  @ApiProperty({ type: String, nullable: true, example: null }) priority!: null;
+  @ApiProperty({ enum: ['pendiente','manual'] }) classificationStatus!: 'pendiente' | 'manual';
+  @ApiProperty({ type: String, nullable: true }) priority!: string | null;
+  @ApiProperty() version!: number;
+  @ApiProperty({ type: Object, nullable: true }) academicContext!: unknown;
+  @ApiProperty({type:Number,nullable:true}) academicFactor!: number | null;
+  @ApiProperty({type:String,nullable:true}) responseDueAt!: string | null;
+  @ApiProperty({type:String,nullable:true}) resolutionDueAt!: string | null;
+  @ApiProperty({type:String,nullable:true}) firstResponseAt!: string | null;
+  @ApiProperty({type:String,nullable:true}) resolvedAt!: string | null;
+  @ApiProperty({type:String,nullable:true}) solution!: string | null;
+  @ApiProperty() failureConfirmed!: boolean;
+  @ApiProperty() isDemo!: boolean;
   @ApiProperty({ format: 'date-time' }) createdAt!: string;
   @ApiProperty({ format: 'date-time' }) updatedAt!: string;
 }
