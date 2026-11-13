@@ -1,5 +1,27 @@
 # Estado del equipo — actualización del 12 de noviembre de 2026
 
+## Flujo integrado en main y aviso para los agentes
+
+Roberto autorizó continuar con la integración y publicación del flujo del caso
+práctico. Merge `eccd465`, conservando `1e82d84` y la historia de Johan
+`1667778`. El código funcional no cambia respecto a la entrega validada; no se
+reaplican migraciones ni se reescriben los planes. Este punto actualiza las
+referencias anteriores que indicaban integración pendiente.
+
+Comprobación de publicación: API/web recompiladas desde main, cliente Prisma
+generado, tres servicios saludables y HTTP 200 en localhost:8080; salud de base
+y servicio auxiliar ok. El paquete web servido coincide con la compilación.
+
+Johan y Jasmine deben comprobar el nuevo origin/main e incorporarlo en sus ramas
+sin descartar trabajo, con el esquema Prisma compatible, y reconstruir su única
+instalación campusitsm. Aviso listo para compartir o pegar a sus agentes:
+[CONTINUIDAD_AGENTES_CASO_PRACTICO.md](CONTINUIDAD_AGENTES_CASO_PRACTICO.md).
+
+Se preservan las ramas del equipo. Se detectó `constancias-verificables@f15d204`
+con vistas iniciales explícitamente sin backend/PDF/verificación real; no se
+integra ni se declara módulo terminado. `privacidad-auditoria` también conserva
+su alcance separado. Los apartados siguientes mantienen la evidencia histórica.
+
 ## Flujo del caso práctico implementado en rama propia
 
 Encargo de Roberto: tres perfiles visibles (administrador/TI, profesor y
