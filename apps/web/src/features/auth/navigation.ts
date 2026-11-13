@@ -13,6 +13,7 @@ export type NavigationItem = {
 const dashboard: NavigationItem = { label: 'Dashboard', description: 'Tu espacio de trabajo en CampusITSM.', icon: House, to: '/', permissions: [] }
 const navigation: NavigationItem[] = [
   { label: 'Tickets', description: 'Consulta tus incidencias y su seguimiento.', icon: ClipboardText, to: '/incidencias', permissions: access.personalTickets },
+  { label: 'Constancias', description: 'Consulta tus constancias de atención.', icon: ShieldCheck, to: '/constancias', permissions: access.certificates },
   { label: 'Calendario académico', description: 'Organiza los eventos, cursos y secciones de la institución.', icon: CalendarDots, to: '/admin/calendario', permissions: [...access.personalCalendar, ...access.manageCalendar] },
   { label: 'Reportes', description: 'Consulta los reportes correspondientes a tu alcance.', icon: ChartBar, permissions: access.reports },
   { label: 'Operaciones de TI', description: 'Accede a la cola de atención de tu equipo.', icon: ShieldCheck, to: '/ti/cola', permissions: access.teamTickets },
