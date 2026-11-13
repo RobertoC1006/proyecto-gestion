@@ -16,6 +16,7 @@ const json = (route, data, status = 200) => route.fulfill({ status, contentType:
 async function fixture(page, onCreate = async route => json(route, ticket, 201)) {
   await page.route('**/api/v1/auth/me', route => json(route, { user, csrfToken: 'fixture-csrf' }));
   await page.route('**/api/v1/academic/me/events?*', route => json(route, { items: [], total: 0, page: 1, pageSize: 100 }));
+  await page.route('**/api/v1/academic/me/context?*', route => json(route, {factor:1,reason:'Actividad regular',event:null,evaluatedAt:ticket.createdAt}));
   await page.route('**/api/v1/academic/me/courses?*', route => json(route, { items: [], total: 0, page: 1, pageSize: 100 }));
   await page.route('**/api/v1/academic/me/sections?*', route => json(route, { items: [], total: 0, page: 1, pageSize: 100 }));
   await page.route('**/api/v1/tickets**', async route => {
@@ -59,7 +60,7 @@ test('Curso usa asociaciones propias y limpia la sección al cambiar de curso', 
   await page.goto('/incidencias/nueva');
   await page.getByRole('textbox', { name: /Descripción del problema/ }).fill(ticket.description);
   await page.getByRole('combobox', { name: /Servicio afectado/ }).selectOption('correo');
-  await page.getByRole('combobox', { name: /Alcance del reporte/ }).selectOption('curso');
+  await page.getByRole('button', { name: /Un curso o actividad/ }).click();
   const course = page.getByRole('combobox', { name: 'Curso' });
   await expect(course.locator('option')).toHaveCount(3);
   await course.selectOption(courseA.id);
@@ -87,7 +88,7 @@ test('P02–P05 muestran un ticket real, sin prioridad ni clasificación inventa
   await page.getByRole('button', { name: 'Enviar incidencia' }).click();
   await expect(page).toHaveURL(new RegExp(`/incidencias/registrada/${id}$`));
   await expect(page.getByText(`Ticket: ${ticket.code}`)).toBeVisible();
-  await expect(page.getByText('Clasificación', { exact: true })).toBeVisible();
+  await expect(page.getByText('Evaluación', { exact: true })).toBeVisible();
   await expect(page.getByText('Pendiente', { exact: true })).toBeVisible();
   await expect(page.getByText('Aún no calculada')).toBeVisible();
   await page.screenshot({ path: path.join(shots, 'p04-desktop.png'), fullPage: true });
@@ -99,7 +100,7 @@ test('P02–P05 muestran un ticket real, sin prioridad ni clasificación inventa
   await filtered;
   await page.screenshot({ path: path.join(shots, 'p05-desktop.png'), fullPage: true });
   await page.getByText(ticket.code).click();
-  await expect(page.getByRole('heading', { name: `Incidencia ${ticket.code}` })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Seguimiento de incidencia' })).toBeVisible();
   await page.goto('/');
   await expect(page.getByText(ticket.code)).toBeVisible();
   await page.setViewportSize({ width: 390, height: 844 });

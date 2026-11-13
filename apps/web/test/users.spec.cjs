@@ -64,10 +64,10 @@ test('lista y filtra sin cargar un perfil inexistente; edita tarjetas y switch c
   const dialog = editor(page);
   await expect(dialog.getByRole('heading', { name: 'Ana Torres' })).toBeVisible();
   await expect(dialog.getByRole('combobox')).toHaveCount(0);
-  await expect(dialog.getByRole('radio', { name: 'Docente', exact: true })).toBeChecked();
+  await expect(dialog.getByRole('radio', { name: 'Profesor', exact: true })).toBeChecked();
   await screenshot(page, 'usuarios-modal-escritorio.png');
   await dialog.getByRole('radio', { name: 'Administrador', exact: true }).check();
-  await expect(dialog.getByRole('radio', { name: 'Docente', exact: true })).not.toBeChecked();
+  await expect(dialog.getByRole('radio', { name: 'Profesor', exact: true })).not.toBeChecked();
   await dialog.getByRole('radio', { name: 'Mesa de Ayuda', exact: true }).check();
   await dialog.getByRole('switch', { name: 'Acceso activo' }).uncheck();
   await dialog.getByLabel('Motivo del cambio').fill('Asignación administrativa de prueba.');
@@ -86,9 +86,9 @@ test('conflicto de versión permite recargar el perfil antes de editar de nuevo'
   await dialog.getByLabel('Motivo del cambio').fill('Cambio concurrente de prueba.');
   await dialog.getByRole('button', { name: 'Guardar cambios' }).click();
   await expect(dialog.getByRole('alert')).toContainText('El acceso cambió');
-  state.rows[0].role = 'ti_supervisor'; state.rows[0].accessVersion++;
+  state.rows[0].role = 'estudiante'; state.rows[0].accessVersion++;
   await dialog.getByRole('button', { name: 'Recargar perfil' }).click();
-  await expect(dialog.getByRole('radio', { name: 'Supervisor TI', exact: true })).toBeChecked();
+  await expect(dialog.getByRole('radio', { name: 'Estudiante', exact: true })).toBeChecked();
   await expect(dialog.getByLabel('Motivo del cambio')).toHaveValue('');
   await expect(dialog.getByRole('button', { name: 'Guardar cambios' })).toBeDisabled();
 });
@@ -151,9 +151,9 @@ test('mantiene el modal y muestra la protección del último administrador', asy
 test('modal móvil sin desbordamiento y tarjetas accesibles con teclado', async ({ page }) => {
   await fixture(page); await page.setViewportSize({ width: 390, height: 844 }); await openEditor(page);
   const dialog = editor(page);
-  const teacher = dialog.getByRole('radio', { name: 'Docente', exact: true });
+  const teacher = dialog.getByRole('radio', { name: 'Profesor', exact: true });
   await teacher.focus(); await page.keyboard.press('ArrowRight');
-  await expect(dialog.getByRole('radio', { name: 'Agente TI', exact: true })).toBeChecked();
+  await expect(dialog.getByRole('radio', { name: 'Administrador', exact: true })).toBeChecked();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   expect(await dialog.evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);
   await screenshot(page, 'usuarios-modal-movil.png');

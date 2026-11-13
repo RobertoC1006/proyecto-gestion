@@ -7,6 +7,21 @@ pantallas_asignadas: [P09, P10, P11, P12, P15, P20, P21, P22, P23]
 
 # Plan de implementación de CampusITSM para Jasmine
 
+## Coordinación del 12 de noviembre — flujo del caso práctico
+
+Roberto encargó en `flujo-caso-practico` el recorrido académico y de atención,
+con tres perfiles visibles: administrador/TI, profesor y estudiante. Usuarios
+reutiliza el directorio canónico y ofrece estos tres perfiles; los valores
+históricos se conservan sin borrar cuentas. La rama de Jasmine permanece intacta.
+Dos migraciones del flujo aplicadas por autorización específica, diez checksums
+verificados. Ver [contrato](../docs/CONTRATO_FLUJO_CASO_PRACTICO.md),
+REGISTRO_CAMBIOS_BD y ESTADO_EQUIPO para consumir los nuevos estados de Tickets.
+
+Este bloque no inicia constancias, consentimiento/auditoría global ni reportes
+analíticos. El ticket resuelto guarda solution, resolvedAt y failureConfirmed
+para una integración futura de constancias, sin emitirlas todavía. No duplicar
+Tickets ni inferir elegibilidad solo por estar resuelto.
+
 ## P20/Usuarios publicado en main — 11 de noviembre de 2026
 
 Roberto autorizó integrar la entrega de Jasmine `7ab1ed7` y la corrección

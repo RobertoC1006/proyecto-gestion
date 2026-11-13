@@ -7,6 +7,21 @@ pantallas_asignadas: [P01, P13, P14, P16, P17, P18, P19, P24]
 
 # Plan de implementación de CampusITSM para Roberto
 
+## Encargo del 12 de noviembre — flujo del caso práctico
+
+Roberto autorizó la rama `flujo-caso-practico` y el recorrido completo de
+calendario propio → reporte → prioridad → atención/resolución → seguimiento.
+Tres perfiles visibles: administrador/TI, profesor y estudiante. Se preservan
+los valores históricos de roles y las ramas de compañeros. Profesor registra
+actividades de sus cursos, sin preguntas, respuestas ni notas de exámenes.
+
+Contexto/factor y configuración P19 conectados al módulo de Johan, cola P07,
+atención P08 y seguimiento P06. Dos migraciones aplicadas por autorización
+específica; diez checksums verificados. 58 pruebas aisladas aprobadas. No se
+integra main. Ver [contrato del flujo](../docs/CONTRATO_FLUJO_CASO_PRACTICO.md)
+y ESTADO_EQUIPO antes de continuar. IA, pronóstico, PDF/QR y adjuntos siguen
+pospuestos. Roberto aplaza la prueba de profesor con cuenta real.
+
 ## P20/Usuarios publicado en main — 11 de noviembre de 2026
 
 Roberto autorizó integrar la entrega de Jasmine `7ab1ed7` y la corrección

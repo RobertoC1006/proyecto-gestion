@@ -1,5 +1,40 @@
 # Estado del equipo — actualización del 12 de noviembre de 2026
 
+## Flujo del caso práctico implementado en rama propia
+
+Encargo de Roberto: tres perfiles visibles (administrador/TI, profesor y
+estudiante), programación académica propia, prioridad contextual, cola,
+atención/resolución y seguimiento. Rama `flujo-caso-practico`, código `48b78d8`,
+desde la revisión de Johan, sin integrar main ni alterar sus ramas.
+
+Servidor y web compilan. 58 pruebas aisladas aprobadas: identidad, permisos,
+usuarios, calendario, cuatro puntajes, aislamiento institucional/titular,
+profesor limitado a sus asignaciones, reintentos, versiones concurrentes y
+resolución con SLA desde el registro. Dos migraciones aplicadas por autorización
+específica, diez checksums coincidentes y protección de tablas comprobada.
+La instalación habitual está saludable. Registro y contrato del flujo detallan
+el alcance. No se afirma medir mejoras porcentuales ni rendimiento de IA.
+
+Escenario cargado mediante la interfaz y sesión real de Roberto: dos cursos,
+dos secciones, asociaciones del estudiante, examen y entrega, cuatro tickets
+identificados como demostración. Comprobados 12/P1, 9/P1, 6/P2 y 2/P4 en la
+base compartida y la cola. En pantalla: orden técnico T2→T1 y contextual T1→T2.
+T1 pasó de registrada a en_atencion y resuelto, con primera respuesta, solución
+explícitamente simulada e historial; sus plazos originales se conservaron.
+Calendario administrativo muestra ambos eventos y su detalle. No se presenta
+la resolución de demostración como reparación real de Moodle. Con sesión real
+estudiante se comprobaron dashboard, las dos actividades en calendario, enlace
+a nuevo reporte con curso/sección y contexto precargados, listado de cuatro
+incidencias y seguimiento de T1 resuelta con la misma solución e historial.
+Se reinició la API sin perder sesión, datos ni estado. La pestaña del seguimiento
+de T1 queda abierta para revisión. Son comprobaciones manuales con API real;
+no se declara ejecutada toda la suite de navegador. Las pruebas de interfaz
+afectadas se adaptaron a los tres perfiles y a los controles actuales.
+Detalle: [entrega del flujo](entregas/roberto-flujo-caso-practico.md).
+Roberto aplaza la prueba del profesor con una cuenta real; no se crean cuentas
+ni se cambian roles del equipo para simularla. Constancias, IA, pronósticos,
+adjuntos y consentimiento/auditoría global conservan su alcance pospuesto.
+
 ## Revisión en pantalla de incidencias — 12 de noviembre de 2026
 
 Johan publicó `gestion-incidencias@1667778`, que incorpora main `4855a10` y

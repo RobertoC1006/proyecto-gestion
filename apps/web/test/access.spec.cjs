@@ -3,10 +3,10 @@ const path = require('node:path');
 
 const permissions = {
   estudiante: ['academic:read:self', 'tickets:create', 'tickets:read:self', 'certificates:request:self'],
-  docente: ['academic:read:self', 'tickets:create', 'tickets:read:self', 'certificates:request:self'],
+  docente: ['academic:teach', 'academic:read:self', 'tickets:create', 'tickets:read:self', 'certificates:request:self'],
   ti_agente: ['academic:read:self', 'tickets:read:team', 'tickets:work:team'],
   ti_supervisor: ['academic:read:self', 'tickets:read:team', 'tickets:work:team', 'tickets:assign:team', 'reports:read:team'],
-  administrador: ['academic:read:self', 'academic:manage', 'users:manage', 'permissions:manage', 'reports:read:institution', 'audit:read:institution', 'configuration:manage'],
+  administrador: ['academic:read:self', 'academic:manage', 'users:manage', 'permissions:manage', 'reports:read:institution', 'audit:read:institution', 'configuration:manage', 'tickets:read:institution', 'tickets:work:institution'],
 };
 const sessionFor = role => ({ user: { id: '00000000-0000-4000-8000-000000000099', institutionId: '00000000-0000-4000-8000-000000000001', email: 'fixture@example.test', displayName: 'Cuenta de prueba', role, active: true, teamId: null, permissions: permissions[role] }, csrfToken: 'csrf-fixture' });
 const screenshots = path.resolve(__dirname, '../../../.local/verification/acceso-navegacion');
@@ -68,17 +68,17 @@ for (const role of Object.keys(permissions)) {
     await expect(nav.getByRole('link', { name: 'Dashboard', exact: true })).toHaveAttribute('aria-current', 'page');
     await expect(nav.getByRole('link', { name: 'Calendario académico', exact: true })).toBeVisible();
     await expect(home.getByRole('link', { name: /^Calendario académico/ })).toHaveAttribute('href', role === 'administrador' ? '/admin/calendario' : '/calendario');
-    await expect(nav.getByRole('link', { name: 'Tickets', exact: true })).toHaveCount(['estudiante', 'docente'].includes(role) ? 1 : 0);
-    await expect(nav.getByRole('link', { name: 'Operaciones de TI', exact: true })).toHaveCount(role.startsWith('ti_') ? 1 : 0);
-    for (const label of ['Usuarios', 'Permisos', 'Auditoría', 'Configuración']) {
+    await expect(nav.getByRole('link', { name: 'Mis incidencias', exact: true })).toHaveCount(['estudiante', 'docente'].includes(role) ? 1 : 0);
+    await expect(nav.getByRole('link', { name: 'Cola de TI', exact: true })).toHaveCount(role === 'administrador' ? 1 : 0);
+    for (const label of ['Usuarios', 'Permisos', 'Auditoría', 'Prioridades y SLA']) {
       await expect(nav.getByText(label, { exact: true })).toHaveCount(role === 'administrador' ? 1 : 0);
       await expect(home.getByText(label, { exact: true })).toHaveCount(role === 'administrador' ? 1 : 0);
     }
-    await expect(home.getByRole('link', { name: /^Tickets/ })).toHaveCount(['estudiante', 'docente'].includes(role) ? 1 : 0);
-    await expect(home.getByRole('link', { name: /^Operaciones de TI/ })).toHaveCount(role.startsWith('ti_') ? 1 : 0);
+    await expect(home.getByRole('link', { name: /^Mis incidencias/ })).toHaveCount(['estudiante', 'docente'].includes(role) ? 1 : 0);
+    await expect(home.getByRole('link', { name: /^Cola de TI/ })).toHaveCount(role === 'administrador' ? 1 : 0);
     await expect(nav.getByText('Reportes', { exact: true })).toHaveCount(['administrador', 'ti_supervisor'].includes(role) ? 1 : 0);
     await expect(nav.locator('.sidebar__secondary')).toHaveCount(role === 'administrador' ? 1 : 0);
-    expect(state.calls.every(call => call.startsWith('auth/'))).toBe(true);
+    expect(state.calls.every(call => call.startsWith('auth/') || (['estudiante','docente'].includes(role) && (call.startsWith('tickets') || call.startsWith('academic/me/'))))).toBe(true);
   });
 }
 

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { ArrowRight, ArrowsClockwise, Headset, MagnifyingGlass } from '@phosphor-icons/react'
 import { Link } from 'react-router-dom'
 import { Button, ButtonLink, Card, EmptyState, Notice, PageHeading, Select } from '../../components/ui'
@@ -9,7 +9,7 @@ import './workflow.css'
 
 export default function QueuePage(){
  const [order,setOrder]=useState('context'),[status,setStatus]=useState(''),[search,setSearch]=useState(''),[page,setPage]=useState(1)
- const result=useQuery({queryKey:['operations',order,status,search,page],queryFn:()=>workflowApi.queue(new URLSearchParams({order,page:String(page),pageSize:'20',...(status?{status}:{}),...(search.trim()?{search:search.trim()}:{})})),refetchInterval:15000})
+ const result=useQuery({queryKey:['operations',order,status,search,page],queryFn:()=>workflowApi.queue(new URLSearchParams({order,page:String(page),pageSize:'20',...(status?{status}:{}),...(search.trim()?{search:search.trim()}:{})})),placeholderData:keepPreviousData,refetchInterval:15000})
  const count=(state:string)=>result.data?.summary.find(x=>x.status===state)?._count??0
  return <div className="content-stack workflow-page"><PageHeading title="Cola de atención de TI" subtitle="Evalúa el impacto, considera el calendario y acompaña cada incidencia hasta su solución." action={<Button variant="secondary" onClick={()=>void result.refetch()}><ArrowsClockwise/>Actualizar</Button>}/>
   <div className="workflow-stats"><Card><span>Por revisar</span><strong>{count('registrado')}</strong><small>Reportes registrados</small></Card><Card><span>En atención</span><strong>{count('en_atencion')}</strong><small>Con primera respuesta humana</small></Card><Card><span>Resueltas</span><strong>{count('resuelto')}</strong><small>Con solución registrada</small></Card></div>

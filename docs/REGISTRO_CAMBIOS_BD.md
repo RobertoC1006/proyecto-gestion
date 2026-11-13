@@ -1,5 +1,47 @@
 # Coordinación de cambios en la base compartida
 
+## Flujo contextual autorizado — 12 de noviembre de 2026
+
+Roberto encargó el flujo completo con tres perfiles visibles y autorizó
+específicamente aplicar sus dos migraciones. Código `48b78d8`, rama
+`flujo-caso-practico`; ejecutor agente de Roberto. Destino CampusITSM /
+npjibnlxepiwfermtcmo / campusitsm. Antes: ocho migraciones, cero tickets y un
+evento. No se guardó un volcado completo de registros privados.
+
+Aplicadas mediante el comando manual migrador:
+
+- `20261113000100_case_workflow/migration.sql`, SHA256
+  `f106959114bdbf009b0cbd914bcc137ce6385630748d26358c6f40b403baf2bf`:
+  autoría opcional de evento; campos de evaluación, atención, versión y origen
+  sintético de Ticket; estados en_atencion/resuelto y clasificación manual;
+  TicketChange y WorkflowPolicy. No borra ni sobrescribe datos existentes.
+- `20261113000200_workflow_permissions/migration.sql`, SHA256
+  `48407f82abe8f2185a13ec69fb3326aee7771b90aa32723792694112c6147975`:
+  amplía los CHECK de RoleAccess para academic:teach y operación institucional.
+  Conserva alcances anteriores y no cambia las filas RoleAccess existentes.
+
+Verificación posterior: diez migraciones y diez checksums coincidentes,
+TicketChange/WorkflowPolicy del migrador con RLS, sin lectura anon/authenticated.
+API puede leer e insertar historial, sin UPDATE sobre TicketChange. API/web y
+Python saludables en la única instalación campusitsm, localhost:8080.
+58 comprobaciones aisladas aprobadas antes de aplicar. La prueba no escribe
+en Supabase ni deja otra aplicación encendida.
+
+Los compañeros deben recibir el esquema y los estados nuevos antes de atender
+estos tickets con su aplicación; los clientes antiguos de incidencias no se
+consideran compatibles con en_atencion/resuelto. Main y ramas ajenas permanecen
+intactos. Este registro es el aviso en repositorio; no se enviaron mensajes.
+Contrato: [CONTRATO_FLUJO_CASO_PRACTICO.md](CONTRATO_FLUJO_CASO_PRACTICO.md).
+
+Carga posterior autorizada por el encargo de datos de demostración: acción
+`POST /operations/demo` desde la sesión real administradora, con la cuenta
+estudiante canónica seleccionada en pantalla y sin profesor (prueba aplazada).
+Dos cursos DEMO, dos secciones y asociaciones, dos eventos y cuatro tickets
+isDemo. Antes de crear: cero tickets; después: cuatro con puntajes 12/9/6/2.
+El administrador atendió y resolvió T1 mediante la interfaz; solución y notas
+indican expresamente simulación. No se cambiaron roles, claves ni cuentas del
+equipo. Datos e historial quedan persistidos para revisión, sin limpiar tablas.
+
 ## Incidencias — aplicación autorizada para revisión en pantalla, 12 de noviembre de 2026
 
 Roberto autorizó expresamente aplicar la migración revisada y abrir el módulo
