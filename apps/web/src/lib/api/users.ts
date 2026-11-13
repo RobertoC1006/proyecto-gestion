@@ -11,7 +11,7 @@ export type SupportTeam = components['schemas']['SupportTeamItemDto']
 export type UsersPage = components['schemas']['UsersPageDto']
 export type UsersQuery = NonNullable<operations['UsersController_listUsers']['parameters']['query']>
 export type UpdateUserAccess = components['schemas']['UpdateUserAccessDto']
-export const roles = Object.keys(roleLabels) as CampusRole[]
+export const roles = ['estudiante', 'docente', 'administrador'] as CampusRole[]
 
 export async function listUsers(query: UsersQuery): Promise<UsersPage> {
   const params = new URLSearchParams({ page: String(query.page ?? 1), pageSize: String(query.pageSize ?? 20) })

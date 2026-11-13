@@ -697,6 +697,60 @@
       }
     },
     "/api/v1/academic/memberships": {
+      "get": {
+        "operationId": "AcademicController_memberships",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 100,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": "VALIDATION_ERROR; fields contiene el error de cada campo."
+          },
+          "401": {
+            "description": "Sesión no disponible o inválida."
+          },
+          "403": {
+            "description": "Requiere administrador y protección de escritura."
+          },
+          "404": {
+            "description": "Objeto no visible en la institución."
+          },
+          "409": {
+            "description": "Código duplicado o versión desactualizada."
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Calendario académico — administración"
+        ]
+      },
       "post": {
         "operationId": "AcademicController_associate",
         "parameters": [],
@@ -1135,6 +1189,31 @@
         ]
       }
     },
+    "/api/v1/academic/me/context": {
+      "get": {
+        "operationId": "PersonalAcademicController_context",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "400": {
+            "description": "Consulta inválida; code/message/fields."
+          },
+          "401": {
+            "description": "Sesión válida requerida."
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Calendario académico — titular"
+        ]
+      }
+    },
     "/api/v1/academic/me/courses": {
       "get": {
         "operationId": "PersonalAcademicController_courses",
@@ -1353,6 +1432,375 @@
         ],
         "tags": [
           "Calendario académico — titular"
+        ]
+      }
+    },
+    "/api/v1/tickets": {
+      "post": {
+        "operationId": "TicketsController_create",
+        "parameters": [
+          {
+            "name": "idempotency-key",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTicketDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Reintento idéntico.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketDto"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "VALIDATION_ERROR"
+          },
+          "401": {
+            "description": "SESSION_REQUIRED"
+          },
+          "403": {
+            "description": "FORBIDDEN o WRITE_PROTECTION_REQUIRED"
+          },
+          "409": {
+            "description": "IDEMPOTENCY_CONFLICT"
+          },
+          "503": {
+            "description": "DEPENDENCY_UNAVAILABLE"
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Incidencias — Semana 1"
+        ]
+      },
+      "get": {
+        "operationId": "TicketsController_list",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "registrado",
+                "en_atencion",
+                "resuelto"
+              ]
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "maxLength": 100,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketPageDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "VALIDATION_ERROR"
+          },
+          "401": {
+            "description": "SESSION_REQUIRED"
+          },
+          "403": {
+            "description": "FORBIDDEN o WRITE_PROTECTION_REQUIRED"
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Incidencias — Semana 1"
+        ]
+      }
+    },
+    "/api/v1/tickets/services": {
+      "get": {
+        "operationId": "TicketsController_services",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TicketServiceDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "VALIDATION_ERROR"
+          },
+          "401": {
+            "description": "SESSION_REQUIRED"
+          },
+          "403": {
+            "description": "FORBIDDEN o WRITE_PROTECTION_REQUIRED"
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Incidencias — Semana 1"
+        ]
+      }
+    },
+    "/api/v1/tickets/{id}": {
+      "get": {
+        "operationId": "TicketsController_get",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "VALIDATION_ERROR"
+          },
+          "401": {
+            "description": "SESSION_REQUIRED"
+          },
+          "403": {
+            "description": "FORBIDDEN o WRITE_PROTECTION_REQUIRED"
+          },
+          "404": {
+            "description": "Ticket ajeno o inexistente."
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Incidencias — Semana 1"
+        ]
+      }
+    },
+    "/api/v1/operations/demo": {
+      "post": {
+        "operationId": "OperationsController_demoCase",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Atención y prioridad contextual"
+        ]
+      }
+    },
+    "/api/v1/operations/policy": {
+      "get": {
+        "operationId": "OperationsController_policy",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Atención y prioridad contextual"
+        ]
+      },
+      "patch": {
+        "operationId": "OperationsController_savePolicy",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Atención y prioridad contextual"
+        ]
+      }
+    },
+    "/api/v1/operations/tickets": {
+      "get": {
+        "operationId": "OperationsController_queue",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Atención y prioridad contextual"
+        ]
+      }
+    },
+    "/api/v1/operations/tickets/{id}": {
+      "get": {
+        "operationId": "OperationsController_detail",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Atención y prioridad contextual"
+        ]
+      },
+      "patch": {
+        "operationId": "OperationsController_action",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Atención y prioridad contextual"
         ]
       }
     },
@@ -2235,6 +2683,10 @@
       "EventDto": {
         "type": "object",
         "properties": {
+          "createdById": {
+            "type": "string",
+            "nullable": true
+          },
           "id": {
             "type": "string",
             "format": "uuid"
@@ -2318,6 +2770,7 @@
           }
         },
         "required": [
+          "createdById",
           "id",
           "institutionId",
           "title",
@@ -2503,6 +2956,246 @@
         "required": [
           "reason",
           "expectedVersion"
+        ]
+      },
+      "CreateTicketDto": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "minLength": 20,
+            "maxLength": 5000
+          },
+          "service": {
+            "type": "string",
+            "enum": [
+              "aula_virtual",
+              "wifi_red",
+              "correo",
+              "equipos",
+              "impresoras",
+              "cuentas_accesos",
+              "videoconferencia",
+              "sistemas_institucionales",
+              "almacenamiento_nube",
+              "software_licencias",
+              "otro"
+            ]
+          },
+          "scope": {
+            "type": "string",
+            "enum": [
+              "general",
+              "curso"
+            ]
+          },
+          "courseId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "sectionId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        },
+        "required": [
+          "description",
+          "service",
+          "scope",
+          "courseId",
+          "sectionId"
+        ]
+      },
+      "TicketDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "code": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "service": {
+            "type": "string",
+            "enum": [
+              "aula_virtual",
+              "wifi_red",
+              "correo",
+              "equipos",
+              "impresoras",
+              "cuentas_accesos",
+              "videoconferencia",
+              "sistemas_institucionales",
+              "almacenamiento_nube",
+              "software_licencias",
+              "otro"
+            ]
+          },
+          "scope": {
+            "type": "string",
+            "enum": [
+              "general",
+              "curso"
+            ]
+          },
+          "courseId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "sectionId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "registrado",
+              "en_atencion",
+              "resuelto"
+            ]
+          },
+          "classificationStatus": {
+            "type": "string",
+            "enum": [
+              "pendiente",
+              "manual"
+            ]
+          },
+          "priority": {
+            "type": "string",
+            "nullable": true
+          },
+          "version": {
+            "type": "number"
+          },
+          "academicContext": {
+            "type": "object",
+            "nullable": true
+          },
+          "academicFactor": {
+            "type": "number",
+            "nullable": true
+          },
+          "responseDueAt": {
+            "type": "string",
+            "nullable": true
+          },
+          "resolutionDueAt": {
+            "type": "string",
+            "nullable": true
+          },
+          "firstResponseAt": {
+            "type": "string",
+            "nullable": true
+          },
+          "resolvedAt": {
+            "type": "string",
+            "nullable": true
+          },
+          "solution": {
+            "type": "string",
+            "nullable": true
+          },
+          "failureConfirmed": {
+            "type": "boolean"
+          },
+          "isDemo": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "description",
+          "service",
+          "scope",
+          "courseId",
+          "sectionId",
+          "status",
+          "classificationStatus",
+          "priority",
+          "version",
+          "academicContext",
+          "academicFactor",
+          "responseDueAt",
+          "resolutionDueAt",
+          "firstResponseAt",
+          "resolvedAt",
+          "solution",
+          "failureConfirmed",
+          "isDemo",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "TicketServiceDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "enum": [
+              "aula_virtual",
+              "wifi_red",
+              "correo",
+              "equipos",
+              "impresoras",
+              "cuentas_accesos",
+              "videoconferencia",
+              "sistemas_institucionales",
+              "almacenamiento_nube",
+              "software_licencias",
+              "otro"
+            ]
+          },
+          "label": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "label"
+        ]
+      },
+      "TicketPageDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TicketDto"
+            }
+          },
+          "total": {
+            "type": "number"
+          },
+          "page": {
+            "type": "number"
+          },
+          "pageSize": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "page",
+          "pageSize"
         ]
       },
       "SupportTeamItemDto": {

@@ -1,5 +1,24 @@
 # Memoria de CampusITSM
 
+## Encargo vigente — flujo del caso práctico y tres perfiles visibles
+
+12 de noviembre de 2026. Roberto autorizó implementar el recorrido profesor →
+actividad → reporte → contexto/prioridad → atención/resolución → seguimiento,
+en rama nueva `flujo-caso-practico`, conservando la entrega de Johan. Código
+inicial `48b78d8`. Tres perfiles visibles: administrador (también TI en el
+prototipo), profesor (`docente`) y estudiante. Se conservan los enums históricos
+de TI por compatibilidad; esta decisión sustituye la selección de cinco roles.
+Profesor solo programa en sus cursos/secciones asignados. No es un aula virtual.
+
+Dos migraciones aplicadas a la base compartida por autorización específica;
+diez migraciones con checksums coincidentes. Ver REGISTRO_CAMBIOS_BD y
+CONTRATO_FLUJO_CASO_PRACTICO. 58 pruebas aisladas aprobadas y API/web compiladas.
+Instalación campusitsm activa en localhost:8080, volúmenes conservados. No se
+integra main. Profesor con sesión real se aplaza por decisión de Roberto; la
+autorización se prueba con cuentas descartables. No duplicar Auth ni perfiles.
+IA, pronóstico, PDF/QR, adjuntos y consentimiento/auditoría global siguen fuera
+de este bloque. Revisar ESTADO_EQUIPO para los recorridos visuales completados.
+
 ## Reanudación más reciente — integración autorizada de P20
 
 Roberto solicitó corregir la entrega de Jasmine y sustituir su panel lateral por

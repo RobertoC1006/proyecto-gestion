@@ -1,4 +1,60 @@
-# Estado del equipo — 11 de noviembre de 2026
+# Estado del equipo — actualización del 12 de noviembre de 2026
+
+## Flujo del caso práctico implementado en rama propia
+
+Encargo de Roberto: tres perfiles visibles (administrador/TI, profesor y
+estudiante), programación académica propia, prioridad contextual, cola,
+atención/resolución y seguimiento. Rama `flujo-caso-practico`, código `48b78d8`,
+desde la revisión de Johan, sin integrar main ni alterar sus ramas.
+
+Servidor y web compilan. 58 pruebas aisladas aprobadas: identidad, permisos,
+usuarios, calendario, cuatro puntajes, aislamiento institucional/titular,
+profesor limitado a sus asignaciones, reintentos, versiones concurrentes y
+resolución con SLA desde el registro. Dos migraciones aplicadas por autorización
+específica, diez checksums coincidentes y protección de tablas comprobada.
+La instalación habitual está saludable. Registro y contrato del flujo detallan
+el alcance. No se afirma medir mejoras porcentuales ni rendimiento de IA.
+
+Escenario cargado mediante la interfaz y sesión real de Roberto: dos cursos,
+dos secciones, asociaciones del estudiante, examen y entrega, cuatro tickets
+identificados como demostración. Comprobados 12/P1, 9/P1, 6/P2 y 2/P4 en la
+base compartida y la cola. En pantalla: orden técnico T2→T1 y contextual T1→T2.
+T1 pasó de registrada a en_atencion y resuelto, con primera respuesta, solución
+explícitamente simulada e historial; sus plazos originales se conservaron.
+Calendario administrativo muestra ambos eventos y su detalle. No se presenta
+la resolución de demostración como reparación real de Moodle. Con sesión real
+estudiante se comprobaron dashboard, las dos actividades en calendario, enlace
+a nuevo reporte con curso/sección y contexto precargados, listado de cuatro
+incidencias y seguimiento de T1 resuelta con la misma solución e historial.
+Se reinició la API sin perder sesión, datos ni estado. La pestaña del seguimiento
+de T1 queda abierta para revisión. Son comprobaciones manuales con API real;
+no se declara ejecutada toda la suite de navegador. Las pruebas de interfaz
+afectadas se adaptaron a los tres perfiles y a los controles actuales.
+Detalle: [entrega del flujo](entregas/roberto-flujo-caso-practico.md).
+Roberto aplaza la prueba del profesor con una cuenta real; no se crean cuentas
+ni se cambian roles del equipo para simularla. Constancias, IA, pronósticos,
+adjuntos y consentimiento/auditoría global conservan su alcance pospuesto.
+
+## Revisión en pantalla de incidencias — 12 de noviembre de 2026
+
+Johan publicó `gestion-incidencias@1667778`, que incorpora main `4855a10` y
+conecta P03 con cursos/secciones propios. Roberto pidió ver esta versión y
+autorizó expresamente aplicar su migración ya revisada. Se aplicó y verificó
+`20261108000100_tickets_core` en la base compartida: ocho migraciones y checksums
+coincidentes, RLS y privilegios de las dos tablas comprobados. Ver
+[REGISTRO_CAMBIOS_BD.md](REGISTRO_CAMBIOS_BD.md).
+
+La rama local de revisión `revision-incidencias-pantalla` conserva el código
+de Johan. API/web compilan, cinco pruebas de servicio sin red pasan, y la única
+instalación campusitsm está saludable en localhost:8080 con sus volúmenes.
+Roberto inició sesión personalmente con la cuenta estudiante y se abrió P03
+con servicios reales y selector General/Curso. Se mostró el alcance Curso;
+no se enviaron reportes. Creación, persistencia y aislamiento HTTP entre dos
+cuentas siguen pendientes de comprobar. No se crearon tickets ni se cambiaron
+roles o permisos para esta revisión. Main no se fusionó;
+consentimiento/auditoría global y adjuntos siguen pospuestos por la priorización
+de Roberto conservada en `alcance-primer-avance@bb8df0a`. Esta sección actualiza
+los estados anteriores que indicaban `90a2790` o migración pendiente.
 
 ## P20 integrado por autorización de Roberto
 
@@ -225,3 +281,44 @@ Una instalación de trabajo campusitsm en 8080; conservar volúmenes. Las prueba
 se aíslan y cierran sus contenedores. Los archivos/modelos siguen siendo locales.
 Los ZIP son documentación regenerable, sin secretos, y no sustituyen el código
 ni acreditan integración. Revisar Git, contratos y el plan propio antes de avanzar.
+
+## Avance de Johan — Semana 1 de incidencias — 12 de noviembre de 2026
+
+En `gestion-incidencias` se conectó P03 al contrato ya integrado de cursos
+propios (`GET /academic/me/courses` y `GET /academic/me/sections?courseId=...`).
+El cliente conserva `allPages` y los tipos de `lib/api/academic`; General no
+consulta cursos y envía `scope: general` con curso/sección nulos. Curso exige un
+curso asociado a la sesión, permite sección opcional y limpia la selección al
+cambiar de curso. Estados vacíos y errores de consulta se muestran por separado,
+con reintento y preservación del formulario. El servidor sigue derivando titular
+e institución de la sesión y valida la asociación al crear el reporte.
+
+P02–P05 mantienen el recorrido existente de tickets: creación con código y
+estado inicial `registrado`/clasificación `pendiente`, listado y detalle del
+titular, paginación/búsqueda y misma respuesta 404 para tickets ajenos o
+inexistentes. Se mantiene la clave de idempotencia al reintentar la misma
+solicitud. Se añadieron casos Playwright para los alcances General y Curso y para
+limpiar la sección al cambiar de curso.
+
+Verificación de código disponible en esta sesión: compilación de API, generación
+de OpenAPI y tipos web, `tsc --noEmit` del frontend y cinco pruebas unitarias de
+tickets aprobaron. `git diff --check` pasó. Los recorridos Playwright, los
+alcances con base local, el 404 HTTP entre dos cuentas y persistencia tras
+reinicio quedan pendientes de ejecución en Compose local. La última salida
+compartida por Johan mostraba API reiniciándose, mientras PostgreSQL y Python
+estaban saludables; el contenedor `migrate` reflejaba una ejecución de cinco
+días antes. La migración de permisos `20261111000100_role_permissions` es
+posterior, por lo que debe aplicarse y verificarse primero en PostgreSQL local.
+No usar esta indicación para apuntar a Supabase.
+
+La revisión técnica previa de Roberto para la migración inicial de tickets está
+registrada en [REVISION_MIGRACION_TICKETS.md](REVISION_MIGRACION_TICKETS.md),
+incluidas 35 comprobaciones PostgreSQL descartables. En esta sesión no se pudo
+repetirlas porque el entorno de ejecución no tenía Docker disponible. No se
+modificó ni aplicó la migración de tickets a la base compartida.
+
+El contrato de evidencias ya está publicado, pero el bucket privado compartido
+y su configuración de servidor siguen sin habilitarse: carga/descarga no forman
+parte de este avance. `ticket.created` continúa como futura integración de
+Jasmine y no bloquea la creación ni introduce auditoría paralela. Detalle:
+[entrega de Johan, Corte 4](entregas/johan-semana-01-corte-04.md).
