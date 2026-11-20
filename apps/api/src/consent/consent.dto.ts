@@ -20,3 +20,15 @@ export class ConsentMeDto {
   @ApiProperty({ type: ConsentVersionDto, nullable: true }) current!: ConsentVersionDto | null;
   @ApiProperty({ type: ConsentAcceptanceDto, nullable: true }) acceptance!: ConsentAcceptanceDto | null;
 }
+
+export class ConsentAcceptDto {
+  @ApiProperty({ format: 'uuid', description: 'Identificador de la versión que el usuario vio.' })
+  expectedVersionId!: string;
+}
+
+export class ConsentAcceptancePageDto {
+  @ApiProperty({ type: [ConsentAcceptanceDto] }) items!: ConsentAcceptanceDto[];
+  @ApiProperty() total!: number;
+  @ApiProperty() page!: number;
+  @ApiProperty() pageSize!: number;
+}

@@ -218,6 +218,27 @@ La consulta de GitHub no encontró un Pull Request abierto o cerrado hacia
 Por esa razón no se incluye un enlace de PR y no se creó uno durante esta
 sesión. Tampoco se hizo push, merge ni rebase.
 
+## Continuación integrada con `main`
+
+Se integró la base actual de `main`, conservando Tickets, identidad,
+Usuarios/permisos y el consentimiento/auditoría previo. La implementación
+cierra las siguientes mejoras:
+
+- La aceptación exige la versión vigente que el usuario vio; si cambia, rechaza
+  con `CONSENT_VERSION_CHANGED` y solicita volver a leerla.
+- La pantalla exige una casilla explícita antes de aceptar.
+- El aceptante sigue vinculado a sesión, institución y idempotencia.
+- La auditoría incorpora `TicketChange` además de cambios académicos,
+  identidad, permisos y consentimientos.
+- El saneamiento conserva arrays primitivos seguros y elimina claves sensibles
+  anidadas.
+- La consulta limita y pagina fuentes; exporta CSV con los mismos filtros
+  autorizados, sin antes/después ni datos privados.
+- La consulta administrativa de aceptaciones requiere `audit:read:institution`
+  y devuelve versión, usuario visible y fecha, sin correo.
+
+No se aplicó la migración a Supabase ni se modificaron datos compartidos.
+
 ## Pendientes de revisión y aprobación de Roberto
 
 1. Revisar y aprobar los contratos y la implementación de consentimiento y

@@ -39,7 +39,10 @@ test('Privacidad: consentimiento idempotente y auditoría aislada', async t => {
   for (const user of [admin, student, foreign]) identities.set(user.email, user);
   async function request(path, { method = 'GET', body, session, headers = {} } = {}) {
     const response = await fetch(`${base}/api/v1/${path}`, { method, headers: { origin: 'http://localhost:8080', 'content-type': 'application/json', ...(session ? { cookie: session.cookie, 'x-csrf-token': session.csrf } : {}), ...headers }, body: body === undefined ? undefined : JSON.stringify(body) });
-    return { status: response.status, body: await response.json(), cookie: response.headers.get('set-cookie') };
+    const text = await response.text();
+    let parsed;
+    try { parsed = JSON.parse(text); } catch { parsed = text; }
+    return { status: response.status, body: parsed, cookie: response.headers.get('set-cookie') };
   }
   async function login(user) {
     const result = await request('auth/login', { method: 'POST', body: { email: user.email, password: 'Password-test-123' } });
@@ -54,11 +57,21 @@ test('Privacidad: consentimiento idempotente y auditoría aislada', async t => {
     adminSession = await login(admin); studentSession = await login(student);
     await t.test('La aceptación requiere acción y es idempotente', async () => {
       assert.equal((await request('consent/me', { session: studentSession })).body.acceptance, null);
-      const accepted = await request('consent/accept', { method: 'POST', body: {}, session: studentSession });
+      const mismatch = await request('consent/accept', { method: 'POST', body: { expectedVersionId: randomUUID() }, session: studentSession });
+      assert.equal(mismatch.status, 409);
+      const accepted = await request('consent/accept', { method: 'POST', body: { expectedVersionId: version.id }, session: studentSession });
       assert.equal([200, 201].includes(accepted.status), true); assert.equal(accepted.body.version, version.version);
-      const duplicate = await request('consent/accept', { method: 'POST', body: {}, session: studentSession });
+      const duplicate = await request('consent/accept', { method: 'POST', body: { expectedVersionId: version.id }, session: studentSession });
       assert.equal([200, 201].includes(duplicate.status), true); assert.equal(duplicate.body.id, accepted.body.id);
       assert.equal(await db.consentAcceptance.count({ where: { userId: student.id } }), 1);
+    });
+    await t.test('La consulta administrativa lista aceptaciones sin correo', async () => {
+      assert.equal((await request('consent/acceptances', { session: studentSession })).status, 403);
+      const result = await request('consent/acceptances?page=1&pageSize=20', { session: adminSession });
+      assert.equal(result.status, 200);
+      assert.equal(result.body.total, 1);
+      assert.equal(result.body.items[0].displayName, student.displayName);
+      assert.equal(result.body.items[0].email, undefined);
     });
     await t.test('Auditoría exige permiso y filtra por institución, acción y página', async () => {
       assert.equal((await request('audit', { session: studentSession })).status, 403);
@@ -83,12 +96,50 @@ test('Privacidad: consentimiento idempotente y auditoría aislada', async t => {
       assert.equal(item.before.password, undefined);
       assert.equal(item.before.nested.token, undefined);
       assert.equal(item.before.nested.safe, 'visible');
-      assert.equal(item.before.values, undefined);
+      assert.deepEqual(item.before.values, ['privado']);
       assert.equal(item.after.email, undefined);
       assert.equal(item.after.authorization, undefined);
       assert.equal(item.after.nested.safe, 'también visible');
     });
+    await t.test('Auditoría integra cambios de tickets y exporta CSV autorizado', async () => {
+      const ticket = await db.ticket.create({
+        data: {
+          institutionId,
+          ownerId: student.id,
+          code: `INC-PRIVACY-${randomUUID().slice(0, 8)}`,
+          description: 'Prueba privada de auditoría.',
+          service: 'equipos',
+          scope: 'general',
+          idempotencyKey: randomUUID(),
+          requestHash: '1'.repeat(64),
+          status: 'resuelto',
+          failureConfirmed: true,
+          resolvedAt: new Date(),
+        },
+      });
+      await db.ticketChange.create({
+        data: {
+          ticketId: ticket.id,
+          institutionId,
+          actorId: admin.id,
+          action: 'resolve',
+          note: 'Falla confirmada',
+          before: { status: 'en_atencion' },
+          after: { status: 'resuelto', solution: 'Se reparó el equipo.' },
+        },
+      });
+      const result = await request('audit?action=ticket.resolve&objectType=Ticket', { session: adminSession });
+      assert.equal(result.status, 200);
+      assert.equal(result.body.items.length, 1);
+      assert.equal(result.body.items[0].objectId, ticket.id);
+      assert.equal(result.body.items[0].after.status, 'resuelto');
+      const exported = await request('audit/export?action=ticket.resolve&objectType=Ticket', { session: adminSession });
+      assert.equal(exported.status, 200, JSON.stringify(exported.body));
+      assert.equal((await request('audit/export?action=ticket.resolve&objectType=Ticket', { session: studentSession })).status, 403);
+    });
   } finally {
+    await db.ticketChange.deleteMany({ where: { institutionId } });
+    await db.ticket.deleteMany({ where: { institutionId } });
     await db.rolePermissionChange.deleteMany({ where: { institutionId: { in: [institutionId, foreignInstitution] } } });
     await db.consentAcceptance.deleteMany({ where: { institutionId: { in: [institutionId, foreignInstitution] } } });
     await db.consentVersion.deleteMany({ where: { version: '1.0' } });

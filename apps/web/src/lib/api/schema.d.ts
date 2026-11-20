@@ -580,6 +580,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/consent/acceptances": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ConsentController_acceptances"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/audit": {
         parameters: {
             query?: never;
@@ -588,6 +604,22 @@ export interface paths {
             cookie?: never;
         };
         get: operations["AuditController_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/audit/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["AuditController_export"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1018,6 +1050,19 @@ export interface components {
         ConsentMeDto: {
             current: components["schemas"]["ConsentVersionDto"] | null;
             acceptance: components["schemas"]["ConsentAcceptanceDto"] | null;
+        };
+        ConsentAcceptDto: {
+            /**
+             * Format: uuid
+             * @description Identificador de la versión que el usuario vio.
+             */
+            expectedVersionId: string;
+        };
+        ConsentAcceptancePageDto: {
+            items: components["schemas"]["ConsentAcceptanceDto"][];
+            total: number;
+            page: number;
+            pageSize: number;
         };
         AuditItemDto: {
             /** Format: uuid */
@@ -3028,7 +3073,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConsentAcceptDto"];
+            };
+        };
         responses: {
             200: {
                 headers: {
@@ -3036,6 +3085,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ConsentAcceptanceDto"];
+                };
+            };
+            /** @description Sesión no disponible o inválida. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description La cuenta no puede aceptar consentimiento. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ConsentController_acceptances: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConsentAcceptancePageDto"];
                 };
             };
             /** @description Sesión no disponible o inválida. */
@@ -3070,6 +3152,37 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["AuditPageDto"];
                 };
+            };
+            /** @description Sesión no disponible o inválida. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Requiere audit:read:institution. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AuditController_export: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Sesión no disponible o inválida. */
             401: {

@@ -27,6 +27,7 @@
   },
   "devDependencies": {
     "@nestjs/testing": "11.2.8",
+    "@types/express": "^5.0.6",
     "@types/node": "22.15.30",
     "prisma": "6.19.3",
     "ts-node": "10.9.2",

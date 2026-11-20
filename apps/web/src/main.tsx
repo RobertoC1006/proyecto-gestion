@@ -53,7 +53,7 @@ function App() {
         <Route path="/profesor/calendario/nuevo" element={<PermissionBoundary permissions={["academic:teach"]}><EventForm /></PermissionBoundary>} />
         <Route path="/profesor/calendario/:id/editar" element={<PermissionBoundary permissions={["academic:teach"]}><EventForm /></PermissionBoundary>} />
         <Route path="/admin/configuracion" element={<PermissionBoundary permissions={access.configuration}><PolicyPage /></PermissionBoundary>} />
-        <Route path="/admin/privacidad" element={<PermissionBoundary permissions={access.privacy}><PrivacyPage /></PermissionBoundary>} />
+        <Route path="/admin/privacidad" element={<PrivacyPage />} />
         <Route path="/calendario" element={<PermissionBoundary permissions={access.personalCalendar}><PersonalCalendar /></PermissionBoundary>} />
         <Route path="/admin/cursos" element={<PermissionBoundary permissions={access.manageCalendar}><CoursesPage /></PermissionBoundary>} />
         <Route path="/admin/calendario" element={<PermissionBoundary permissions={access.manageCalendar}><CalendarPage /></PermissionBoundary>} />

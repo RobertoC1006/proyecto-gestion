@@ -18,10 +18,12 @@ function ConsentPanel() {
   const client = useQueryClient()
   const consent = useQuery({ queryKey: ['consent', 'me'], queryFn: () => request<ConsentMe>('consent/me') })
   const [accepting, setAccepting] = useState(false)
+  const [consentChecked, setConsentChecked] = useState(false)
   const [message, setMessage] = useState('')
   async function accept() {
     setAccepting(true); setMessage('')
-    try { await request<Acceptance>('consent/accept', { method: 'POST', body: '{}' }); setMessage('Consentimiento registrado.'); await client.invalidateQueries({ queryKey: ['consent', 'me'] }) }
+    if (!current?.id) return
+    try { await request<Acceptance>('consent/accept', { method: 'POST', body: JSON.stringify({ expectedVersionId: current.id }) }); setMessage('Consentimiento registrado.'); setConsentChecked(false); await client.invalidateQueries({ queryKey: ['consent', 'me'] }) }
     catch (error) { setMessage(errorText(error)) }
     finally { setAccepting(false) }
   }
@@ -37,7 +39,7 @@ function ConsentPanel() {
         <div className="consent-version__icon"><ShieldCheck size={30} /></div>
         <div><h3>{current.title}</h3><p>{current.summary}</p><small>Versión {current.version} · Vigente desde {formatDate(current.effectiveAt)}</small></div>
       </div>}
-      {current && (accepted ? <Notice icon={CheckCircle}><strong>Consentimiento aceptado</strong><p>Versión {accepted.version} · {formatDate(accepted.acceptedAt)}</p></Notice> : <div className="consent-action"><p>Lee la política vigente y confirma de forma explícita para continuar.</p><Button disabled={accepting} onClick={() => void accept()}>{accepting ? 'Registrando…' : 'Aceptar consentimiento'}</Button></div>)}
+      {current && (accepted ? <Notice icon={CheckCircle}><strong>Consentimiento aceptado</strong><p>Versión {accepted.version} · {formatDate(accepted.acceptedAt)}</p></Notice> : <div className="consent-action"><label className="consent-checkbox"><input type="checkbox" checked={consentChecked} onChange={event => setConsentChecked(event.target.checked)} />He leído y acepto explícitamente esta versión.</label><Button disabled={accepting || !consentChecked} onClick={() => void accept()}>{accepting ? 'Registrando…' : 'Aceptar consentimiento'}</Button></div>)}
     </Card>
     <Card>
       <CardHeading title="Protección de datos" icon={LockKey} />
@@ -57,17 +59,31 @@ function AuditPanel() {
     return request<AuditPage>(`audit?${params.toString()}`)
   } })
   function submit(event: React.FormEvent) { event.preventDefault(); setPage(1); setApplied(filters); setSelected(null) }
+  async function exportAudit() {
+    const params = new URLSearchParams()
+    Object.entries(applied).forEach(([key, value]) => { if (value) params.set(key, key === 'from' || key === 'to' ? new Date(value).toISOString() : value) })
+    const response = await fetch(`/api/v1/audit/export${params.size ? `?${params.toString()}` : ''}`, { credentials: 'same-origin', cache: 'no-store' })
+    if (!response.ok) throw new Error('No se pudo exportar la auditoría.')
+    const blob = await response.blob()
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = 'campusitsm-auditoria.csv'
+    link.click()
+    URL.revokeObjectURL(url)
+  }
   return <div className="audit-layout">
     <Card className="audit-filter-card"><CardHeading title="Filtros de auditoría" icon={Funnel} /><form className="audit-filters" onSubmit={submit}>
       <Field label="Desde"><input className="input" type="datetime-local" value={filters.from} onChange={event => setFilters({ ...filters, from: event.target.value ? new Date(event.target.value).toISOString() : '' })} /></Field>
       <Field label="Hasta"><input className="input" type="datetime-local" value={filters.to ? filters.to.slice(0, 16) : ''} onChange={event => setFilters({ ...filters, to: event.target.value ? new Date(event.target.value).toISOString() : '' })} /></Field>
-      <Field label="Acción"><Select value={filters.action} onChange={event => setFilters({ ...filters, action: event.target.value })}><option value="">Todas</option><option value="consent.accept">Aceptar consentimiento</option><option value="access.change">Cambio de acceso</option><option value="permissions.change">Cambio de permisos</option><option value="create">Crear</option><option value="update">Actualizar</option></Select></Field>
+      <Field label="Acción"><Select value={filters.action} onChange={event => setFilters({ ...filters, action: event.target.value })}><option value="">Todas</option><option value="consent.accept">Aceptar consentimiento</option><option value="access.change">Cambio de acceso</option><option value="permissions.change">Cambio de permisos</option><option value="ticket.resolve">Resolver ticket</option><option value="ticket.start">Atender ticket</option><option value="create">Crear</option><option value="update">Actualizar</option></Select></Field>
       <Field label="Objeto"><Select value={filters.objectType} onChange={event => setFilters({ ...filters, objectType: event.target.value })}><option value="">Todos</option><option value="ConsentVersion">Consentimiento</option><option value="AppUser">Usuario</option><option value="RoleAccess">Permisos</option><option value="AcademicEvent">Evento académico</option></Select></Field>
       <Button type="submit" icon={Funnel}>Filtrar</Button>
     </form></Card>
     {query.isPending ? <Card><p role="status">Cargando auditoría…</p></Card> : query.error ? <Notice tone="amber" role="alert">{query.error instanceof ApiError && query.error.status === 403 ? 'No tienes permiso para consultar la auditoría.' : errorText(query.error)}<Button variant="ghost" onClick={() => void query.refetch()}>Reintentar</Button></Notice> : <Card className="audit-results">
       <CardHeading title="Resultados de la auditoría" action={<span className="privacy-count">{query.data?.total ?? 0} registros</span>} />
       {!query.data?.items.length ? <EmptyState title="No hay registros" description="Prueba con otros filtros o limpia la consulta." /> : <div className="audit-table-wrap"><table className="audit-table"><thead><tr><th>Fecha y hora</th><th>Actor</th><th>Acción</th><th>Objeto</th></tr></thead><tbody>{query.data.items.map(item => <tr key={item.id} tabIndex={0} role="button" aria-label={`Ver auditoría ${item.action} de ${item.actor}`} aria-selected={selected?.id === item.id} className={selected?.id === item.id ? 'is-selected' : ''} onClick={() => setSelected(item)} onKeyDown={event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); setSelected(item) } }}><td>{formatDate(item.occurredAt)}</td><td><UserCircle size={18} />{item.actor}</td><td>{item.action}</td><td>{item.objectType}</td></tr>)}</tbody></table></div>}
+      <div className="button-row"><Button variant="secondary" onClick={() => void exportAudit()}>Exportar CSV autorizado</Button></div>
       <div className="audit-pagination"><span>Página {page} de {Math.max(1, Math.ceil((query.data?.total ?? 0) / 10))}</span><div><Button variant="secondary" disabled={page <= 1} onClick={() => setPage(value => value - 1)}>Anterior</Button><Button variant="secondary" disabled={!query.data || page >= Math.ceil(query.data.total / 10)} onClick={() => setPage(value => value + 1)}>Siguiente</Button></div></div>
     </Card>}
     {selected && <Card className="audit-detail"><CardHeading title="Detalle del registro" /><dl><dt>Actor</dt><dd>{selected.actor}</dd><dt>Fecha y hora</dt><dd>{formatDate(selected.occurredAt)}</dd><dt>Acción</dt><dd>{selected.action}</dd><dt>Objeto</dt><dd>{selected.objectType}{selected.objectId ? ` · ${selected.objectId}` : ''}</dd></dl><div className="audit-change"><strong>Cambios</strong><div><pre>{JSON.stringify(selected.before, null, 2) || '—'}</pre><span>→</span><pre>{JSON.stringify(selected.after, null, 2) || '—'}</pre></div></div>{selected.reason && <p><strong>Justificación</strong><br />{selected.reason}</p>}</Card>}

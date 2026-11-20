@@ -2121,6 +2121,16 @@
       "post": {
         "operationId": "ConsentController_accept",
         "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConsentAcceptDto"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "",
@@ -2128,6 +2138,38 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ConsentAcceptanceDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sesión no disponible o inválida."
+          },
+          "403": {
+            "description": "La cuenta no puede aceptar consentimiento."
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Consentimiento"
+        ]
+      }
+    },
+    "/api/v1/consent/acceptances": {
+      "get": {
+        "operationId": "ConsentController_acceptances",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConsentAcceptancePageDto"
                 }
               }
             }
@@ -2163,6 +2205,31 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Sesión no disponible o inválida."
+          },
+          "403": {
+            "description": "Requiere audit:read:institution."
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Auditoría"
+        ]
+      }
+    },
+    "/api/v1/audit/export": {
+      "get": {
+        "operationId": "AuditController_export",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
           },
           "401": {
             "description": "Sesión no disponible o inválida."
@@ -3592,6 +3659,45 @@
         "required": [
           "current",
           "acceptance"
+        ]
+      },
+      "ConsentAcceptDto": {
+        "type": "object",
+        "properties": {
+          "expectedVersionId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Identificador de la versión que el usuario vio."
+          }
+        },
+        "required": [
+          "expectedVersionId"
+        ]
+      },
+      "ConsentAcceptancePageDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ConsentAcceptanceDto"
+            }
+          },
+          "total": {
+            "type": "number"
+          },
+          "page": {
+            "type": "number"
+          },
+          "pageSize": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "page",
+          "pageSize"
         ]
       },
       "AuditItemDto": {
