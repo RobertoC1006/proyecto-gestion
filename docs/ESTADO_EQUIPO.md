@@ -344,3 +344,18 @@ y su configuración de servidor siguen sin habilitarse: carga/descarga no forman
 parte de este avance. `ticket.created` continúa como futura integración de
 Jasmine y no bloquea la creación ni introduce auditoría paralela. Detalle:
 [entrega de Johan, Corte 4](entregas/johan-semana-01-corte-04.md).
+
+## Seguimiento personal de incidencias — responsable asignado — 19 de noviembre
+
+En `gestion-incidencias`, el detalle personal de `GET /tickets/:id` ahora
+incluye `assigneeName` cuando existe una asignación. La búsqueda limita el
+responsable a la institución del titular y no expone su UUID en la respuesta
+personal. P06 muestra el nombre o indica que aún no hay responsable. El detalle
+operativo también filtra la consulta del nombre por institución y conserva en
+el selector el responsable actual al recargar.
+
+OpenAPI y tipos web se regeneraron desde NestJS. Las compilaciones de API y web
+pasaron. No se añadieron ni ejecutaron pruebas en este corte, no hubo cambios de
+esquema ni migraciones y no se accedió a Supabase PostgreSQL. Siguen pendientes
+el ajuste manual de categoría/servicio, el acuerdo del mecanismo de actualización
+por eventos y la revisión integral de P06–P08. Adjuntos e IA permanecen aplazados.

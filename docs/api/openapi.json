@@ -3107,6 +3107,10 @@
           "failureConfirmed": {
             "type": "boolean"
           },
+          "assigneeName": {
+            "type": "string",
+            "nullable": true
+          },
           "isDemo": {
             "type": "boolean"
           },

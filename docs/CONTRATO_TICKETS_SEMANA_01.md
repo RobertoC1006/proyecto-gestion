@@ -174,10 +174,13 @@ por titular e institución antes de contar o paginar. La vista resumida incluye
 `id`, `code`, `description`, `service`, `scope`, `status`,
 `classificationStatus`, `priority: null`, `createdAt` y `updatedAt`.
 
-El detalle acepta UUID y devuelve el reporte propio con curso/sección y,
-cuando exista el flujo acordado, metadatos de evidencia visibles al titular.
-Nunca incluye `storageKey` ni rutas locales. ID ajeno o inexistente: el mismo 404.
-Ninguna ruta acepta un parámetro de titular arbitrario.
+El detalle acepta UUID y devuelve el reporte propio con curso/sección y el
+nombre visible del responsable de TI asignado (`assigneeName`), o `null` si
+todavía no hay responsable. La consulta del nombre se limita a la institución
+del titular; la respuesta personal no expone el UUID interno del responsable.
+Cuando exista el flujo acordado, también podrá incluir metadatos de evidencia
+visibles al titular. Nunca incluye `storageKey` ni rutas locales. ID ajeno o
+inexistente: el mismo 404. Ninguna ruta acepta un parámetro de titular arbitrario.
 
 ## Servicios para P03 y evidencia opcional
 

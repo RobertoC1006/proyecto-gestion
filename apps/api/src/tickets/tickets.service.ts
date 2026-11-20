@@ -20,7 +20,8 @@ export const ticketResponse = (t: Ticket, operational = false) => ({
   ...(operational ? { urgency:t.urgency, impact:t.impact, technicalScore:t.technicalScore, score:t.score } : {}),
   responseDueAt:t.responseDueAt?.toISOString()??null, resolutionDueAt:t.resolutionDueAt?.toISOString()??null,
   firstResponseAt:t.firstResponseAt?.toISOString()??null, resolvedAt:t.resolvedAt?.toISOString()??null,
-  solution:t.solution, failureConfirmed:t.failureConfirmed, assigneeId:t.assigneeId, isDemo:t.isDemo,
+  solution:t.solution, failureConfirmed:t.failureConfirmed,
+  ...(operational ? { assigneeId:t.assigneeId } : {}), isDemo:t.isDemo,
   createdAt: t.createdAt.toISOString(), updatedAt: t.updatedAt.toISOString(),
 });
 const uniqueOn = (error: unknown, field: string) => error instanceof Prisma.PrismaClientKnownRequestError &&
@@ -103,6 +104,9 @@ export class TicketsService {
     const ticket = await this.db.ticket.findFirst({ where: { id: ticketId,
       institutionId: principal.institutionId, ownerId: principal.id }, include:{course:{select:{name:true}},changes:{orderBy:[{createdAt:'asc'},{id:'asc'}]}} });
     if (!ticket) throw new NotFoundException({ code: 'NOT_FOUND', message: 'No se encontró el ticket.' });
-    return {...ticketResponse(ticket),courseName:ticket.course?.name,changes:ticket.changes.map(c=>({id:c.id,action:c.action,note:c.note,createdAt:c.createdAt.toISOString()}))};
+    const assignee = ticket.assigneeId ? await this.db.appUser.findFirst({
+      where: { id: ticket.assigneeId, institutionId: principal.institutionId }, select: { displayName: true },
+    }) : null;
+    return {...ticketResponse(ticket),assigneeName:assignee?.displayName??null,courseName:ticket.course?.name,changes:ticket.changes.map(c=>({id:c.id,action:c.action,note:c.note,createdAt:c.createdAt.toISOString()}))};
   }
 }

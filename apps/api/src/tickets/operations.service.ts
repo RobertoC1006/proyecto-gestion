@@ -53,7 +53,7 @@ export class OperationsService {
   this.read(actor); const id = uuid(rawId,'id');
   const row = await this.db.ticket.findFirst({ where:{ id,institutionId:actor.institutionId }, include:{owner:{select:{displayName:true}},course:{select:{name:true}},changes:{orderBy:[{createdAt:'asc'},{id:'asc'}]} } });
   if (!row) throw new NotFoundException({ code:'NOT_FOUND',message:'No se encontró la incidencia.' });
-  const assignee = row.assigneeId ? await this.db.appUser.findUnique({where:{id:row.assigneeId},select:{displayName:true}}) : null;
+  const assignee = row.assigneeId ? await this.db.appUser.findFirst({where:{id:row.assigneeId,institutionId:actor.institutionId},select:{displayName:true}}) : null;
   return {...ticketResponse(row,true),ownerName:row.owner.displayName,courseName:row.course?.name,assigneeName:assignee?.displayName,changes:row.changes.map(c=>({id:c.id,action:c.action,note:c.note,createdAt:c.createdAt.toISOString()}))};
  }
  async action(actor: CampusPrincipal, rawId: string, input: unknown) {

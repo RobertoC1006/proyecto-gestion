@@ -34,6 +34,7 @@ export class TicketDto {
   @ApiProperty({type:String,nullable:true}) resolvedAt!: string | null;
   @ApiProperty({type:String,nullable:true}) solution!: string | null;
   @ApiProperty() failureConfirmed!: boolean;
+  @ApiPropertyOptional({ type: String, nullable: true }) assigneeName?: string | null;
   @ApiProperty() isDemo!: boolean;
   @ApiProperty({ format: 'date-time' }) createdAt!: string;
   @ApiProperty({ format: 'date-time' }) updatedAt!: string;

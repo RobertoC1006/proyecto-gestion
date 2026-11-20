@@ -841,6 +841,7 @@ export interface components {
             resolvedAt: string | null;
             solution: string | null;
             failureConfirmed: boolean;
+            assigneeName?: string | null;
             isDemo: boolean;
             /** Format: date-time */
             createdAt: string;
