@@ -1,35 +1,85 @@
-import { FileText, ShieldCheck } from '@phosphor-icons/react'
+import { Download, FileText, ShieldCheck } from '@phosphor-icons/react'
+import { useState } from 'react'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Button, Card, EmptyState, Notice, PageHeading } from '../../components/ui'
+import { ApiError, request } from '../../lib/api/http'
+import type { CertificateDto, CertificatesPageDto } from '../../lib/api/certificates'
 
 export default function ConstanciasPage() {
+  const client = useQueryClient()
+  const [selected, setSelected] = useState<CertificateDto | null>(null)
+  const [error, setError] = useState('')
+  const data = useQuery({
+    queryKey: ['certificates', 'mine'],
+    queryFn: () => request<CertificatesPageDto>('certificates'),
+  })
+  const issue = useMutation({
+    mutationFn: (ticketId: string) => request<CertificateDto>(`certificates/${ticketId}/issue`, { method: 'POST', body: '{}' }),
+    onSuccess: async certificate => {
+      setSelected(certificate)
+      setError('')
+      await client.invalidateQueries({ queryKey: ['certificates', 'mine'] })
+    },
+    onError: (reason: unknown) => setError(reason instanceof ApiError ? reason.message : 'No se pudo emitir la constancia.'),
+  })
+
+  async function download(certificate: CertificateDto) {
+    const response = await fetch(`/api/v1/certificates/${certificate.id}/download`, { credentials: 'same-origin', cache: 'no-store' })
+    if (!response.ok) throw new Error('No se pudo descargar la constancia.')
+    const blob = await response.blob()
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `${certificate.code}.pdf`
+    link.click()
+    URL.revokeObjectURL(url)
+  }
+
   return <section>
     <PageHeading
       title="Mis constancias"
       subtitle="Consulta las constancias asociadas a tus incidencias resueltas."
       illustrationIcon={FileText}
     />
-    <Notice tone="amber" icon={ShieldCheck} role="status">
-      La consulta y emisión de constancias estará disponible cuando el servicio de constancias esté conectado.
-    </Notice>
+    {error && <Notice tone="amber" icon={ShieldCheck} role="alert">{error}</Notice>}
     <div className="content-grid content-grid--two">
       <Card>
         <h2>Constancias disponibles</h2>
-        <p className="body-muted">Aquí aparecerán las incidencias elegibles para solicitar una constancia.</p>
-        <EmptyState
-          title="Listado en preparación"
-          description="Todavía no podemos consultar tus constancias. No se ha realizado ninguna consulta al backend."
-        />
+        {data.isLoading && <Notice tone="amber" role="status">Consultando incidencias elegibles...</Notice>}
+        {data.error && <Notice tone="amber" role="alert">No se pudo consultar las constancias.</Notice>}
+        {!data.isLoading && data.data && data.data.eligible.length === 0 && (
+          <EmptyState title="Sin constancias disponibles" description="Solo aparecen tickets resueltos con una falla confirmada." />
+        )}
+        {!data.isLoading && data.data?.eligible.map(item => (
+          <div className="certificate-row" key={item.ticketId}>
+            <div>
+              <strong>{item.ticketCode}</strong>
+              <p className="body-muted">{item.service} · Resuelto {new Date(item.resolvedAt).toLocaleString('es-PE')}</p>
+            </div>
+            {item.certificate ? (
+              <Button type="button" variant="secondary" onClick={() => setSelected(item.certificate)}>Ver constancia</Button>
+            ) : (
+              <Button type="button" onClick={() => issue.mutate(item.ticketId)} disabled={issue.isPending}>
+                {issue.isPending ? 'Emitiendo...' : 'Emitir constancia'}
+              </Button>
+            )}
+          </div>
+        ))}
       </Card>
       <Card>
         <h2>Detalle de constancia</h2>
-        <p className="body-muted">Todavía no existe un detalle real de constancia para revisar.</p>
-        <Notice tone="amber" role="status">
-          No existe un PDF descargable ni un código de verificación disponible hasta integrar el servicio de constancias.
-        </Notice>
-        <div className="button-row">
-          <Button disabled>Descargar PDF</Button>
-          <Button variant="secondary" disabled>Verificación pública</Button>
-        </div>
+        {selected ? <>
+          <p><strong>Código:</strong> {selected.code}</p>
+          <p><strong>Incidencia:</strong> {selected.ticketCode}</p>
+          <p><strong>Emitida:</strong> {new Date(selected.issuedAt).toLocaleString('es-PE')}</p>
+          <p className="body-muted">Huella SHA-256: {selected.sha256}</p>
+          <div className="button-row">
+            <Button type="button" icon={Download} onClick={() => void download(selected)}>Descargar PDF</Button>
+            <Button variant="secondary" type="button" onClick={() => window.open(`/verificar/${encodeURIComponent(selected.code)}`, '_blank', 'noopener,noreferrer')}>
+              Verificación pública
+            </Button>
+          </div>
+        </> : <EmptyState title="Selecciona una constancia" description="El detalle y la descarga aparecerán después de emitir o seleccionar una constancia." />}
       </Card>
     </div>
   </section>;

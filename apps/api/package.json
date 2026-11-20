@@ -12,7 +12,9 @@
     "test:academic": "node --test test/academic.test.cjs",
     "test:auth": "node --test --test-concurrency=1 test/auth.test.cjs test/auth.provider.test.cjs test/role-permissions.test.cjs",
     "api:export": "node prisma/export-openapi.cjs",
-    "test:users": "node --test test/users.test.cjs"
+    "test:users": "node --test test/users.test.cjs",
+    "test:certificates": "npm run build && node --test test/certificates.test.cjs",
+    "test:certificates:http": "npm run build && node --test test/certificates.http.test.cjs"
   },
   "dependencies": {
     "@nestjs/common": "11.2.8",
@@ -21,12 +23,16 @@
     "@nestjs/swagger": "11.4.8",
     "@prisma/client": "6.19.3",
     "@supabase/supabase-js": "2.119.0",
+    "pdf-lib": "^1.17.1",
+    "qrcode": "^1.5.4",
     "reflect-metadata": "0.2.2",
     "rxjs": "7.8.2"
   },
   "devDependencies": {
     "@nestjs/testing": "11.2.8",
+    "@types/express": "^5.0.6",
     "@types/node": "22.15.30",
+    "@types/qrcode": "^1.5.6",
     "prisma": "6.19.3",
     "ts-node": "10.9.2",
     "typescript": "5.9.3"

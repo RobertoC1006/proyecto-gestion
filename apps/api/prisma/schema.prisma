@@ -19,6 +19,7 @@ model Institution {
   users     AppUser[]
   roleAccess RoleAccess[]
   rolePermissionChanges RolePermissionChange[]
+  certificates Certificate[]
 }
 
 enum AcademicEventType {
@@ -176,6 +177,7 @@ model AppUser {
   institution   Institution @relation(fields: [institutionId], references: [id], onDelete: Restrict)
   team          SupportTeam? @relation(fields: [institutionId, teamId], references: [institutionId, id], onDelete: Restrict)
   sessions      AuthSession[]
+  certificates  Certificate[]
   tickets       Ticket[]
 
   @@unique([institutionId, id])
@@ -299,6 +301,7 @@ model Ticket {
   isDemo               Boolean @default(false)
   changes              TicketChange[]
   attachment           TicketAttachment?
+  certificate          Certificate?
 
   @@unique([institutionId, ownerId, idempotencyKey])
   @@index([institutionId, ownerId, createdAt(sort: Desc), id(sort: Desc)])
@@ -335,6 +338,48 @@ model TicketChange {
   ticket Ticket @relation(fields: [ticketId], references: [id], onDelete: Restrict)
   @@index([institutionId, ticketId, createdAt])
 }
+
+model Certificate {
+  id            String   @id @default(uuid()) @db.Uuid
+  institutionId String   @db.Uuid
+  ticketId      String   @unique @db.Uuid
+  ownerId       String   @db.Uuid
+  code          String   @unique @db.VarChar(64)
+  ticketCode    String   @db.VarChar(40)
+  service       TicketService
+  resolvedAt    DateTime @db.Timestamptz(3)
+  issuedAt      DateTime @default(now()) @db.Timestamptz(3)
+  sha256        String   @db.Char(64)
+  storageKey    String   @unique @db.VarChar(120)
+  institution   Institution @relation(fields: [institutionId], references: [id], onDelete: Restrict)
+  ticket        Ticket      @relation(fields: [ticketId], references: [id], onDelete: Restrict)
+  owner         AppUser     @relation(fields: [institutionId, ownerId], references: [institutionId, id], onDelete: Restrict)
+  verifications CertificateVerification[]
+
+  @@index([institutionId, ownerId, issuedAt(sort: Desc), id(sort: Desc)])
+  @@index([institutionId, ticketId])
+}
+
+enum CertificateVerificationResult {
+  valida
+  inexistente
+  alterado
+  archivo_no_verificable
+}
+
+model CertificateVerification {
+  id            String   @id @default(uuid()) @db.Uuid
+  institutionId String   @db.Uuid
+  certificateId String?  @db.Uuid
+  code          String   @db.VarChar(64)
+  result        CertificateVerificationResult
+  occurredAt    DateTime @default(now()) @db.Timestamptz(3)
+  certificate   Certificate? @relation(fields: [certificateId], references: [id], onDelete: Restrict)
+
+  @@index([institutionId, occurredAt(sort: Desc)])
+  @@index([code, occurredAt(sort: Desc)])
+}
+
 model WorkflowPolicy {
   institutionId String @id @db.Uuid
   rules Json
