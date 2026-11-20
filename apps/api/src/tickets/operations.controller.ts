@@ -1,16 +1,18 @@
 import { DemoService } from './demo.service';
 import { Body, Controller, Get, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
-import { ApiCookieAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiCookieAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { CampusSessionGuard, RequirePermissions } from '../auth/auth.guard';
 import { AuthRequest } from '../auth/auth.service';
 import { OperationsService } from './operations.service';
+import { OperationTicketActionDto, TicketDto, TicketServiceDto } from './tickets.dto';
+import { TicketsService } from './tickets.service';
 
 @ApiTags('Atención y prioridad contextual')
 @ApiCookieAuth('campus_session')
 @UseGuards(CampusSessionGuard)
 @Controller('operations')
 export class OperationsController {
- constructor(private readonly operations: OperationsService, private readonly demo: DemoService) {}
+ constructor(private readonly operations: OperationsService, private readonly demo: DemoService, private readonly tickets: TicketsService) {}
  @Post('demo') @RequirePermissions('configuration:manage')
  demoCase(@Req() r:AuthRequest,@Body() b:unknown) {return this.demo.prepare(r.campusPrincipal!,b);}
  @Get('policy') @RequirePermissions('configuration:manage')
@@ -19,8 +21,14 @@ export class OperationsController {
  savePolicy(@Req() r:AuthRequest,@Body() b:unknown) {return this.operations.savePolicy(r.campusPrincipal!,b);}
  @Get('tickets') @RequirePermissions('tickets:read:institution')
  queue(@Req() r:AuthRequest,@Query() q:unknown) {return this.operations.queue(r.campusPrincipal!,q);}
+ @Get('services') @RequirePermissions('tickets:read:institution')
+ @ApiOkResponse({ type: [TicketServiceDto] })
+ services() { return this.tickets.services(); }
  @Get('tickets/:id') @RequirePermissions('tickets:read:institution')
+ @ApiOkResponse({ type: TicketDto })
  detail(@Req() r:AuthRequest,@Param('id') id:string) {return this.operations.detail(r.campusPrincipal!,id);}
  @Patch('tickets/:id') @RequirePermissions('tickets:work:institution')
+ @ApiBody({ type: OperationTicketActionDto })
+ @ApiOkResponse({ type: TicketDto })
  action(@Req() r:AuthRequest,@Param('id') id:string,@Body() b:unknown) {return this.operations.action(r.campusPrincipal!,id,b);}
 }

@@ -1,5 +1,5 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Prisma, TicketService } from '@prisma/client';
 import { PrismaService } from '../database/prisma.service';
 import { AcademicService } from '../academic/academic.service';
 import { CampusPrincipal, requirePermission } from '../auth/auth.policy';
@@ -58,7 +58,7 @@ export class OperationsService {
  }
  async action(actor: CampusPrincipal, rawId: string, input: unknown) {
   requirePermission(actor,'tickets:work:institution'); const id=uuid(rawId,'id'), b=object(input), version=positive(b.expectedVersion,'expectedVersion'), note=text(b.note,'note',2000,5);
-  if (!['evaluate','start','note','resolve','assign'].includes(String(b.action))) invalid('action','Acción no válida.');
+  if (!['evaluate','start','note','resolve','assign','reclassify'].includes(String(b.action))) invalid('action','Acción no válida.');
   return this.db.$transaction(async tx=>{
    await this.fresh(actor,tx,'tickets:work:institution');
    await tx.$queryRaw`SELECT "id" FROM "Ticket" WHERE "id"=${id}::uuid AND "institutionId"=${actor.institutionId}::uuid FOR UPDATE`;
@@ -76,6 +76,10 @@ export class OperationsService {
     const assigneeId=uuid(b.assigneeId,'assigneeId'); const user=await tx.appUser.findFirst({where:{id:assigneeId,institutionId:actor.institutionId,active:true}});
     if (!user || !(await this.permissions.effective(actor.institutionId,user.role,tx)).includes('tickets:work:institution')) invalid('assigneeId','Selecciona un encargado de TI activo de esta institución.');
     patch.assigneeId=assigneeId;
+   } else if (b.action==='reclassify') {
+    if (typeof b.service!=='string' || !Object.values(TicketService).includes(b.service as TicketService)) invalid('service','Selecciona un servicio válido.');
+    if (b.service===before.service) invalid('service','Selecciona un servicio distinto para registrar la corrección.');
+    patch={...patch,service:b.service as TicketService,classificationStatus:'manual'};
    } else if (b.action==='start') {
     if (!before.priority || before.status!=='registrado') invalid('action','Evalúa la prioridad antes de iniciar la atención.');
     patch={...patch,status:'en_atencion',assigneeId:actor.id,firstResponseAt:before.firstResponseAt??now};

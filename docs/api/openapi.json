@@ -1786,6 +1786,35 @@
         ]
       }
     },
+    "/api/v1/operations/services": {
+      "get": {
+        "operationId": "OperationsController_services",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TicketServiceDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Atención y prioridad contextual"
+        ]
+      }
+    },
     "/api/v1/operations/tickets/{id}": {
       "get": {
         "operationId": "OperationsController_detail",
@@ -1801,7 +1830,14 @@
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketDto"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -1825,9 +1861,26 @@
             }
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OperationTicketActionDto"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketDto"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -3259,6 +3312,74 @@
           "total",
           "page",
           "pageSize"
+        ]
+      },
+      "OperationTicketActionDto": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "evaluate",
+              "start",
+              "note",
+              "resolve",
+              "assign",
+              "reclassify"
+            ]
+          },
+          "expectedVersion": {
+            "type": "number",
+            "minimum": 1
+          },
+          "note": {
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 2000
+          },
+          "urgency": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 3
+          },
+          "impact": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 3
+          },
+          "service": {
+            "type": "string",
+            "enum": [
+              "aula_virtual",
+              "wifi_red",
+              "correo",
+              "equipos",
+              "impresoras",
+              "cuentas_accesos",
+              "videoconferencia",
+              "sistemas_institucionales",
+              "almacenamiento_nube",
+              "software_licencias",
+              "otro"
+            ],
+            "description": "Requerido cuando action=reclassify."
+          },
+          "assigneeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "solution": {
+            "type": "string",
+            "maxLength": 5000
+          },
+          "failureConfirmed": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "action",
+          "expectedVersion",
+          "note"
         ]
       },
       "SupportTeamItemDto": {

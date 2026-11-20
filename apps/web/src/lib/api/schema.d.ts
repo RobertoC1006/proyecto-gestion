@@ -468,6 +468,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/operations/services": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["OperationsController_services"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/operations/tickets/{id}": {
         parameters: {
             query?: never;
@@ -880,6 +896,23 @@ export interface components {
             total: number;
             page: number;
             pageSize: number;
+        };
+        OperationTicketActionDto: {
+            /** @enum {string} */
+            action: "evaluate" | "start" | "note" | "resolve" | "assign" | "reclassify";
+            expectedVersion: number;
+            note: string;
+            urgency?: number;
+            impact?: number;
+            /**
+             * @description Requerido cuando action=reclassify.
+             * @enum {string}
+             */
+            service?: "aula_virtual" | "wifi_red" | "correo" | "equipos" | "impresoras" | "cuentas_accesos" | "videoconferencia" | "sistemas_institucionales" | "almacenamiento_nube" | "software_licencias" | "otro";
+            /** Format: uuid */
+            assigneeId?: string;
+            solution?: string;
+            failureConfirmed?: boolean;
         };
         SupportTeamItemDto: {
             /**
@@ -2673,6 +2706,25 @@ export interface operations {
             };
         };
     };
+    OperationsController_services: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TicketServiceDto"][];
+                };
+            };
+        };
+    };
     OperationsController_detail: {
         parameters: {
             query?: never;
@@ -2688,7 +2740,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["TicketDto"];
+                };
             };
         };
     };
@@ -2701,13 +2755,19 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OperationTicketActionDto"];
+            };
+        };
         responses: {
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["TicketDto"];
+                };
             };
         };
     };

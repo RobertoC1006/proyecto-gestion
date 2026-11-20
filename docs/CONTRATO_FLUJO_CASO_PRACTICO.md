@@ -45,13 +45,16 @@ Origin/CSRF para escrituras. El servidor aplica institución/titular y permisos.
 | Ruta | Operación y capacidad |
 | --- | --- |
 | GET `/operations/tickets` | Cola paginada, `tickets:read:institution`; `order=context/technical/arrival`, filtros status/search/page/pageSize |
+| GET `/operations/services` | Servicios del catálogo existente, `tickets:read:institution`; misma fuente que P03 |
 | GET `/operations/tickets/:id` | Detalle, contexto e historial de la institución |
-| PATCH `/operations/tickets/:id` | `tickets:work:institution`; action, expectedVersion y note de 5–2000 caracteres |
+| PATCH `/operations/tickets/:id` | `tickets:work:institution`; action, expectedVersion y note de 5–2000 caracteres. `reclassify` acepta `service` del catálogo |
 | GET/PATCH `/operations/policy` | `configuration:manage`; cuatro rules, expectedVersion, reason |
 | POST `/operations/demo` | Configuración y atención institucional; studentId y professorId opcional, de cuentas canónicas activas |
 
-Acciones de ticket: `evaluate` exige urgency/impact 1–3; `assign` exige assigneeId
-con capacidad de atención; `start` asigna al actor y registra primera atención
+Acciones de ticket: `evaluate` exige urgency/impact 1–3; `reclassify` exige un
+servicio distinto del catálogo y registra el motivo en `TicketChange`; no cambia
+urgencia, impacto, puntaje ni plazos. `assign` exige assigneeId con capacidad de
+atención; `start` asigna al actor y registra primera atención
 humana; `note` añade avance durante atención; `resolve` exige solución y
 failureConfirmed booleano. Solo se resuelve desde en_atencion y no se reabre.
 Cada cambio bloquea el ticket, comprueba versión y actor vigente y guarda

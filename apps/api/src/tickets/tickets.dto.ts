@@ -55,3 +55,15 @@ export class TicketServiceDto {
   @ApiProperty({ enum: TicketService }) id!: TicketService;
   @ApiProperty() label!: string;
 }
+
+export class OperationTicketActionDto {
+  @ApiProperty({ enum: ['evaluate', 'start', 'note', 'resolve', 'assign', 'reclassify'] }) action!: string;
+  @ApiProperty({ minimum: 1 }) expectedVersion!: number;
+  @ApiProperty({ minLength: 5, maxLength: 2000 }) note!: string;
+  @ApiPropertyOptional({ minimum: 1, maximum: 3 }) urgency?: number;
+  @ApiPropertyOptional({ minimum: 1, maximum: 3 }) impact?: number;
+  @ApiPropertyOptional({ enum: TicketService, description: 'Requerido cuando action=reclassify.' }) service?: TicketService;
+  @ApiPropertyOptional({ format: 'uuid' }) assigneeId?: string;
+  @ApiPropertyOptional({ maxLength: 5000 }) solution?: string;
+  @ApiPropertyOptional() failureConfirmed?: boolean;
+}
