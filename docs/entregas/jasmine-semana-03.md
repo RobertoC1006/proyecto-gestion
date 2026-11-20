@@ -4,6 +4,10 @@
 
 - Rama: `reportes-operativos`
 - Base: `origin/main`
+- Commits de privacidad/auditoría:
+  - `3ae0363` — Integré main preservando privacidad y auditoría.
+  - `4ae4b6b` — Implementé controles de privacidad y auditoría.
+- Commit P15: `41652a7` — Implementé P15 reportes operativos.
 - Alcance implementado: P15 Reportes operativos y comparación.
 - No se integraron módulos de Semana 4 ni `validacion-constancias`.
 - Privacidad/auditoría y Constancias conservan sus ramas independientes.
@@ -31,11 +35,19 @@ explícitamente que el pronóstico no está disponible.
 
 ## P21, P22 y P23
 
-- P21: matriz de permisos publicada en `main`.
-- P22: consentimiento y aceptación están en `privacidad-auditoria`; su migración
-  sigue pendiente de coordinación para el entorno compartido.
-- P23: auditoría base está en `privacidad-auditoria`; incluye filtros, detalle,
-  saneamiento y exportación, pero no integra esta rama hasta coordinación.
+- P21 — Completado y publicado en `main`: matriz real por institución/rol,
+  permisos efectivos, motivos, versiones, protección de última administración
+  y endpoints autorizados. Migración `20261111000100_role_permissions` ya aplicada
+  y registrada por el equipo.
+- P22 — Implementado y probado aisladamente en `privacidad-auditoria`: versión
+  mostrada/esperada, aceptación explícita, idempotencia e institución. La ruta
+  privada permite el consentimiento a usuarios autenticados; la consulta
+  administrativa usa `audit:read:institution`. La migración
+  `20261112000100_consent` no está acreditada como aplicada en Supabase.
+- P23 — Implementado y probado aisladamente en `privacidad-auditoria`: consulta
+  institucional paginada, filtros, detalle sancionado, integración con
+  `TicketChange`, solo lectura y exportación CSV autorizada. Sigue pendiente
+  integración a `main`.
 
 ## Pruebas
 
@@ -69,3 +81,16 @@ interceptados únicamente para presentación. El navegador disponible mostró
 renderizado responsive, filtros, KPIs, gráfico observado, categorías y aviso de
 pronóstico. No se acreditó una sesión real ni una comparación automatizada
 exacta contra la lámina del mockup por limitaciones de viewport/sesión.
+
+## Estado de cierre
+
+- Completado y verificado en P15: backend de conteos reales, alcance, filtros,
+  CSV, estados de datos ausentes, pruebas unitarias/HTTP y builds.
+- Completado y publicado en P21: permisos y matriz vigente en `main`.
+- Implementado y probado aisladamente en P22/P23: consentimiento y auditoría
+  de la rama `privacidad-auditoria`.
+- Pendiente de integración: P22/P23 en `main` y aplicación coordinada de la
+  migración de consentimiento.
+- Bloqueado por dependencia: pronóstico observado/pronosticado de Roberto.
+- Pendiente de validación real: sesión Supabase, escritorio/móvil con datos
+  reales y comparación visual exhaustiva contra el mockup.
