@@ -5,7 +5,7 @@ import { CampusPrincipal, rolePermissions } from './auth.policy';
 import { allowedPermissions, permissionCatalog, permissionDependencies, protectedPermissions, roleLabels } from './permission.catalog';
 
 type Reader = Pick<Prisma.TransactionClient, 'roleAccess'>;
-const roles = Object.values(CampusRole);
+const roles: CampusRole[] = ['estudiante', 'docente', 'administrador'];
 const invalid = (message: string) => new BadRequestException({ code: 'VALIDATION_ERROR', message });
 
 @Injectable()
@@ -32,7 +32,7 @@ export class RolePermissionsService {
   }
   async update(actor: CampusPrincipal, roleValue: string, value: unknown) {
     this.authorize(actor);
-    if (!roles.includes(roleValue as CampusRole)) throw invalid('Selecciona uno de los cinco roles disponibles.');
+    if (!roles.includes(roleValue as CampusRole)) throw invalid('Selecciona uno de los tres roles disponibles.');
     const role = roleValue as CampusRole;
     const body = value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : {};
     if (Object.keys(body).some(key => !['permissions', 'expectedVersion', 'reason'].includes(key)) ||

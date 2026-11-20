@@ -7,6 +7,21 @@ pantallas_asignadas: [P02, P03, P04, P05, P06, P07, P08]
 
 # Plan de implementación de CampusITSM para Johan
 
+## Coordinación del 12 de noviembre — flujo del caso práctico
+
+Por encargo expreso de Roberto, `flujo-caso-practico` conserva la entrega
+`gestion-incidencias@1667778` y conecta contexto académico, prioridad, cola,
+atención/resolución y seguimiento. No modifica la rama de Johan ni integra main.
+Tres perfiles visibles: administrador/TI, profesor y estudiante. Las migraciones
+del flujo ya se aplicaron y verificaron en Supabase por autorización específica;
+consumir el esquema exacto antes de leer los estados en_atencion/resuelto.
+No volver a crear tablas, reglas de prioridad ni endpoints paralelos.
+
+Consultar [contrato del flujo](../docs/CONTRATO_FLUJO_CASO_PRACTICO.md),
+REGISTRO_CAMBIOS_BD y ESTADO_EQUIPO. IA y adjuntos permanecen pospuestos.
+58 comprobaciones aisladas aprobadas; no confundirlas con mejoras porcentuales
+de atención o precisión de IA. La integración en main sigue pendiente de Roberto.
+
 ## P20/Usuarios publicado en main — 11 de noviembre de 2026
 
 Roberto autorizó integrar la entrega de Jasmine `7ab1ed7` y la corrección
