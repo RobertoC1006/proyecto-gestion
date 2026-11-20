@@ -532,6 +532,38 @@ export interface paths {
         patch: operations["UsersController_updateAccess"];
         trace?: never;
     };
+    "/api/v1/reports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ReportsController_report"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reports/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ReportsController_export"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -931,6 +963,46 @@ export interface components {
              * @example 1
              */
             expectedVersion: number;
+        };
+        ReportSeriesDto: {
+            period: string;
+            observed: number;
+            forecast: number | null;
+        };
+        ReportCategoryDto: {
+            service: string;
+            label: string;
+            count: number;
+            percentage: Record<string, never> | null;
+        };
+        ReportFiltersDto: {
+            /** Format: date-time */
+            from?: string;
+            /** Format: date-time */
+            to?: string;
+            /** @enum {string} */
+            period?: "day" | "week" | "month";
+            service?: string;
+            /** @enum {string} */
+            status?: "registrado" | "en_atencion" | "resuelto";
+            /** @enum {string} */
+            scope?: "institution" | "team";
+        };
+        ReportsDto: {
+            series: components["schemas"]["ReportSeriesDto"][];
+            categories: components["schemas"]["ReportCategoryDto"][];
+            total: number;
+            registered: number;
+            inAttention: number;
+            resolved: number;
+            resolutionRate: Record<string, never> | null;
+            resolvedWithinSlaRate: Record<string, never> | null;
+            source: string;
+            synthetic: boolean;
+            /** @enum {string} */
+            forecastStatus: "unavailable";
+            forecastMessage: string;
+            filters: components["schemas"]["ReportFiltersDto"];
         };
     };
     responses: never;
@@ -2835,6 +2907,56 @@ export interface operations {
             };
             /** @description Conflicto por versión de acceso concurrente (CONFLICT) o protección del último administrador (LAST_ADMINISTRATOR). */
             409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ReportsController_report: {
+        parameters: {
+            query?: {
+                from?: string;
+                to?: string;
+                period?: "day" | "week" | "month";
+                service?: string;
+                status?: "registrado" | "en_atencion" | "resuelto";
+                scope?: "institution" | "team";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReportsDto"];
+                };
+            };
+        };
+    };
+    ReportsController_export: {
+        parameters: {
+            query?: {
+                from?: string;
+                to?: string;
+                period?: "day" | "week" | "month";
+                service?: string;
+                status?: "registrado" | "en_atencion" | "resuelto";
+                scope?: "institution" | "team";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };

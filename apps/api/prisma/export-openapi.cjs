@@ -12,4 +12,4 @@ const path = require('node:path');
     .setVersion('1.0.0').addCookieAuth('campus_session', undefined, 'campus_session').build());
   fs.writeFileSync(path.resolve(__dirname, '../../../docs/api/openapi.json'), JSON.stringify(doc, null, 2) + '\n');
   await app.close();
-})().catch(() => { console.error('No se pudo generar OpenAPI.'); process.exitCode = 1; });
+})().catch(error => { console.error('No se pudo generar OpenAPI.', error); process.exitCode = 1; });

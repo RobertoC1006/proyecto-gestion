@@ -1,0 +1,23 @@
+.reports-page { max-width: 1180px; margin: 0 auto; }
+.reports-filter-card { margin-bottom: 18px; }
+.reports-filters { display: grid; grid-template-columns: repeat(3, minmax(150px, 1fr)); gap: 12px; align-items: end; }
+.reports-filters .field { margin: 0; }
+.reports-filters input, .reports-filters select { width: 100%; }
+.reports-kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-bottom: 18px; }
+.reports-kpis .card { display: grid; gap: 5px; }
+.reports-kpis span, .reports-kpis small { color: var(--muted); }
+.reports-kpis strong { color: var(--green-dark); font-size: 28px; }
+.reports-grid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(280px, 1fr); gap: 16px; margin-bottom: 18px; }
+.reports-chart { height: 260px; display: flex; align-items: flex-end; gap: 10px; border-bottom: 1px solid var(--border); padding-top: 28px; }
+.reports-bar { flex: 1 1 36px; max-width: 70px; height: 230px; display: grid; grid-template-rows: 20px 1fr 24px; align-items: end; text-align: center; }
+.reports-bar__track { height: 186px; display: flex; align-items: flex-end; }
+.reports-bar__fill { width: 100%; min-height: 2px; background: var(--green); border-radius: 7px 7px 0 0; }
+.reports-bar__value, .reports-bar__label { color: var(--muted); font-size: 11px; }
+.reports-category { display: grid; grid-template-columns: minmax(160px, 1fr) 1fr 40px; gap: 10px; align-items: center; margin: 14px 0; }
+.reports-category div:first-child strong, .reports-category div:first-child span { display: block; }
+.reports-category div:first-child span { color: var(--muted); font-size: 11px; margin-top: 3px; }
+.reports-category__track { height: 8px; background: var(--surface-muted); border-radius: 999px; overflow: hidden; }
+.reports-category__track span { display: block; height: 100%; background: var(--green); }
+.reports-category b { text-align: right; }
+@media (max-width: 900px) { .reports-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); } .reports-grid { grid-template-columns: 1fr; } }
+@media (max-width: 600px) { .reports-filters, .reports-kpis { grid-template-columns: 1fr; } .reports-chart { gap: 4px; overflow-x: auto; } .reports-bar { min-width: 38px; } .reports-category { grid-template-columns: minmax(130px, 1fr) 70px 30px; } }

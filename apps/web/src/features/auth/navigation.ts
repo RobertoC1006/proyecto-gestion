@@ -14,7 +14,7 @@ const dashboard: NavigationItem = { label: 'Dashboard', description: 'Tu espacio
 const navigation: NavigationItem[] = [
   { label: 'Mis incidencias', description: 'Consulta tus incidencias y su seguimiento.', icon: ClipboardText, to: '/incidencias', permissions: access.personalTickets },
   { label: 'Calendario académico', description: 'Organiza los eventos, cursos y secciones de la institución.', icon: CalendarDots, to: '/admin/calendario', permissions: [...access.personalCalendar, ...access.manageCalendar] },
-  { label: 'Reportes', description: 'Consulta los reportes correspondientes a tu alcance.', icon: ChartBar, permissions: access.reports },
+  { label: 'Reportes', description: 'Consulta los reportes correspondientes a tu alcance.', icon: ChartBar, to: '/reportes', permissions: access.reports },
   { label: 'Cola de TI', description: 'Accede a la cola de atención de tu equipo.', icon: ShieldCheck, to: '/ti/cola', permissions: access.teamTickets },
 ]
 const administration: NavigationItem[] = [
