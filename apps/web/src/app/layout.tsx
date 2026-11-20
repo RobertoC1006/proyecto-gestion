@@ -8,6 +8,8 @@ import './globals.css'
 export default function RootLayout({ children }: { children: ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false)
   const { pathname, key } = useLocation()
+  const academic = pathname.startsWith('/admin/calendario') || pathname === '/calendario'
+  const currentTickets = pathname === '/' || pathname.startsWith('/incidencias')
   const sharedView = pathname === '/' || pathname.startsWith('/admin/calendario') || pathname === '/calendario' || pathname === '/admin/permisos' || pathname === '/admin/usuarios'
   useEffect(() => {
     setMenuOpen(false)
@@ -33,7 +35,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           onToggleMenu={() => setMenuOpen((open) => !open)}
         />
         <main id="main-content" className="main-content" tabIndex={-1}>
-          {sharedView ? children : <div className="legacy-view">{children}</div>}
+          {academic || currentTickets || sharedView ? children : <div className="legacy-view">{children}</div>}
         </main>
         <footer className="app-footer">
           <span>

@@ -61,6 +61,7 @@ export class EventRelationDto {
   @ApiProperty({ type: String }) name!: string;
 }
 export class EventDto {
+  @ApiProperty({type:String,nullable:true}) createdById!: string | null;
   @ApiProperty({ type: String, format: 'uuid' }) id!: string;
   @ApiProperty({ type: String, format: 'uuid' }) institutionId!: string;
   @ApiProperty({ type: String }) title!: string;

@@ -1,5 +1,70 @@
 # Coordinación de cambios en la base compartida
 
+## Flujo contextual autorizado — 12 de noviembre de 2026
+
+Roberto encargó el flujo completo con tres perfiles visibles y autorizó
+específicamente aplicar sus dos migraciones. Código `48b78d8`, rama
+`flujo-caso-practico`; ejecutor agente de Roberto. Destino CampusITSM /
+npjibnlxepiwfermtcmo / campusitsm. Antes: ocho migraciones, cero tickets y un
+evento. No se guardó un volcado completo de registros privados.
+
+Aplicadas mediante el comando manual migrador:
+
+- `20261113000100_case_workflow/migration.sql`, SHA256
+  `f106959114bdbf009b0cbd914bcc137ce6385630748d26358c6f40b403baf2bf`:
+  autoría opcional de evento; campos de evaluación, atención, versión y origen
+  sintético de Ticket; estados en_atencion/resuelto y clasificación manual;
+  TicketChange y WorkflowPolicy. No borra ni sobrescribe datos existentes.
+- `20261113000200_workflow_permissions/migration.sql`, SHA256
+  `48407f82abe8f2185a13ec69fb3326aee7771b90aa32723792694112c6147975`:
+  amplía los CHECK de RoleAccess para academic:teach y operación institucional.
+  Conserva alcances anteriores y no cambia las filas RoleAccess existentes.
+
+Verificación posterior: diez migraciones y diez checksums coincidentes,
+TicketChange/WorkflowPolicy del migrador con RLS, sin lectura anon/authenticated.
+API puede leer e insertar historial, sin UPDATE sobre TicketChange. API/web y
+Python saludables en la única instalación campusitsm, localhost:8080.
+58 comprobaciones aisladas aprobadas antes de aplicar. La prueba no escribe
+en Supabase ni deja otra aplicación encendida.
+
+Los compañeros deben recibir el esquema y los estados nuevos antes de atender
+estos tickets con su aplicación; los clientes antiguos de incidencias no se
+consideran compatibles con en_atencion/resuelto. Main y ramas ajenas permanecen
+intactos. Este registro es el aviso en repositorio; no se enviaron mensajes.
+Contrato: [CONTRATO_FLUJO_CASO_PRACTICO.md](CONTRATO_FLUJO_CASO_PRACTICO.md).
+
+Carga posterior autorizada por el encargo de datos de demostración: acción
+`POST /operations/demo` desde la sesión real administradora, con la cuenta
+estudiante canónica seleccionada en pantalla y sin profesor (prueba aplazada).
+Dos cursos DEMO, dos secciones y asociaciones, dos eventos y cuatro tickets
+isDemo. Antes de crear: cero tickets; después: cuatro con puntajes 12/9/6/2.
+El administrador atendió y resolvió T1 mediante la interfaz; solución y notas
+indican expresamente simulación. No se cambiaron roles, claves ni cuentas del
+equipo. Datos e historial quedan persistidos para revisión, sin limpiar tablas.
+
+## Incidencias — aplicación autorizada para revisión en pantalla, 12 de noviembre de 2026
+
+Roberto autorizó expresamente aplicar la migración revisada y abrir el módulo
+de Johan en su instalación habitual. Fuente: `gestion-incidencias@1667778`;
+ejecutor: agente de Roberto, desde `revision-incidencias-pantalla`.
+Destino: CampusITSM / npjibnlxepiwfermtcmo / esquema campusitsm.
+
+Se aplicó únicamente `20261108000100_tickets_core/migration.sql` con el comando
+manual migrador. SHA256: `d0727f7f1eca862b3fe40da5859493419b98938e076e8c7741cb2466b4b4715a`,
+idéntico al dictamen y las 35 comprobaciones aisladas anteriores. Antes de
+aplicar: siete migraciones finalizadas y tablas de tickets ausentes.
+Después: ocho migraciones con checksums coincidentes; Ticket/TicketAttachment
+pertenecen a campusitsm_migrator, RLS activo, API con CRUD y sin lectura de
+anon/authenticated. Conexión API en campusitsm y TLS comprobados. Ambas tablas
+vacías al verificar; no se crearon tickets de prueba ni se cambiaron cuentas.
+
+API y web reconstruidas desde `1667778`, junto a Python saludables en la única
+instalación campusitsm, localhost:8080, con volúmenes conservados. Compilaciones
+API/web y cinco pruebas del servicio de tickets sin red aprobadas. No se integra
+la rama en main ni se aplica consentimiento/auditoría; adjuntos siguen pospuestos.
+Los compañeros deben incorporar el archivo exacto al consumir Tickets. Este
+registro conserva el aviso de coordinación en Git; no se enviaron mensajes al equipo.
+
 ## P20 / usuarios-modal-correcciones — publicación autorizada en main
 
 Desde `administracion-usuarios@7ab1ed7`, correcciones y rediseño pedidos por
@@ -74,6 +139,7 @@ Respaldo final privado restaurado; traslado atómico con conteos/SHA256 de las
 | 2026-11-07 | Roberto / infraestructura común | base-compartida-supabase / 864413a | 20261107000200_auth_email_flow/migration.sql | AuthFlow | Supabase CampusITSM / campusitsm | Transición solicitada por Roberto / agente de Roberto | Aplicado y verificado con Prisma; seis migraciones finalizadas, pruebas aisladas y contenido trasladado comprobado |
 | 2026-11-07 | Roberto / infraestructura común | base-compartida-supabase / 864413a | 20261107000300_shared_instances/migration.sql | instanceId e índices de AuthSession/AuthFlow; conserva sesiones antiguas | Supabase CampusITSM / campusitsm | Transición solicitada por Roberto / agente de Roberto | Aplicado y verificado con Prisma; seis migraciones finalizadas, pruebas aisladas y contenido trasladado comprobado |
 | 2026-11-07 | Roberto / infraestructura común | base-compartida-supabase / 864413a | 20261107000400_server_only_access/migration.sql | RLS para las 12 tablas de negocio; política solo para API servidor | Supabase CampusITSM / campusitsm | Transición solicitada por Roberto / agente de Roberto | Aplicado y verificado con Prisma; seis migraciones finalizadas, pruebas aisladas y contenido trasladado comprobado |
+| 2026-11-08 | Johan / incidencias Semana 1 | gestion-incidencias / 4d287c0 | 20261108000100_tickets_core/migration.sql | Ticket, TicketAttachment, índices, CHECK, acceso servidor | PostgreSQL local mediante compose.local.yml | Corte 1 de Johan; revisión del SQL por Roberto antes de cualquier aplicación compartida | Migrador local: siete migraciones sin pendientes; API y demás servicios saludables. Johan confirmó las rutas HTTP y la persistencia local del ticket. No aplicado a Supabase |
 
 Estados: anunciado, validado localmente, acordado cuando afecte partes comunes, aplicado, verificado o requiere
 corrección. Cada entrada debe explicar brevemente la compatibilidad con los otros

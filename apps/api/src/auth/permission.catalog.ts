@@ -2,11 +2,14 @@ import { CampusRole } from '@prisma/client';
 import { rolePermissions } from './auth.policy';
 
 export const roleLabels: Record<CampusRole, string> = {
-  estudiante: 'Estudiante', docente: 'Docente', ti_agente: 'Agente TI', ti_supervisor: 'Supervisor TI', administrador: 'Administrador',
+  estudiante: 'Estudiante', docente: 'Profesor', ti_agente: 'Agente TI', ti_supervisor: 'Supervisor TI', administrador: 'Administrador',
 };
 type Action = 'consultar' | 'registrar' | 'atender' | 'asignar' | 'administrar';
 const definition = (key: string, module: string, label: string, action: Action, scope: string, available = false) => ({ key, module, label, action, scope, available });
 export const permissionCatalog = [
+  definition('academic:teach', 'Calendario académico', 'Programar actividades de mis cursos', 'registrar', 'Cursos asignados', true),
+  definition('tickets:read:institution', 'Atención de TI', 'Consultar cola institucional', 'consultar', 'Institución', true),
+  definition('tickets:work:institution', 'Atención de TI', 'Evaluar, atender y resolver incidencias', 'atender', 'Institución', true),
   definition('academic:read:self', 'Calendario académico', 'Consultar mi calendario', 'consultar', 'Institución y cursos propios', true),
   definition('academic:manage', 'Calendario académico', 'Gestionar eventos, cursos y secciones', 'administrar', 'Institución', true),
   definition('tickets:read:self', 'Incidencias', 'Consultar mis incidencias', 'consultar', 'Datos propios'),
@@ -25,7 +28,7 @@ export const permissionCatalog = [
 export const protectedPermissions = ['users:manage', 'permissions:manage'];
 export const permissionDependencies: Record<string, string> = {
   'tickets:create': 'tickets:read:self', 'tickets:work:team': 'tickets:read:team',
-  'tickets:assign:team': 'tickets:read:team', 'academic:manage': 'academic:read:self',
+  'tickets:work:institution': 'tickets:read:institution', 'academic:teach': 'academic:read:self', 'tickets:assign:team': 'tickets:read:team', 'academic:manage': 'academic:read:self',
 };
 export function allowedPermissions(role: CampusRole): string[] {
   return role === 'administrador' ? permissionCatalog.map(p => p.key) : [...rolePermissions[role]];

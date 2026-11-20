@@ -1,0 +1,47 @@
+.tickets-view { max-width: 1180px; margin: 0 auto; }
+.tickets-view .page-heading { margin-bottom: 0; }
+.tickets-view .card { padding: 24px; }
+.tickets-view .card > h2 { margin-bottom: 16px; }
+.tickets-summary { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.tickets-summary .card { display: grid; grid-template-columns: 34px 1fr; column-gap: 12px; row-gap: 3px; align-items: center; }
+.tickets-summary svg { grid-row: span 2; color: var(--green); }
+.tickets-summary strong { font-size: 21px; }
+.tickets-summary span { color: var(--muted); font-size: 13px; }
+.tickets-card-head { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 18px; }
+.ticket-list { display: grid; gap: 8px; margin-top: 14px; }
+.ticket-list__row { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 2fr) minmax(185px, 1.5fr) minmax(130px, 1fr) 20px; align-items: center; gap: 13px; padding: 14px; border: 1px solid var(--border); border-radius: 12px; }
+.ticket-list__row > * { min-width: 0; }
+.ticket-list__row > strong { overflow-wrap: anywhere; font-size: 12px; }
+.ticket-list__row:hover { border-color: #9bd9b8; background: #f7fdf9; }
+.ticket-list__row > span:nth-child(2) { min-width: 0; }
+.ticket-list__row b, .ticket-list__row small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ticket-list__row small { color: var(--muted); margin-top: 4px; }
+.ticket-list__row time { color: var(--muted); font-size: 12px; }
+.ticket-state { color: #7a5b09; background: #fff5d8; border-radius: 999px; padding: 7px 10px; font-size: 12px; width: fit-content; }
+.ticket-list__tools { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 18px; }
+.ticket-list__tools label { width: 100%; font-weight: 700; font-size: 13px; }
+.ticket-list__tools .ticket-list__filter { width: auto; display: inline-flex; align-items: center; gap: 8px; }
+.ticket-list__filter select { min-width: 145px; }
+.ticket-list__tools input { max-width: 370px; flex: 1 1 230px; }
+.ticket-pages, .ticket-form-actions, .ticket-receipt__actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 22px; }
+.ticket-pages { justify-content: flex-end; }
+.tickets-back { display: inline-flex; align-items: center; gap: 8px; color: var(--green); font-weight: 700; width: fit-content; }
+.ticket-form-layout { display: grid; grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr); gap: 18px; align-items: start; }
+.ticket-form-layout .field { margin-top: 18px; }
+.ticket-form-layout textarea { min-height: 155px; resize: vertical; }
+.ticket-steps { padding-left: 24px; display: grid; gap: 14px; color: var(--muted); }
+.ticket-steps li::marker { color: var(--green); font-weight: 800; }
+.ticket-steps strong, .ticket-steps small { display: block; }
+.ticket-steps strong { color: var(--text); }
+.ticket-description { white-space: pre-wrap; margin: 18px 0; }
+.ticket-facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 15px; margin-top: 16px; }
+.ticket-facts > div { border-top: 1px solid var(--border); padding-top: 12px; }
+.ticket-facts span, .ticket-facts strong { display: block; }
+.ticket-facts span { color: var(--muted); font-size: 12px; margin-bottom: 4px; }
+.ticket-receipt { text-align: center; max-width: 800px; }
+.ticket-receipt > svg { color: var(--green); align-self: center; }
+.ticket-receipt .page-heading { justify-content: center; }
+.ticket-receipt__code { color: var(--green-dark); background: var(--mint); border-radius: 999px; padding: 10px 20px; align-self: center; }
+.ticket-receipt__actions { justify-content: center; }
+@media (max-width: 900px) { .ticket-list__row { grid-template-columns: 1fr 2fr 20px; } .ticket-list__row .ticket-state, .ticket-list__row time { display: none; } .ticket-form-layout { grid-template-columns: 1fr; } }
+@media (max-width: 600px) { .tickets-summary, .ticket-facts { grid-template-columns: 1fr; } .ticket-list__row { grid-template-columns: 1fr 20px; } .ticket-list__row > span:nth-child(2) { grid-column: 1; } .ticket-list__row > svg { grid-column: 2; grid-row: 1 / span 2; } }

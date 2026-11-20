@@ -6,10 +6,10 @@ import { CampusRole } from '@prisma/client';
 const own = ['academic:read:self', 'tickets:create', 'tickets:read:self', 'certificates:request:self'];
 export const rolePermissions: Record<CampusRole, readonly string[]> = {
   estudiante: own,
-  docente: own,
+  docente: [...own, 'academic:teach'],
   ti_agente: ['academic:read:self', 'tickets:read:team', 'tickets:work:team'],
   ti_supervisor: ['academic:read:self', 'tickets:read:team', 'tickets:work:team', 'tickets:assign:team', 'reports:read:team'],
-  administrador: ['academic:read:self', 'academic:manage', 'users:manage', 'permissions:manage', 'reports:read:institution', 'audit:read:institution', 'configuration:manage'],
+  administrador: ['academic:read:self', 'academic:manage', 'users:manage', 'permissions:manage', 'reports:read:institution', 'audit:read:institution', 'configuration:manage', 'tickets:read:institution', 'tickets:work:institution'],
 };
 export interface CampusPrincipal {
   id: string; institutionId: string; email: string; displayName: string;

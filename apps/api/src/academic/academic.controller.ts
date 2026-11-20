@@ -23,6 +23,8 @@ export class AcademicController {
   sections(@Req() r: AcademicRequest, @Query() q: SectionQueryDto) { return this.academic.listSections(r.academicPrincipal!, q); }
   @Post('sections') @ApiCreatedResponse({ type: SectionDto })
   createSection(@Req() r: AcademicRequest, @Body() b: SectionInputDto) { return this.academic.createSection(r.academicPrincipal!, b); }
+  @Get('memberships')
+  memberships(@Req() r: AcademicRequest, @Query() q: PageQueryDto) { return this.academic.memberships(r.academicPrincipal!, q); }
   @Post('memberships')
   associate(@Req() r: AcademicRequest, @Body() b: MembershipDto) { return this.academic.associate(r.academicPrincipal!, b); }
   @Delete('memberships/:sectionId/:subjectId') @ApiOkResponse({ type: DeletedDto })
@@ -47,6 +49,8 @@ export class AcademicController {
 @Controller('academic/me')
 export class PersonalAcademicController {
   constructor(@Inject(AcademicService) private readonly academic: AcademicService) {}
+  @Get('context')
+  context(@Req() r: AcademicRequest, @Query() q: unknown) { return this.academic.personalContext(r.academicPrincipal!, q); }
   @Get('courses') @Header('Cache-Control', 'no-store') @ApiOkResponse({ type: CoursePageDto })
   courses(@Req() r: AcademicRequest, @Query() q: PageQueryDto) { return this.academic.personalCourses(r.academicPrincipal!, q); }
   @Get('sections') @Header('Cache-Control', 'no-store') @ApiOkResponse({ type: SectionPageDto })
