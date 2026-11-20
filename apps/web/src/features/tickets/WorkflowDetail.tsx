@@ -5,7 +5,7 @@ import { ArrowLeft, CheckCircle, Clock, Headset } from '@phosphor-icons/react'
 import { Button, ButtonLink, Card, Field, Notice, PageHeading, Select } from '../../components/ui'
 import { request } from '../../lib/api/http'
 import { workflowApi, statusLabels, type WorkflowTicket } from '../../lib/api/workflow'
-import { ticketDate, type TicketService } from '../../lib/api/tickets'
+import { ticketApi, ticketDate, type TicketService } from '../../lib/api/tickets'
 import { useAuth } from '../auth/AuthContext'
 import './workflow.css'
 
@@ -18,7 +18,7 @@ export default function WorkflowDetail({operational=false}:{operational?:boolean
  const markEditing=()=>setEditVersion(v=>v??ticket.data!.version)
  useEffect(()=>{if(ticket.data&&editVersion===null){setUrgency(String(ticket.data.urgency??3));setImpact(String(ticket.data.impact??2));setService(ticket.data.service);if(operational)setAssigneeId(ticket.data.assigneeId??'')}},[ticket.data?.version,editVersion,operational])
  const staff=useQuery({queryKey:['users','operators'],queryFn:()=>request<{items:{id:string;displayName:string}[]}>('users?role=administrador&active=true&pageSize=100'),enabled:operational&&!!user?.permissions.includes('users:manage')})
- const services=useQuery({queryKey:['tickets','services'],queryFn:workflowApi.services,enabled:operational})
+ const services=useQuery({queryKey:['tickets','services'],queryFn:()=>operational?workflowApi.services():ticketApi.services(),enabled:!!user})
  const save=useMutation({mutationFn:(action:string)=>workflowApi.action(id,{action,expectedVersion:editVersion??ticket.data!.version,note,urgency:Number(urgency),impact:Number(impact),service,solution,failureConfirmed:confirmed,assigneeId}),onSuccess:(_,action)=>{setEditVersion(null);setNote('');setNotice(actionLabels[action]);void client.invalidateQueries({queryKey:['tickets']});void client.invalidateQueries({queryKey:['operations']})}})
  if(ticket.isPending)return <Card role="status">Cargando incidencia…</Card>
  if(ticket.error)return <Notice tone="amber" role="alert">{ticket.error.message} <Button onClick={()=>void ticket.refetch()} variant="ghost">Reintentar</Button></Notice>
@@ -27,7 +27,7 @@ export default function WorkflowDetail({operational=false}:{operational?:boolean
  const disabled=save.isPending||note.trim().length<5
  const deadline=(value:string|null|undefined,completed:string|null|undefined)=>value?<><strong className={!completed&&Date.parse(value)<Date.now()?'workflow-overdue':''}>{ticketDate(value)}</strong><small>{completed?`Registrada: ${ticketDate(completed)}`:Date.parse(value)<Date.now()?'Plazo vencido':'Pendiente · plazo continuo'}</small></>:<small>Se define al evaluar la prioridad</small>
  return <div className="content-stack workflow-page"><ButtonLink to={operational?'/ti/cola':'/incidencias'} variant="ghost"><ArrowLeft/>Volver a {operational?'la cola':'mis incidencias'}</ButtonLink>
-  <PageHeading title={t.description.split(':')[0].length<35?t.description.split(':')[0]:'Seguimiento de incidencia'} subtitle={t.code} action={<span className={`workflow-status ${t.status}`}>{statusLabels[t.status]}</span>}/>
+  <PageHeading title={t.description.split(':')[0].length<35?t.description.split(':')[0]:'Seguimiento de incidencia'} subtitle={t.code} action={<div className="workflow-inline">{t.priority&&<span className={`workflow-priority ${t.priority}`}>{t.priority}</span>}<span className={`workflow-status ${t.status}`}>{statusLabels[t.status]}</span></div>}/>
   {t.isDemo&&<Notice>Datos de demostración · Este reporte pertenece al caso práctico académico.</Notice>}{notice&&<Notice role="status">{notice}</Notice>}
   <div className="workflow-detail-layout"><div className="content-stack"><Card><h2>El problema reportado</h2><p className="workflow-description">{t.description}</p><div className="workflow-facts"><div><small>Servicio</small><strong>{services.data?.find(item=>item.id===t.service)?.label??t.service.replace(/_/g,' ')}</strong></div><div><small>Curso</small><strong>{t.courseName??'Reporte general'}</strong></div><div><small>Registrada</small><strong>{ticketDate(t.createdAt)}</strong></div><div><small>Responsable de TI</small><strong>{t.assigneeName??'Pendiente de asignación'}</strong></div>{operational&&<div><small>Reportado por</small><strong>{t.ownerName}</strong></div>}</div></Card>
    <Card className="workflow-context-card"><span className="workflow-eyebrow">CONTEXTO ACADÉMICO</span><h2>{context?.reason??'Pendiente de evaluación por TI'}</h2><p>{context?.event?`${ticketDate(context.event.startsAt)} · Actividad verificada con el calendario y las asociaciones del titular.`:'El contexto se verifica al evaluar el reporte; no depende de palabras escritas en su descripción.'}</p>{operational&&t.priority&&<div className="workflow-score"><span>Urgencia<strong>{t.urgency}</strong></span><b>×</b><span>Impacto<strong>{t.impact}</strong></span><b>×</b><span>Factor<strong>{t.academicFactor}</strong></span><b>=</b><span>Puntaje<strong>{t.score}</strong></span><span className={`workflow-priority ${t.priority}`}>{t.priority}</span></div>}{!operational&&t.priority&&<span className={`workflow-priority ${t.priority}`}>{t.priority}</span>}</Card>

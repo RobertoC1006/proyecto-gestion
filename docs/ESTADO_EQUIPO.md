@@ -373,3 +373,18 @@ automatizadas ni se conectó a Supabase PostgreSQL. La validación visual y de
 datos en la base local sigue pendiente mientras Supabase Auth esté pausado.
 La tarjeta de constancia reciente depende de la entrega de Jasmine y no se
 simuló con datos ficticios.
+
+## Corrección manual y seguimiento P06 — 20 de noviembre
+
+En `gestion-incidencias`, TI puede corregir el servicio de una incidencia
+abierta mediante una acción versionada con motivo. El catálogo proviene del
+mismo módulo usado por P03; la corrección queda en `TicketChange` y no altera
+urgencia, puntaje ni plazos. API y web compilaron. La cuenta de estudiante
+disponible mostró correctamente acceso denegado a la vista de TI; la acción
+operativa queda pendiente de comprobación visual con una cuenta autorizada.
+
+P06 consulta las etiquetas del servicio para mostrar su nombre legible y
+presenta la prioridad junto al estado cuando ya existe una evaluación. Se
+reconstruyó la web con `compose.local.yml` y se comprobó en el navegador un
+ticket propio registrado, con servicio «Equipo de cómputo», contexto pendiente
+y plazos aún no definidos. No se generaron ni ejecutaron migraciones.
