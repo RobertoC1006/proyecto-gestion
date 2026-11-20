@@ -90,7 +90,7 @@ export class TicketsService {
   async list(principal: CampusPrincipal, raw: unknown) {
     const { page, pageSize, status, search } = ticketsQuery(raw);
     const where: Prisma.TicketWhereInput = { institutionId: principal.institutionId, ownerId: principal.id,
-      ...(status ? { status } : {}),
+      ...(status === 'active' ? { status: { not: 'resuelto' } } : status ? { status } : {}),
       ...(search ? { OR: [{ code: { contains: search, mode: 'insensitive' } },
         { description: { contains: search, mode: 'insensitive' } }] } : {}) };
     const [items, total] = await this.db.$transaction([
@@ -98,6 +98,18 @@ export class TicketsService {
         skip: (page - 1) * pageSize, take: pageSize }), this.db.ticket.count({ where }),
     ]);
     return { items: items.map(t => ticketResponse(t)), total, page, pageSize };
+  }
+  async summary(principal: CampusPrincipal) {
+    const rows = await this.db.ticket.groupBy({
+      by: ['status'],
+      where: { institutionId: principal.institutionId, ownerId: principal.id },
+      _count: { _all: true },
+    });
+    const count = (status: Ticket['status']) => rows.find(row => row.status === status)?._count._all ?? 0;
+    const registered = count('registrado');
+    const inAttention = count('en_atencion');
+    const resolved = count('resuelto');
+    return { total: registered + inAttention + resolved, registered, inAttention, resolved };
   }
   async get(principal: CampusPrincipal, id: unknown) {
     const ticketId = uuid(id, 'id');

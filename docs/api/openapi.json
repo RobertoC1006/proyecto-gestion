@@ -1546,7 +1546,8 @@
               "enum": [
                 "registrado",
                 "en_atencion",
-                "resuelto"
+                "resuelto",
+                "active"
               ]
             }
           },
@@ -1605,6 +1606,41 @@
                   "items": {
                     "$ref": "#/components/schemas/TicketServiceDto"
                   }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "VALIDATION_ERROR"
+          },
+          "401": {
+            "description": "SESSION_REQUIRED"
+          },
+          "403": {
+            "description": "FORBIDDEN o WRITE_PROTECTION_REQUIRED"
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Incidencias — Semana 1"
+        ]
+      }
+    },
+    "/api/v1/tickets/summary": {
+      "get": {
+        "operationId": "TicketsController_summary",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketSummaryDto"
                 }
               }
             }
@@ -3174,6 +3210,29 @@
         "required": [
           "id",
           "label"
+        ]
+      },
+      "TicketSummaryDto": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "number"
+          },
+          "registered": {
+            "type": "number"
+          },
+          "inAttention": {
+            "type": "number"
+          },
+          "resolved": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "total",
+          "registered",
+          "inAttention",
+          "resolved"
         ]
       },
       "TicketPageDto": {

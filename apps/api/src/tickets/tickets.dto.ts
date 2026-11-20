@@ -11,8 +11,14 @@ export class CreateTicketDto {
 export class TicketsQueryDto {
   @ApiPropertyOptional({ type: Number, minimum: 1, default: 1 }) page?: number;
   @ApiPropertyOptional({ type: Number, minimum: 1, maximum: 100, default: 20 }) pageSize?: number;
-  @ApiPropertyOptional({ enum: TicketStatus }) status?: TicketStatus;
+  @ApiPropertyOptional({ enum: [...Object.values(TicketStatus), 'active'] }) status?: TicketStatus | 'active';
   @ApiPropertyOptional({ type: String, maxLength: 100 }) search?: string;
+}
+export class TicketSummaryDto {
+  @ApiProperty() total!: number;
+  @ApiProperty() registered!: number;
+  @ApiProperty() inAttention!: number;
+  @ApiProperty() resolved!: number;
 }
 export class TicketDto {
   @ApiProperty({ format: 'uuid' }) id!: string;

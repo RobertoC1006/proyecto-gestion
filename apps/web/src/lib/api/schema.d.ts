@@ -388,6 +388,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/tickets/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["TicketsController_summary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/tickets/{id}": {
         parameters: {
             query?: never;
@@ -852,6 +868,12 @@ export interface components {
             /** @enum {string} */
             id: "aula_virtual" | "wifi_red" | "correo" | "equipos" | "impresoras" | "cuentas_accesos" | "videoconferencia" | "sistemas_institucionales" | "almacenamiento_nube" | "software_licencias" | "otro";
             label: string;
+        };
+        TicketSummaryDto: {
+            total: number;
+            registered: number;
+            inAttention: number;
+            resolved: number;
         };
         TicketPageDto: {
             items: components["schemas"]["TicketDto"][];
@@ -2344,7 +2366,7 @@ export interface operations {
             query?: {
                 page?: number;
                 pageSize?: number;
-                status?: "registrado" | "en_atencion" | "resuelto";
+                status?: "registrado" | "en_atencion" | "resuelto" | "active";
                 search?: string;
             };
             header?: never;
@@ -2469,6 +2491,46 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TicketServiceDto"][];
+                };
+            };
+            /** @description VALIDATION_ERROR */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description SESSION_REQUIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description FORBIDDEN o WRITE_PROTECTION_REQUIRED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    TicketsController_summary: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TicketSummaryDto"];
                 };
             };
             /** @description VALIDATION_ERROR */

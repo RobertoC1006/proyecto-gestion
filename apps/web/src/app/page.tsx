@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { ArrowRight, CalendarDots, ClipboardText, Plus } from '@phosphor-icons/react'
+import { ArrowRight, CalendarDots, CheckCircle, ClipboardText, Clock, Plus } from '@phosphor-icons/react'
 import { Link } from 'react-router-dom'
 import { ButtonLink, Card, CardHeading, EmptyState, IconBubble, PageHeading, TextLink } from '../components/ui'
 import { roleLabels, useAuth } from '../features/auth/AuthContext'
@@ -22,6 +22,7 @@ function ModuleList({ title, items }: { title: string; items: NavigationItem[] }
 
 function TicketHome({ userId }: { userId: string }) {
   const own = useQuery({ queryKey: ['tickets', userId, 'home'], queryFn: () => ticketApi.list(new URLSearchParams({ page: '1', pageSize: '3' })) })
+  const summary = useQuery({ queryKey: ['tickets', userId, 'summary'], queryFn: ticketApi.summary })
   const services = useQuery({ queryKey: ['tickets', 'services'], queryFn: ticketApi.services })
   const events = useQuery({ queryKey: ['academic', userId, 'next-event'], queryFn: async () => {
     const now = new Date(); const to = new Date(now.getTime() + 7 * 86400000)
@@ -30,7 +31,8 @@ function TicketHome({ userId }: { userId: string }) {
     return list.sort((a, b) => a.startsAt.localeCompare(b.startsAt))[0] || null
   } })
   return <>
-    <div className="tickets-summary"><Card><ClipboardText aria-hidden="true" /><strong>{own.data?.total ?? '—'}</strong><span>Mis incidencias registradas</span></Card><Card><CalendarDots aria-hidden="true" /><strong>{events.data ? ticketDate(events.data.startsAt) : '—'}</strong><span>Próxima actividad académica</span></Card></div>
+    <div className="tickets-summary"><Card><ClipboardText aria-hidden="true" /><strong>{summary.data?.total ?? '—'}</strong><span>Mis incidencias</span></Card><Card><Clock aria-hidden="true" /><strong>{summary.data?.inAttention ?? '—'}</strong><span>En atención</span></Card><Card><CheckCircle aria-hidden="true" /><strong>{summary.data?.resolved ?? '—'}</strong><span>Resueltas</span></Card></div>
+    {summary.error && <p role="alert">No se pudieron consultar tus conteos. <button type="button" onClick={() => void summary.refetch()}>Reintentar</button></p>}
     <Card><div className="tickets-card-head"><h2>Mis incidencias recientes</h2><TextLink to="/incidencias">Ver todas</TextLink></div>
       {own.isPending ? <p role="status">Cargando tus reportes…</p> : own.error ? <p role="alert">No se pudieron cargar tus reportes. <button type="button" onClick={() => void own.refetch()}>Reintentar</button></p> : own.data?.items.length ? <div className="ticket-list">{own.data.items.map(ticket => <TicketRow key={ticket.id} ticket={ticket} services={services.data} />)}</div> : <EmptyState title="Aún no tienes incidencias" description="Cuando registres un reporte, aparecerá aquí." action={<ButtonLink to="/incidencias/nueva">Crear reporte</ButtonLink>} />}
     </Card>

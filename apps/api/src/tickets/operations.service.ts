@@ -41,7 +41,7 @@ export class OperationsService {
  async queue(actor: CampusPrincipal, input: unknown) {
   this.read(actor); const q = object(input), { page, pageSize, status, search } = ticketsQuery(q);
   const order = q.order ?? 'context'; if (!['context','technical','arrival'].includes(String(order))) invalid('order','Orden no válido.');
-  const where: Prisma.TicketWhereInput = { institutionId: actor.institutionId, ...(status ? { status } : { status: { not: 'resuelto' } }), ...(search ? { OR: [{ code: { contains: search, mode: 'insensitive' } }, { description: { contains: search, mode: 'insensitive' } }] } : {}) };
+  const where: Prisma.TicketWhereInput = { institutionId: actor.institutionId, ...(status && status !== 'active' ? { status } : { status: { not: 'resuelto' } }), ...(search ? { OR: [{ code: { contains: search, mode: 'insensitive' } }, { description: { contains: search, mode: 'insensitive' } }] } : {}) };
   const orderBy: Prisma.TicketOrderByWithRelationInput[] = order === 'arrival' ? [{ createdAt: 'asc' }, { id: 'asc' }] : [{ [order === 'technical' ? 'technicalScore' : 'score']: { sort: 'desc', nulls: 'last' } }, { createdAt: 'asc' }, { id: 'asc' }];
   const [items,total,summary] = await this.db.$transaction([
    this.db.ticket.findMany({ where, orderBy, skip:(page-1)*pageSize, take:pageSize, include:{ owner:{ select:{ displayName:true } }, course:{ select:{ name:true } } } }),

@@ -3,11 +3,13 @@ import { request } from './http'
 
 export type Ticket = components['schemas']['TicketDto']
 export type TicketPage = components['schemas']['TicketPageDto']
+export type TicketSummary = components['schemas']['TicketSummaryDto']
 export type TicketService = components['schemas']['TicketServiceDto']
 export type CreateTicket = components['schemas']['CreateTicketDto']
 
 export const ticketApi = {
   services: () => request<TicketService[]>('tickets/services'),
+  summary: () => request<TicketSummary>('tickets/summary'),
   list: (params: URLSearchParams) => request<TicketPage>(`tickets?${params}`),
   get: (id: string) => request<Ticket>(`tickets/${encodeURIComponent(id)}`),
   create: (body: CreateTicket, key: string) => request<Ticket>('tickets', {

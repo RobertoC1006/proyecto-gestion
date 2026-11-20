@@ -359,3 +359,17 @@ pasaron. No se añadieron ni ejecutaron pruebas en este corte, no hubo cambios d
 esquema ni migraciones y no se accedió a Supabase PostgreSQL. Siguen pendientes
 el ajuste manual de categoría/servicio, el acuerdo del mecanismo de actualización
 por eventos y la revisión integral de P06–P08. Adjuntos e IA permanecen aplazados.
+
+## Resumen personal y filtros de incidencias — 20 de noviembre
+
+En `gestion-incidencias`, P02 consulta los conteos propios de tickets por estado
+desde `GET /tickets/summary`; P05 presenta filtros Todas/Activas/Resueltas y el
+filtro Activas agrupa registros pendientes y en atención. El resumen se limita
+al titular e institución autenticados. Se actualizó OpenAPI, tipos web y los
+contratos de tickets; no se modificó Prisma ni se generó una migración.
+
+Compilaron API y web y `git diff --check` pasó. No se ejecutaron pruebas
+automatizadas ni se conectó a Supabase PostgreSQL. La validación visual y de
+datos en la base local sigue pendiente mientras Supabase Auth esté pausado.
+La tarjeta de constancia reciente depende de la entrega de Jasmine y no se
+simuló con datos ficticios.
