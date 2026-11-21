@@ -17,7 +17,7 @@ function OwnTickets() {
   if (submitted) params.set('search', submitted)
   if (status) params.set('status', status)
   const listing = useQuery({ queryKey: ['tickets', user?.id, 'list', page, submitted, status], refetchInterval: 15000, queryFn: () => ticketApi.list(params), enabled: !!user })
-  const summary = useQuery({ queryKey: ['tickets', user?.id, 'summary'], queryFn: ticketApi.summary, enabled: !!user })
+  const summary = useQuery({ queryKey: ['tickets', user?.id, 'summary'], refetchInterval: 15000, queryFn: ticketApi.summary, enabled: !!user })
   const services = useQuery({ queryKey: ['tickets', 'services'], queryFn: ticketApi.services, enabled: !!user })
   return <div className="content-stack tickets-view">
     <PageHeading title="Mis incidencias" subtitle="Consulta y da seguimiento a tus reportes de TI." action={<ButtonLink to="/incidencias/nueva"><Plus />Nueva incidencia</ButtonLink>} />
