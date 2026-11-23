@@ -10,7 +10,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   const { pathname, key } = useLocation()
   const academic = pathname.startsWith('/admin/calendario') || pathname === '/calendario'
   const currentTickets = pathname === '/' || pathname.startsWith('/incidencias')
-  const sharedView = pathname === '/' || pathname.startsWith('/admin/calendario') || pathname === '/calendario' || pathname === '/admin/permisos' || pathname === '/admin/usuarios' || pathname === '/admin/privacidad'
+  const sharedView = pathname === '/' || pathname.startsWith('/admin/calendario') || pathname === '/calendario' || pathname === '/admin/permisos' || pathname === '/admin/usuarios' || pathname === '/admin/privacidad' || pathname === '/reportes'
   useEffect(() => {
     setMenuOpen(false)
     window.scrollTo({ top: 0, behavior: 'instant' })
