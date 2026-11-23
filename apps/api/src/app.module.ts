@@ -6,6 +6,8 @@ import { AuthModule } from './auth/auth.module';
 import { TicketsModule } from './tickets/tickets.module';
 import { UsersModule } from './users/users.module';
 import { CertificatesModule } from './certificates/certificates.module';
+import { ConsentModule } from './consent/consent.module';
+import { AuditModule } from './audit/audit.module';
 
-@Module({ imports: [DatabaseModule, HealthModule, AuthModule, AcademicModule, TicketsModule, CertificatesModule, UsersModule] })
+@Module({ imports: [DatabaseModule, HealthModule, AuthModule, AcademicModule, TicketsModule, CertificatesModule, UsersModule, ConsentModule, AuditModule] })
 export class AppModule {}

@@ -24,6 +24,7 @@ const administration: NavigationItem[] = [
   { label: 'Permisos', description: 'Configura las capacidades y alcances de cada rol.', icon: Key, to: '/admin/permisos', permissions: access.permissions },
   { label: 'Prioridades y SLA', description: 'Configura los plazos y prepara el caso práctico.', icon: Gear, to: '/admin/configuracion', permissions: access.configuration },
   { label: 'Auditoría', description: 'Consulta el registro de cambios y acciones.', icon: BookOpen, permissions: access.audit },
+  { label: 'Privacidad', description: 'Consulta el consentimiento vigente y su estado.', icon: ShieldCheck, to: '/admin/privacidad', permissions: access.privacy },
 ]
 
 export function navigationFor(user: CurrentUser | null) {

@@ -14,7 +14,8 @@
     "api:export": "node prisma/export-openapi.cjs",
     "test:users": "node --test test/users.test.cjs",
     "test:certificates": "npm run build && node --test test/certificates.test.cjs",
-    "test:certificates:http": "npm run build && node --test test/certificates.http.test.cjs"
+    "test:certificates:http": "npm run build && node --test test/certificates.http.test.cjs",
+    "test:privacy": "node --test test/privacy.test.cjs"
   },
   "dependencies": {
     "@nestjs/common": "11.2.8",

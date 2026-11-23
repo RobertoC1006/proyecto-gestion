@@ -13,6 +13,7 @@ export const access = {
   permissions: ['permissions:manage'],
   configuration: ['configuration:manage'],
   audit: ['audit:read:institution'],
+  privacy: ['audit:read:institution'],
 } as const
 
 export function hasAccess(user: CurrentUser | null, permissions: readonly string[]) {
