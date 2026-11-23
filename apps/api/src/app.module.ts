@@ -5,6 +5,7 @@ import { AcademicModule } from './academic/academic.module';
 import { AuthModule } from './auth/auth.module';
 import { TicketsModule } from './tickets/tickets.module';
 import { UsersModule } from './users/users.module';
+import { CertificatesModule } from './certificates/certificates.module';
 
-@Module({ imports: [DatabaseModule, HealthModule, AuthModule, AcademicModule, TicketsModule, UsersModule] })
+@Module({ imports: [DatabaseModule, HealthModule, AuthModule, AcademicModule, TicketsModule, CertificatesModule, UsersModule] })
 export class AppModule {}

@@ -1893,6 +1893,193 @@
         ]
       }
     },
+    "/api/v1/certificates": {
+      "get": {
+        "operationId": "CertificatesController_mine",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CertificatesPageDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Constancias"
+        ]
+      }
+    },
+    "/api/v1/certificates/{ticketId}/issue": {
+      "post": {
+        "operationId": "CertificatesController_issue",
+        "parameters": [
+          {
+            "name": "ticketId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CertificateDto"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "CERTIFICATE_FILE_UNAVAILABLE: el PDF original no está disponible; la emisión y su huella se conservan."
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Constancias"
+        ]
+      }
+    },
+    "/api/v1/certificates/{id}": {
+      "get": {
+        "operationId": "CertificatesController_detail",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CertificateDto"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "CERTIFICATE_FILE_UNAVAILABLE: el PDF original no está disponible; la emisión y su huella se conservan."
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Constancias"
+        ]
+      }
+    },
+    "/api/v1/certificates/{id}/download": {
+      "get": {
+        "operationId": "CertificatesController_download",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            },
+            "description": ""
+          },
+          "503": {
+            "description": "CERTIFICATE_FILE_UNAVAILABLE: el PDF original no está disponible; la emisión y su huella se conservan."
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Constancias"
+        ]
+      }
+    },
+    "/api/v1/certificates/public/{code}": {
+      "get": {
+        "operationId": "PublicCertificatesController_lookup",
+        "parameters": [
+          {
+            "name": "code",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Verificación pública"
+        ]
+      }
+    },
+    "/api/v1/certificates/public/{code}/verify": {
+      "post": {
+        "operationId": "PublicCertificatesController_verify",
+        "parameters": [
+          {
+            "name": "code",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Verificación pública"
+        ]
+      }
+    },
     "/api/v1/users": {
       "get": {
         "operationId": "UsersController_listUsers",
@@ -3380,6 +3567,142 @@
           "action",
           "expectedVersion",
           "note"
+        ]
+      },
+      "CertificateDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "code": {
+            "type": "string"
+          },
+          "ticketId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ticketCode": {
+            "type": "string"
+          },
+          "service": {
+            "type": "string",
+            "enum": [
+              "aula_virtual",
+              "wifi_red",
+              "correo",
+              "equipos",
+              "impresoras",
+              "cuentas_accesos",
+              "videoconferencia",
+              "sistemas_institucionales",
+              "almacenamiento_nube",
+              "software_licencias",
+              "otro"
+            ]
+          },
+          "resolvedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "issuedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "sha256": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "emitida"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "ticketId",
+          "ticketCode",
+          "service",
+          "resolvedAt",
+          "issuedAt",
+          "sha256",
+          "status"
+        ]
+      },
+      "CertificateEligibilityDto": {
+        "type": "object",
+        "properties": {
+          "ticketId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ticketCode": {
+            "type": "string"
+          },
+          "service": {
+            "type": "string",
+            "enum": [
+              "aula_virtual",
+              "wifi_red",
+              "correo",
+              "equipos",
+              "impresoras",
+              "cuentas_accesos",
+              "videoconferencia",
+              "sistemas_institucionales",
+              "almacenamiento_nube",
+              "software_licencias",
+              "otro"
+            ]
+          },
+          "resolvedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "eligible": {
+            "type": "boolean"
+          },
+          "certificate": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CertificateDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "ticketId",
+          "ticketCode",
+          "service",
+          "resolvedAt",
+          "eligible",
+          "certificate"
+        ]
+      },
+      "CertificatesPageDto": {
+        "type": "object",
+        "properties": {
+          "eligible": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CertificateEligibilityDto"
+            }
+          },
+          "issued": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CertificateDto"
+            }
+          }
+        },
+        "required": [
+          "eligible",
+          "issued"
         ]
       },
       "SupportTeamItemDto": {
