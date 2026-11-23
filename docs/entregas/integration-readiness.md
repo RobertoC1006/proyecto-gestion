@@ -1,5 +1,64 @@
 # T5 — integración de entregas verificadas (S1–S3)
 
+## Actualización vigente — autoverificación acotada T3/T5, sin clones
+
+Sobre `fix/integration-ready@5a1d9428fee5dcd6f2cea482b4d78f76a39ee812`,
+se añadieron únicamente dos regresiones HTTP durables en
+`apps/api/test/audit.snapshot.test.cjs`, reutilizando el seam Nest/AuthProvider/
+Prisma de `privacy.test.cjs`. No se modificó producción. Esta sección actualiza
+los pendientes históricos de abajo sin borrar sus fallos ni convertirlos en
+prueba de un defecto productivo.
+
+- Colisión: 202 filas, mismo UUID e instante en AcademicChange e IdentityChange,
+  con el empate exactamente entre las filas 100/101 del cursor CSV. Se verificó
+  orden por fuente, totalidad, unicidad por identidad pública `(id, action)`,
+  paginación HTTP, exportación de varios lotes, filtros y exclusión de otra
+  institución. Se contrastó también el filtro de acción/tipo/actor.
+- Snapshot: 205 filas iniciales. El middleware de prueba retiene únicamente el
+  primer bloque de datos del response HTTP devolviendo backpressure; no retiene
+  la cabecera, que precede al SELECT. Tras ese primer SELECT, inserta y confirma
+  un evento cuyo orden cae entre las filas 100/101; una consulta HTTP separada
+  observa total 206 antes de liberar drain y permitir el lote siguiente.
+  El CSV contiene exactamente las 205 filas iniciales sin duplicados/saltos;
+  la paginación HTTP posterior contiene las 206 en el orden esperado.
+- Fixtures completos, motivos `Prueba segura` (>=5), UUID válidos y rango
+  `to > from`, contrastados con esquema, restricciones SQL y validador antes
+  del intento. Prisma se usa solo para siembra/limpieza; resultados de negocio
+  se comprueban exclusivamente por HTTP. Sin cambios de código dentro de la
+  imagen ni consultas privadas para afirmar resultados.
+
+Comprobación nueva única (sin corrección/reintento):
+
+- `python 'C:/Users/ROBERT~1/AppData/Local/Temp/gpAKastq/gahBuG2B/campus-audit-snapshot-runner-gq2fqbb4/verify-workflow.py' --tests test/audit.snapshot.test.cjs`
+  — salida **0**, **2 casos aprobados** (TAP cuenta **3 tests**, incluido el
+  contenedor padre), **0 fallidos/omitidos/cancelados**. PostgreSQL 17 real,
+  descartable, 12 migraciones aplicadas solo a workflow_test, red interna única
+  `campusitsm-workflow-check-0e8e13c98e94` y DB tmpfs; contenedor/red retirados
+  por finally. Imagen existente `campusitsm-integration-t5:final-20261121`,
+  únicamente el nuevo archivo montado read-only en
+  `/app/test/audit.snapshot.test.cjs`; sin build/install ni copias del proyecto.
+  El runner temporal copia solo `scripts/verify-workflow.py`, sustituyendo
+  ROOT/imagen y agregando ese montaje, conservando aislamiento/limpieza.
+
+- `node --check apps/api/test/audit.snapshot.test.cjs` — salida **0**.
+- `git diff --check` — salida **0**, únicamente aviso de normalización LF/CRLF
+  para esta documentación.
+
+No hay RED productivo: encargo de verificación del candidato existente, sin
+cambio de comportamiento ni autorización para mutar producción. Los fallos
+EXTRA anteriores de preparación (encoding y motivo `safe` menor de 5) siguen
+siendo historia, no defectos ni RED. No se repitieron las suites 113/11.
+
+**Límite vigente:** esto es autoverificación directa, NO verificación
+independiente ni sustitución de ella. El verificador independiente T5 está
+**no disponible** bajo la instrucción expresa de no crear más clones: su
+preparador obligatorio clona. La propuesta histórica de copia con lista
+positiva de abajo queda superada por esa instrucción; no se invocó ningún
+preparador/verificador ni se eludió la protección anterior. T3 obtiene ahora
+las dos pruebas EXTRA faltantes, pero T5 sigue parcial: revisión nativa final
+high-risk y disposición/commit pertenecen al padre. No se declara listo para
+main ni se modifica main, Supabase, la instalación 8080 o sus volúmenes.
+
 ## Veredicto de esta unidad
 
 **Parcial: no declarar listo para main.** Unión de reportes con tickets,
