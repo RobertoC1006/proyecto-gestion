@@ -1,7 +1,7 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
 import { Prisma, TicketService } from '@prisma/client';
 import { createHash, randomBytes } from 'node:crypto';
-import { mkdir, readFile, stat, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve, sep } from 'node:path';
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import QRCode from 'qrcode';
@@ -38,6 +38,10 @@ type CertificateRecord = {
 };
 
 const validCode = (value: unknown) => typeof value === 'string' && /^CITS-[A-Z0-9]{20}$/.test(value);
+const fileUnavailable = (cause?: unknown) => new ServiceUnavailableException({
+  code: 'CERTIFICATE_FILE_UNAVAILABLE',
+  message: 'El PDF original no está disponible. La emisión y su huella se conservan para verificar el archivo original.',
+}, { cause });
 
 @Injectable()
 export class CertificatesService {
@@ -103,7 +107,6 @@ export class CertificatesService {
 
     try {
       const issuedAt = new Date();
-      let generated: Buffer | null = null;
       const row = await this.db.$transaction(async tx => {
         await tx.$queryRaw`SELECT "id" FROM "Ticket" WHERE "id"=${ticketId}::uuid AND "institutionId"=${actor.institutionId}::uuid AND "ownerId"=${actor.id}::uuid FOR UPDATE`;
         const ticket = await tx.ticket.findFirst({
@@ -132,8 +135,7 @@ export class CertificatesService {
           ticketCreatedAt: ticket.createdAt,
         });
         const sha256 = createHash('sha256').update(pdf).digest('hex');
-        generated = pdf;
-        return tx.certificate.create({
+        const created = await tx.certificate.create({
           data: {
             institutionId: actor.institutionId,
             ticketId,
@@ -147,8 +149,11 @@ export class CertificatesService {
             storageKey,
           },
         });
+        // Publish the issued row only after its original bytes exist. Concurrent requests
+        // waiting on the ticket lock can then reuse that same document, never regenerate it.
+        await this.writePdf(created, pdf);
+        return created;
       });
-      if (generated) await this.writePdf(row, generated);
       await this.ensurePdf(row);
       return this.response(row);
     } catch (error) {
@@ -175,8 +180,8 @@ export class CertificatesService {
     const id = uuid(rawId, 'id');
     const row = await this.db.certificate.findFirst({ where: { id, institutionId: actor.institutionId, ownerId: actor.id } });
     if (!row) throw new NotFoundException({ code: 'NOT_FOUND', message: 'No se encontró la constancia.' });
-    const path = await this.ensurePdf(row);
-    return { path, bytes: await readFile(path), code: row.code };
+    const file = await this.ensurePdf(row);
+    return { ...file, code: row.code }; // Return the exact bytes whose hash was checked.
   }
 
   async publicLookup(rawCode: unknown) {
@@ -242,33 +247,18 @@ export class CertificatesService {
 
   private async ensurePdf(row: CertificateRecord) {
     const path = this.storagePath(row.storageKey);
+    let bytes: Buffer;
     try {
-      const info = await stat(path);
-      if (info.isFile()) {
-        const bytes = await readFile(path);
-        if (createHash('sha256').update(bytes).digest('hex') === row.sha256) return path;
-      }
-    } catch {}
-    const [institution, ticket] = await Promise.all([
-      this.db.institution.findUnique({ where: { id: row.institutionId }, select: { name: true } }),
-      this.db.ticket.findUnique({ where: { id: row.ticketId }, include: { owner: { select: { displayName: true } } } }),
-    ]);
-    const bytes = await this.createPdf({
-      code: row.code,
-      ticketCode: row.ticketCode,
-      service: row.service,
-      ownerName: ticket?.owner.displayName || 'Titular institucional',
-      resolvedAt: row.resolvedAt,
-      issuedAt: row.issuedAt,
-      institutionId: row.institutionId,
-      institutionName: institution?.name,
-      ticketCreatedAt: ticket?.createdAt,
-    });
-    const sha256 = createHash('sha256').update(bytes).digest('hex');
-    await this.writePdf(row, bytes);
-    await this.db.certificate.update({ where: { id: row.id }, data: { sha256 } });
-    row.sha256 = sha256;
-    return path;
+      bytes = await readFile(path);
+    } catch (cause) {
+      throw fileUnavailable(cause);
+    }
+    if (createHash('sha256').update(bytes).digest('hex') !== row.sha256) {
+      throw fileUnavailable(new Error('El archivo almacenado no coincide con la huella emitida.'));
+    }
+    // No issuance snapshot exists for every rendered field. Regeneration could silently
+    // replace a legitimate original, so recovery requires the exact original backup.
+    return { path, bytes };
   }
 
   private async createPdf(input: {

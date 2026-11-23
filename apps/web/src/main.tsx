@@ -41,7 +41,7 @@ const queryClient = new QueryClient({
 function App() {
   const { pathname } = useLocation()
   if (pathname === '/login') return <LoginPage />
-  if (/^\/verificar\/[^/]+\/?$/.test(pathname)) return <main className="legacy-view"><VerifyCertificatePage /></main>
+  if (/^\/verificar\/[^/]+\/?$/.test(pathname)) return <Routes><Route path="/verificar/:codigo" element={<main className="legacy-view"><VerifyCertificatePage /></main>} /></Routes>
   return (
     <SessionBoundary>
     <RootLayout>

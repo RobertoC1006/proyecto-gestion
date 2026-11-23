@@ -1,5 +1,5 @@
 import { BadRequestException, Body, Controller, Get, HttpCode, Param, Post, Req, Res, StreamableFile, UseGuards } from '@nestjs/common';
-import { ApiCookieAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiCookieAuth, ApiOkResponse, ApiServiceUnavailableResponse, ApiTags } from '@nestjs/swagger';
 import type { Response } from 'express';
 import { AuthRequest } from '../auth/auth.service';
 import { CampusSessionGuard, RequirePermissions } from '../auth/auth.guard';
@@ -24,6 +24,7 @@ export class CertificatesController {
   @HttpCode(200)
   @RequirePermissions('certificates:request:self')
   @ApiOkResponse({ type: CertificateDto })
+  @ApiServiceUnavailableResponse({ description: 'CERTIFICATE_FILE_UNAVAILABLE: el PDF original no está disponible; la emisión y su huella se conservan.' })
   issue(@Req() request: AuthRequest, @Param('ticketId') ticketId: string) {
     return this.certificates.issue(request.campusPrincipal!, ticketId);
   }
@@ -31,12 +32,14 @@ export class CertificatesController {
   @Get(':id')
   @RequirePermissions('certificates:request:self')
   @ApiOkResponse({ type: CertificateDto })
+  @ApiServiceUnavailableResponse({ description: 'CERTIFICATE_FILE_UNAVAILABLE: el PDF original no está disponible; la emisión y su huella se conservan.' })
   detail(@Req() request: AuthRequest, @Param('id') id: string) {
     return this.certificates.detail(request.campusPrincipal!, id);
   }
 
   @Get(':id/download')
   @RequirePermissions('certificates:request:self')
+  @ApiServiceUnavailableResponse({ description: 'CERTIFICATE_FILE_UNAVAILABLE: el PDF original no está disponible; la emisión y su huella se conservan.' })
   async download(@Req() request: AuthRequest, @Param('id') id: string, @Res({ passthrough: true }) response: Response) {
     const file = await this.certificates.download(request.campusPrincipal!, id);
     response.setHeader('Content-Type', 'application/pdf');
