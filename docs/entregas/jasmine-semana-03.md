@@ -26,6 +26,40 @@
 - El frontend reutiliza componentes compartidos y muestra observado,
   categorías, filtros, carga, error y datos vacíos.
 
+## Corrección de origen de datos (T4 · S1–S3)
+
+Los conteos conservan su población y definiciones: incluyen los Tickets que
+coinciden con fechas, categoría, estado e institución/equipo autorizado, también
+los marcados `isDemo`. No se excluyen silenciosamente casos de demostración.
+`synthetic` es un booleano: `true` cuando al menos uno de esos Tickets es de
+demostración; `false` para selección vacía o solo real. No significa que todos
+los casos sean sintéticos. Datos de otra institución o equipo fuera del alcance
+no cambian la marca. El CSV repite la marca de la selección completa en cada
+fila temporal (no una marca independiente por periodo). La interfaz muestra
+“Incluye tickets de demostración: Sí/No” a partir del mismo campo.
+
+Verificación aislada de esta corrección:
+
+- RED API: regresiones reprodujeron `false` en población mixta y CSV demo;
+  8 aprobadas, 3 fallidas incluyendo el contenedor de subpruebas, salida 1.
+- RED navegador: ambos mensajes dinámicos ausentes, 2 fallidas, salida 1.
+- GREEN: 11 pruebas de reportes aprobadas; cierre API con workflow, tickets,
+  academic, auth/provider, role-permissions, users y reports: 74 aprobadas.
+- Frontend compilado estáticamente en copia temporal privada; 2 recorridos
+  Playwright con origen verdadero/falso aprobados y API no simulada bloqueada.
+- Se conservaron los fixtures numéricos anteriores y se comprobó CSV exacto,
+  campos vacíos, comillas y separadores CRLF. Filtros y rechazos se comprueban
+  por HTTP; las aserciones de negocio no consultan almacenamiento interno.
+- PostgreSQL descartable en red interna; sin acceso a Supabase, instalación
+  habitual, migraciones compartidas ni cambios de dependencias.
+
+Para reproducir API: construir desde esta rama con
+`docker build --target test -t campusitsm-reports-t4:green-20261121 -f apps/api/Dockerfile .`;
+crear una copia temporal de `scripts/verify-workflow.py`, cambiando solo `ROOT`
+al worktree y la imagen a ese tag; ejecutar
+`python <runner> --tests test/workflow.test.cjs test/tickets.test.cjs test/academic.test.cjs test/auth.test.cjs test/auth.provider.test.cjs test/role-permissions.test.cjs test/users.test.cjs test/reports.test.cjs test/reports.http.test.cjs`.
+Estos resultados no acreditan integración en main ni sesión real Supabase.
+
 ## Pronóstico
 
 No existe un servicio analítico de pronóstico publicado en `main`:

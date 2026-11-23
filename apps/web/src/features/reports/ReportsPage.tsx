@@ -17,7 +17,7 @@ type ReportsData = {
   resolutionRate: number | null
   resolvedWithinSlaRate: number | null
   source: 'tickets-operational'
-  synthetic: false
+  synthetic: boolean
   forecastStatus: 'unavailable'
   forecastMessage: string
   filters: { from: string; to: string; period: 'day' | 'week' | 'month'; scope: 'institution' | 'team' }
@@ -87,7 +87,7 @@ export default function ReportsPage() {
   return <section className="reports-page">
     <PageHeading
       title="Histórico y resultados"
-      subtitle="Reportes operativos basados en Tickets reales."
+      subtitle="Reportes operativos basados en los Tickets seleccionados."
       illustrationIcon={ChartLine}
       action={<Button type="button" icon={Download} onClick={() => void exportReport().catch(() => undefined)} disabled={report.isPending || !!report.error}>Exportar reporte</Button>}
     />
@@ -138,7 +138,7 @@ export default function ReportsPage() {
       )}
 
       <Notice tone="amber" icon={Info} role="status">
-        <strong>Pronóstico no disponible.</strong> {data.forecastMessage} Fuente: `Tickets operativos`; cifras sintéticas: No.
+        <strong>Pronóstico no disponible.</strong> {data.forecastMessage} Fuente: `Tickets operativos`; Incluye tickets de demostración: {data.synthetic ? 'Sí' : 'No'}.
       </Notice>
     </>}
   </section>

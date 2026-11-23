@@ -32,7 +32,7 @@ export class ReportsDto {
   @ApiProperty({ nullable: true }) resolutionRate!: number | null;
   @ApiProperty({ nullable: true }) resolvedWithinSlaRate!: number | null;
   @ApiProperty() source!: 'tickets-operational';
-  @ApiProperty() synthetic!: false;
+  @ApiProperty({ description: 'True when the filtered population includes demonstration tickets.' }) synthetic!: boolean;
   @ApiProperty({ enum: ['unavailable'] }) forecastStatus!: 'unavailable';
   @ApiProperty() forecastMessage!: string;
   @ApiProperty() filters!: ReportFiltersDto;

@@ -89,3 +89,20 @@ test('P15 exportación usa CSV y no incluye pronóstico falso', async () => {
   assert.match(csv, /tickets-operational","false/);
   assert.doesNotMatch(csv, /,[1-9][0-9]*,tickets-operational/);
 });
+
+
+test('P15 CSV conserva origen sintetico de la poblacion seleccionada', async () => {
+  const db = { ticket: { findMany: async () => [{
+    id: 'demo', service: 'correo', status: 'registrado', isDemo: true,
+    createdAt: new Date('2026-11-10T10:00:00Z'),
+  }] } };
+  const service = new ReportsService(db);
+  const csv = await service.export(principal(), {
+    from: '2026-11-01T00:00:00Z', to: '2026-11-20T23:59:59Z', period: 'month',
+  });
+  assert.equal(csv, [
+    'periodo,observado,pronosticado,origen,fuente_sintetica',
+    '"2026-11-01","1","","tickets-operational","true"',
+    '', 'categoria,cantidad,porcentaje', '"Correo institucional","1","100"',
+  ].join(String.fromCharCode(13, 10)));
+});

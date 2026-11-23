@@ -122,6 +122,7 @@ export class ReportsService {
         resolvedAt: true,
         resolutionDueAt: true,
         failureConfirmed: true,
+        isDemo: true,
       },
       orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
     });
@@ -174,7 +175,7 @@ export class ReportsService {
       resolutionRate: rows.length ? Math.round(resolved * 1000 / rows.length) / 10 : null,
       resolvedWithinSlaRate: resolvedWithDue.length ? Math.round(resolvedWithinSla * 1000 / resolvedWithDue.length) / 10 : null,
       source: 'tickets-operational' as const,
-      synthetic: false as const,
+      synthetic: rows.some(row => row.isDemo),
       forecastStatus: 'unavailable' as const,
       forecastMessage: 'El servicio de pronóstico de Roberto no está publicado en esta versión; no hay datos pronosticados disponibles.',
       filters: {
@@ -198,7 +199,7 @@ export class ReportsService {
         item.observed,
         '',
         report.source,
-        'false',
+        report.synthetic,
       ].map(escape).join(',')),
       [],
       ['categoria', 'cantidad', 'porcentaje'].join(','),

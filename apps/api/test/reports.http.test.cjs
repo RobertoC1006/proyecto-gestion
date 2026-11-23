@@ -141,6 +141,67 @@ test('P15: endpoints HTTP con PostgreSQL aislado', async t => {
       const reverse = await request(`reports?from=2026-11-20T00:00:00Z&to=2026-11-01T00:00:00Z&scope=institution`, { session: adminSession });
       assert.equal(reverse.status, 400);
     });
+    await t.test('Origen sintético sigue exactamente filtros y límites autorizados', async () => {
+      const otherInstitution = randomUUID();
+      const otherOwner = randomUUID();
+      const otherTeamOwner = randomUUID();
+      await db.institution.create({ data: { id: otherInstitution, code: 'REPORTS-FOREIGN', name: 'Otra institución' } });
+      try {
+        await db.appUser.createMany({ data: [
+          { id: otherOwner, institutionId: otherInstitution, email: 'foreign@example.test', displayName: 'Ajeno', role: 'estudiante' },
+          { id: otherTeamOwner, institutionId, teamId: foreignTeamId, email: 'other-team@example.test', displayName: 'Otro equipo', role: 'estudiante' },
+        ] });
+        const seed = (ownerId, tenant, code, service, day) => ({
+          institutionId: tenant, ownerId, code, description: 'Demostración aislada de reportes.',
+          service, scope: 'general', status: 'registrado', isDemo: true,
+          idempotencyKey: randomUUID(), requestHash: 'd'.repeat(64), createdAt: new Date(day),
+        });
+        await db.ticket.createMany({ data: [
+          seed(student.id, institutionId, 'INC-DEMO-OWN', 'wifi_red', '2026-11-15T10:00:00Z'),
+          seed(otherTeamOwner, institutionId, 'INC-DEMO-TEAM', 'impresoras', '2026-11-16T10:00:00Z'),
+          seed(otherOwner, otherInstitution, 'INC-DEMO-FOREIGN', 'correo', '2026-11-10T10:00:00Z'),
+        ] });
+        const query = 'from=2026-11-01T00:00:00Z&to=2026-11-20T23:59:59Z&period=day';
+        for (const [filters, total, synthetic] of [
+          ['scope=institution', 4, true], ['scope=team', 3, true],
+          ['scope=institution&service=wifi_red', 1, true],
+          ['scope=institution&service=correo', 1, false],
+          ['scope=institution&status=resuelto', 1, false],
+          ['scope=team&service=impresoras', 0, false],
+          ['scope=institution&service=otro', 0, false],
+          ['scope=institution&from=2026-11-15T10:00:00Z&to=2026-11-15T10:00:01Z', 1, true],
+          ['scope=institution&to=2026-11-14T23:59:59Z', 2, false],
+          ['scope=institution&from=2026-11-17T00:00:00Z', 0, false],
+        ]) {
+          const params = new URLSearchParams(query);
+          for (const [key, value] of new URLSearchParams(filters)) params.set(key, value);
+          const session = params.get('scope') === 'team' ? supervisorSession : adminSession;
+          const report = await request(`reports?${params}`, { session });
+          assert.equal(report.status, 200, JSON.stringify(report.body));
+          assert.equal(report.body.total, total, filters);
+          assert.equal(report.body.synthetic, synthetic, filters);
+          assert.equal(report.body.series.reduce((n, row) => n + row.observed, 0), total);
+          assert.equal(report.body.categories.reduce((n, row) => n + row.count, 0), total);
+          const csv = await request(`reports/export?${params}`, { session });
+          assert.equal(csv.status, 200);
+          const series = csv.body.split(String.fromCharCode(13, 10)).slice(1).filter(line => line.includes('tickets-operational'));
+          assert.ok(series.length);
+          assert.ok(series.every(line => line.endsWith(`"${synthetic}"`)), filters);
+        }
+        const before = await request(`reports?${query}`, { session: adminSession });
+        for (const path of ['reports', 'reports/export']) {
+          assert.equal((await request(`${path}?${query}&service=invalid`, { session: adminSession })).status, 400);
+          assert.equal((await request(`${path}?${query}`, { session: studentSession })).status, 403);
+          assert.equal((await request(`${path}?${query}`)).status, 401);
+          assert.equal((await request(`${path}?${query}&scope=institution`, { session: supervisorSession })).status, 400);
+        }
+        assert.deepEqual((await request(`reports?${query}`, { session: adminSession })).body, before.body);
+      } finally {
+        await db.ticket.deleteMany({ where: { OR: [{ institutionId: otherInstitution }, { code: { startsWith: 'INC-DEMO-' }, institutionId }] } });
+        await db.appUser.deleteMany({ where: { id: { in: [otherOwner, otherTeamOwner] } } });
+        await db.institution.delete({ where: { id: otherInstitution } });
+      }
+    });
   } finally {
     await db.ticket.deleteMany({ where: { institutionId } });
     await db.appUser.deleteMany({ where: { institutionId } });
