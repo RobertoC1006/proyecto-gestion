@@ -22,9 +22,29 @@ export class AuditController {
 
   @Get('export')
   @Header('Cache-Control', 'no-store')
-  async export(@Req() req: AuthRequest, @Query() query: Record<string, unknown>, @Res({ passthrough: true }) response: Response) {
-    response.setHeader('Content-Type', 'text/csv; charset=utf-8');
-    response.setHeader('Content-Disposition', 'attachment; filename="campusitsm-auditoria.csv"');
-    return this.service.export(req.campusPrincipal!, query);
+  async export(@Req() req: AuthRequest, @Query() query: Record<string, unknown>, @Res() response: Response) {
+    try {
+      await this.service.export(req.campusPrincipal!, query, async chunk => {
+        if (response.destroyed) return false;
+        if (!response.headersSent) {
+          response.setHeader('Cache-Control', 'no-store');
+          response.setHeader('Content-Type', 'text/csv; charset=utf-8');
+          response.setHeader('Content-Disposition', 'attachment; filename="campusitsm-auditoria.csv"');
+        }
+        if (response.write(chunk)) return true;
+        // Stop fetching on disconnect; never outrun a slow consumer.
+        return new Promise<boolean>(resolve => {
+          const cleanup = () => { response.off('drain', drained); response.off('close', closed); };
+          const drained = () => { cleanup(); resolve(true); };
+          const closed = () => { cleanup(); resolve(false); };
+          response.once('drain', drained);
+          response.once('close', closed);
+        });
+      });
+      response.end();
+    } catch (error) {
+      if (response.headersSent) response.destroy(error instanceof Error ? error : undefined);
+      else throw error;
+    }
   }
 }

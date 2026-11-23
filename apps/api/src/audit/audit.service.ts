@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../database/prisma.service';
 import { CampusPrincipal } from '../auth/auth.policy';
 import { AuditPageDto } from './audit.dto';
@@ -7,7 +8,7 @@ import * as v from './audit.validation';
 type AuditRow = {
   id: string; occurredAt: Date; actorId: string; action: string;
   objectType: string; objectId: string | null; reason: string | null;
-  before: unknown; after: unknown; actor: string;
+  before: unknown; after: unknown; actor: string; source: number;
 };
 
 const sensitive = /password|token|secret|credential|authorization|cookie|attachment|file|email|phone|address|content|description|text/i;
@@ -37,62 +38,78 @@ export class AuditService {
 
   async list(actor: CampusPrincipal, query: unknown): Promise<AuditPageDto> {
     const q = v.auditQuery(query);
-    const common = { institutionId: actor.institutionId, ...(q.from || q.to ? { createdAt: { ...(q.from ? { gte: q.from } : {}), ...(q.to ? { lte: q.to } : {}) } } : {}), ...(q.actorId ? { actorId: q.actorId } : {}) };
-    const bounded = Math.min(10000, q.page * q.pageSize + q.pageSize);
-    const [academic, identity, permissions, consent, tickets] = await Promise.all([
-      this.db.academicChange.findMany({ where: common, orderBy: [{ createdAt: 'desc' }, { id: 'desc' }], take: bounded }),
-      this.db.identityChange.findMany({ where: common, orderBy: [{ createdAt: 'desc' }, { id: 'desc' }], take: bounded }),
-      this.db.rolePermissionChange.findMany({ where: common, orderBy: [{ createdAt: 'desc' }, { id: 'desc' }], take: bounded }),
-      this.db.consentAcceptance.findMany({ where: { institutionId: actor.institutionId, ...(q.from || q.to ? { acceptedAt: { ...(q.from ? { gte: q.from } : {}), ...(q.to ? { lte: q.to } : {}) } } : {}), ...(q.actorId ? { userId: q.actorId } : {}) }, include: { consentVersion: true, user: { select: { displayName: true } } }, orderBy: [{ acceptedAt: 'desc' }, { id: 'desc' }], take: bounded }),
-      this.db.ticketChange.findMany({ where: common, orderBy: [{ createdAt: 'desc' }, { id: 'desc' }], take: bounded }),
-    ]);
-    const rows: AuditRow[] = [
-      ...academic.map(item => ({ id: item.id, occurredAt: item.createdAt, actorId: item.actorId, actor: item.actorId, action: item.action, objectType: item.entityType, objectId: item.entityId, reason: item.reason, before: item.before, after: item.after })),
-      ...identity.map(item => ({ id: item.id, occurredAt: item.createdAt, actorId: item.actorId, actor: item.actorId, action: 'access.change', objectType: 'AppUser', objectId: item.subjectId, reason: item.reason, before: item.before, after: item.after })),
-      ...permissions.map(item => ({ id: item.id, occurredAt: item.createdAt, actorId: item.actorId, actor: item.actorId, action: 'permissions.change', objectType: 'RoleAccess', objectId: null, reason: item.reason, before: item.before, after: item.after })),
-      ...consent.map(item => ({ id: item.id, occurredAt: item.acceptedAt, actorId: item.userId, actor: item.user.displayName, action: 'consent.accept', objectType: 'ConsentVersion', objectId: item.consentVersionId, reason: null, before: null, after: { version: item.consentVersion.version, acceptedAt: item.acceptedAt.toISOString() } })),
-      ...tickets.map(item => ({ id: item.id, occurredAt: item.createdAt, actorId: item.actorId, actor: item.actorId, action: `ticket.${item.action}`, objectType: 'Ticket', objectId: item.ticketId, reason: item.note, before: item.before, after: item.after })),
-    ].filter(item => (!q.objectType || item.objectType === q.objectType) && (!q.objectId || item.objectId === q.objectId) && (!q.action || item.action === q.action));
-    const actorIds = [...new Set(rows.map(item => item.actorId))];
-    const actors = await this.db.appUser.findMany({ where: { institutionId: actor.institutionId, id: { in: actorIds } }, select: { id: true, displayName: true } });
-    const actorNames = new Map(actors.map(item => [item.id, item.displayName]));
-    rows.forEach(item => { if (actorNames.has(item.actorId)) item.actor = actorNames.get(item.actorId)!; });
-    rows.sort((a, b) => b.occurredAt.getTime() - a.occurredAt.getTime() || b.id.localeCompare(a.id));
-    const total = rows.length;
-    const items = rows.slice((q.page - 1) * q.pageSize, q.page * q.pageSize).map(item => {
-      const beforeValue = sanitize(item.before);
-      const afterValue = sanitize(item.after);
-      return {
-        ...item,
-        occurredAt: item.occurredAt.toISOString(),
-        reason: item.reason && !sensitive.test(item.reason) ? item.reason : null,
-        before: beforeValue && typeof beforeValue === 'object' && !Array.isArray(beforeValue) ? beforeValue as Record<string, unknown> : null,
-        after: afterValue && typeof afterValue === 'object' && !Array.isArray(afterValue) ? afterValue as Record<string, unknown> : null,
-      };
-    });
-    return { items, total, page: q.page, pageSize: q.pageSize };
+    const matched = this.matching(actor, q);
+    return this.db.$transaction(async tx => {
+      const [count] = await tx.$queryRaw<{ total: bigint }[]>(Prisma.sql`SELECT count(*) AS total FROM (${matched}) m`);
+      const rows = await this.read(tx, matched, Prisma.sql`OFFSET ${(q.page - 1) * q.pageSize}`, q.pageSize);
+      return { items: rows.map(item => this.dto(item)), total: Number(count.total), page: q.page, pageSize: q.pageSize };
+    }, { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead });
   }
 
-  async export(actor: CampusPrincipal, query: unknown) {
-    const q = v.auditQuery({ ...(query as Record<string, unknown>), page: 1, pageSize: 100 });
-    const result = await this.list(actor, q);
+  // Parsed values stay private: each public entrypoint validates exactly once.
+  private matching(actor: CampusPrincipal, q: ReturnType<typeof v.auditQuery>) {
+    return Prisma.sql`
+      SELECT h.*, coalesce(u."displayName", h."actorId"::text) AS actor FROM (
+        SELECT id, "institutionId", "createdAt" AS "occurredAt", "actorId", action,
+          "entityType" AS "objectType", "entityId" AS "objectId", reason, "before", "after", 1 AS source FROM "AcademicChange"
+        UNION ALL
+        SELECT id, "institutionId", "createdAt", "actorId", 'access.change', 'AppUser', "subjectId", reason, "before", "after", 2 FROM "IdentityChange"
+        UNION ALL
+        SELECT id, "institutionId", "createdAt", "actorId", 'permissions.change', 'RoleAccess', NULL::uuid, reason, "before", "after", 3 FROM "RolePermissionChange"
+        UNION ALL
+        SELECT c.id, c."institutionId", c."acceptedAt", c."userId", 'consent.accept', 'ConsentVersion', c."consentVersionId", NULL, NULL::jsonb,
+          jsonb_build_object('version', v.version, 'acceptedAt', to_char(c."acceptedAt" AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')), 4
+          FROM "ConsentAcceptance" c JOIN "ConsentVersion" v ON v.id = c."consentVersionId"
+        UNION ALL
+        SELECT id, "institutionId", "createdAt", "actorId", 'ticket.' || action, 'Ticket', "ticketId", note, "before", "after", 5 FROM "TicketChange"
+      ) h LEFT JOIN "AppUser" u ON u.id = h."actorId" AND u."institutionId" = h."institutionId"
+      WHERE h."institutionId" = ${actor.institutionId}::uuid
+        ${q.from ? Prisma.sql`AND h."occurredAt" >= ${q.from}` : Prisma.empty}
+        ${q.to ? Prisma.sql`AND h."occurredAt" <= ${q.to}` : Prisma.empty}
+        ${q.actorId ? Prisma.sql`AND h."actorId" = ${q.actorId}::uuid` : Prisma.empty}
+        ${q.objectId ? Prisma.sql`AND h."objectId" = ${q.objectId}::uuid` : Prisma.empty}
+        ${q.objectType ? Prisma.sql`AND h."objectType" = ${q.objectType}` : Prisma.empty}
+        ${q.action ? Prisma.sql`AND h.action = ${q.action}` : Prisma.empty}`;
+  }
+
+  private read(tx: Prisma.TransactionClient, matched: Prisma.Sql, offset: Prisma.Sql, take: number, cursor?: AuditRow) {
+    return tx.$queryRaw<AuditRow[]>(Prisma.sql`SELECT * FROM (${matched}) m
+      ${cursor ? Prisma.sql`WHERE ("occurredAt", id, source) < (${cursor.occurredAt}, ${cursor.id}::uuid, ${cursor.source})` : Prisma.empty}
+      ORDER BY "occurredAt" DESC, id DESC, source DESC LIMIT ${take} ${offset}`);
+  }
+
+  private dto(item: AuditRow) {
+    const before = sanitize(item.before), after = sanitize(item.after);
+    // Do not leak SQL-only scope or cursor columns into the public DTO.
+    return {
+      id: item.id, occurredAt: item.occurredAt.toISOString(), actorId: item.actorId, actor: item.actor,
+      action: item.action, objectType: item.objectType, objectId: item.objectId,
+      reason: item.reason && !sensitive.test(item.reason) ? item.reason : null,
+      before: before && typeof before === 'object' && !Array.isArray(before) ? before as Record<string, unknown> : null,
+      after: after && typeof after === 'object' && !Array.isArray(after) ? after as Record<string, unknown> : null,
+    };
+  }
+
+  async export(actor: CampusPrincipal, query: unknown, write: (chunk: string) => Promise<boolean>) {
+    const q = v.auditQuery(query);
+    const matched = this.matching(actor, q);
     const escape = (value: unknown) => {
       const text = value == null ? '' : typeof value === 'object' ? JSON.stringify(value) : String(value);
       return `"${text.replace(/[\r\n]/g, ' ').replace(/"/g, '""')}"`;
     };
-    const lines = [
-      ['id', 'occurredAt', 'actorId', 'actor', 'action', 'objectType', 'objectId', 'reason'].join(','),
-      ...result.items.map(item => [
-        item.id,
-        item.occurredAt,
-        item.actorId,
-        item.actor,
-        item.action,
-        item.objectType,
-        item.objectId,
-        item.reason,
-      ].map(escape).join(',')),
-    ];
-    return lines.join('\r\n');
+    await this.db.$transaction(async tx => {
+      let cursor: AuditRow | undefined;
+      if (!await write('id,occurredAt,actorId,actor,action,objectType,objectId,reason')) return;
+      while (true) {
+        const rows = await this.read(tx, matched, Prisma.empty, 100, cursor);
+        if (!rows.length) return;
+        const chunk = rows.map(row => {
+          const item = this.dto(row);
+          return [item.id, item.occurredAt, item.actorId, item.actor, item.action, item.objectType, item.objectId, item.reason].map(escape).join(',');
+        }).join('\r\n');
+        if (!await write('\r\n' + chunk)) return;
+        cursor = rows[rows.length - 1];
+      }
+    }, { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead, timeout: 120000 });
   }
 }

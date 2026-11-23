@@ -232,8 +232,8 @@ cierra las siguientes mejoras:
   identidad, permisos y consentimientos.
 - El saneamiento conserva arrays primitivos seguros y elimina claves sensibles
   anidadas.
-- La consulta limita y pagina fuentes; exporta CSV con los mismos filtros
-  autorizados, sin antes/después ni datos privados.
+- La consulta filtra y pagina globalmente las cinco fuentes; exporta CSV con
+  los mismos filtros autorizados, sin antes/después ni datos privados.
 - La consulta administrativa de aceptaciones requiere `audit:read:institution`
   y devuelve versión, usuario visible y fecha, sin correo.
 
@@ -259,3 +259,82 @@ No se aplicó la migración a Supabase ni se modificaron datos compartidos.
 No se declara iniciada la Semana 2. Exportaciones, anonimización avanzada,
 reportes adicionales y cualquier integración con la base compartida quedan
 fuera de esta entrega.
+
+## Corrección de preparación para integración — T3 (S1–S3)
+
+Sobre `fix/jasmine-auditoria`, base `4ae4b6b`, se reprodujeron por HTTP cuatro
+fallos: coincidencia antigua omitida (0 en lugar de 1), total parcial (8 en
+lugar de 12), exportación con fecha rechazada (400) y CSV truncado (100 de
+205 registros). No se modificó main ni se aplicaron migraciones compartidas.
+
+La lectura usa `Prisma.sql` parametrizado y UNION ALL estático de las cinco
+fuentes. Todos los filtros preceden al conteo y a LIMIT/OFFSET. El total y la
+página comparten una transacción Repeatable Read, incluso en páginas vacías.
+Orden: instante descendente, UUID descendente y fuente descendente como último
+desempate interno. Cada solicitud tiene su propia instantánea; navegar páginas
+con escrituras concurrentes no mantiene una instantánea entre solicitudes.
+
+`GET /api/v1/audit/export` valida una sola vez los mismos parámetros y exporta
+**todas** las coincidencias autorizadas, independientemente de page/pageSize.
+Conserva columnas, nombre de archivo, no-store, escape CSV y saneamiento. Usa
+lotes de 100 y cursor (instante, UUID, fuente), dentro de una única instantánea
+Repeatable Read. Respeta contrapresión del consumidor y cancela la lectura al
+cerrar la conexión. No hay límite de filas de negocio. La transacción tiene un
+timeout operativo de 120 segundos: un error después de iniciar el CSV corta la
+conexión, no devuelve una exportación parcial como respuesta completada.
+
+Validación aislada reproducible:
+
+1. `docker build --target test -t campusitsm-audit-t3:green-20261121a -f apps/api/Dockerfile .`
+2. Copiar `scripts/verify-workflow.py` a un directorio temporal del sistema y
+   sustituir únicamente ROOT por este worktree e imagen compartida por el tag
+   anterior. Mantener red interna, DB tmpfs y limpieza originales.
+3. `python <runner-temporal> --tests test/privacy.test.cjs`: 12/12 pasaron.
+4. `python <runner-temporal> --tests test/workflow.test.cjs test/tickets.test.cjs test/academic.test.cjs test/auth.test.cjs test/auth.provider.test.cjs test/role-permissions.test.cjs test/users.test.cjs test/privacy.test.cjs`:
+   75/75 pasaron, sin omitidos. La imagen también compila la API.
+5. `node --check apps/api/test/privacy.test.cjs` y `git diff --check`.
+
+Regresiones persistidas en privacy.test.cjs: coincidencias detrás del prefijo,
+totales exactos y empates entre páginas, página posterior al final, fechas
+from/to/ambas, CSV de 205 filas, escape y cabeceras, intercalación de las cinco
+fuentes, aislamiento institucional/de actor, 401/403, validación 400 y ausencia
+de mutación observable tras rechazos. Se conservan consentimiento y saneamiento.
+La ampliación de fixtures tuvo un fallo de preparación (descripción menor al
+mínimo de Ticket); se corrigió el fixture y la ejecución final pasó.
+
+Pendiente para revisión independiente: presión de clientes muy lentos,
+desconexiones y escrituras concurrentes durante una exportación grande; no se
+presentan como pruebas de carga ejecutadas. El timeout y la retención de una
+instantánea larga requieren atención operativa. Sin cambios de permisos,
+helpers académicos, dependencias, esquema, frontend ni datos reales. No se
+creó audit.test.cjs: las regresiones reutilizan el fixture HTTP de privacidad.
+Los runners temporales no son artefactos duraderos; reconstruirlos al verificar.
+
+### Evidencia independiente y regresiones de ciclo de vida
+
+El verificador independiente informó 12 pruebas HTTP de privacidad y seis
+probes de ciclo de vida/parámetros/cancelación aprobados, con correspondencia
+de bytes de 83 archivos y sin bloqueo causado por el candidato. Esta evidencia
+no equivale a una declaración de preparación integral para main.
+
+Dos probes EXTRA con PostgreSQL real siguen **sin verificar**: colisión de UUID
+idéntico entre fuentes al paginar por cursor y escrituras concurrentes durante
+la instantánea. Su preparación agotó la corrección permitida: primero falló una
+búsqueda de substring por codificación y después el fixture `reason: 'safe'`
+incumplió el mínimo de cinco caracteres. Son fallos de preparación, no defectos
+funcionales demostrados. No se reintentaron ni reconstruyeron esos probes.
+
+`apps/api/test/audit.lifecycle.test.cjs` conserva tres regresiones pequeñas del
+método público AuditController.export, con EventEmitter y servicio asíncrono
+sustituido: drain devuelve true, close devuelve false, ambos retiran los dos
+listeners; una excepción posterior a las cabeceras destruye la respuesta con
+el mismo Error y nunca llama end. No añade framework ni modifica producción.
+Estas regresiones no prueban concurrencia PostgreSQL ni sustituyen los dos
+probes EXTRA pendientes.
+
+Validación de persistencia: `node --check apps/api/test/audit.lifecycle.test.cjs`
+terminó con código 0. Una única ejecución `node --test test/audit.lifecycle.test.cjs`
+en `campusitsm-audit-t3:green-20261121a`, con red deshabilitada y el archivo
+montado en solo lectura en `/app/test/audit.lifecycle.test.cjs`, pasó 3/3
+(código 0, sin omitidos). No se reconstruyó la imagen ni se repitió la suite
+completa o los probes EXTRA.
