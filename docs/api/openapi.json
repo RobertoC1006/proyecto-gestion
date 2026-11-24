@@ -4395,6 +4395,7 @@
           },
           "actorId": {
             "type": "string",
+            "nullable": true,
             "format": "uuid"
           },
           "actor": {

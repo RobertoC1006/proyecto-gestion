@@ -6,7 +6,7 @@ import { AuditPageDto } from './audit.dto';
 import * as v from './audit.validation';
 
 type AuditRow = {
-  id: string; occurredAt: Date; actorId: string; action: string;
+  id: string; occurredAt: Date; actorId: string | null; action: string;
   objectType: string; objectId: string | null; reason: string | null;
   before: unknown; after: unknown; actor: string; source: number;
 };
@@ -49,7 +49,7 @@ export class AuditService {
   // Parsed values stay private: each public entrypoint validates exactly once.
   private matching(actor: CampusPrincipal, q: ReturnType<typeof v.auditQuery>) {
     return Prisma.sql`
-      SELECT h.*, coalesce(u."displayName", h."actorId"::text) AS actor FROM (
+      SELECT h.*, coalesce(u."displayName", h."actorId"::text, 'Consulta pública') AS actor FROM (
         SELECT id, "institutionId", "createdAt" AS "occurredAt", "actorId", action,
           "entityType" AS "objectType", "entityId" AS "objectId", reason, "before", "after", 1 AS source FROM "AcademicChange"
         UNION ALL
@@ -62,6 +62,12 @@ export class AuditService {
           FROM "ConsentAcceptance" c JOIN "ConsentVersion" v ON v.id = c."consentVersionId"
         UNION ALL
         SELECT id, "institutionId", "createdAt", "actorId", 'ticket.' || action, 'Ticket', "ticketId", note, "before", "after", 5 FROM "TicketChange"
+        UNION ALL
+        SELECT id, "institutionId", "issuedAt", "ownerId", 'certificate.issue', 'Certificate', id, NULL, NULL::jsonb,
+          jsonb_build_object('code', code, 'ticketId', "ticketId", 'sha256', sha256), 6 FROM "Certificate"
+        UNION ALL
+        SELECT id, "institutionId", "occurredAt", NULL::uuid, 'certificate.verify', 'Certificate', "certificateId", NULL, NULL::jsonb,
+          jsonb_build_object('code', code, 'result', result), 7 FROM "CertificateVerification"
       ) h LEFT JOIN "AppUser" u ON u.id = h."actorId" AND u."institutionId" = h."institutionId"
       WHERE h."institutionId" = ${actor.institutionId}::uuid
         ${q.from ? Prisma.sql`AND h."occurredAt" >= ${q.from}` : Prisma.empty}

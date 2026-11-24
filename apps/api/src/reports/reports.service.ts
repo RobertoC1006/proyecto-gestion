@@ -30,19 +30,21 @@ function invalid(field: string, message: string): never {
   throw new BadRequestException({ code: 'VALIDATION_ERROR', message: 'Revisa los campos indicados.', fields: { [field]: message } });
 }
 
-function startOfUtcDay(value: Date) {
-  return new Date(Date.UTC(value.getUTCFullYear(), value.getUTCMonth(), value.getUTCDate()));
+// Calendar keys represent dates in America/Lima (UTC-05), independently of the server TZ.
+function limaCalendar(value: Date) {
+  return new Date(value.getTime() - 5 * 3600000);
 }
 
 function periodStart(value: Date, period: ReportQuery['period']) {
-  if (period === 'month') return new Date(Date.UTC(value.getUTCFullYear(), value.getUTCMonth(), 1));
+  const local = limaCalendar(value);
+  if (period === 'month') return new Date(Date.UTC(local.getUTCFullYear(), local.getUTCMonth(), 1));
+  const day = new Date(Date.UTC(local.getUTCFullYear(), local.getUTCMonth(), local.getUTCDate()));
   if (period === 'week') {
-    const day = startOfUtcDay(value);
     const weekday = (day.getUTCDay() + 6) % 7;
     day.setUTCDate(day.getUTCDate() - weekday);
     return day;
   }
-  return startOfUtcDay(value);
+  return day;
 }
 
 function periodKey(value: Date, period: ReportQuery['period']) {

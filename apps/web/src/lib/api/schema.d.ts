@@ -1286,7 +1286,7 @@ export interface components {
             /** Format: date-time */
             occurredAt: string;
             /** Format: uuid */
-            actorId: string;
+            actorId: string | null;
             actor: string;
             action: string;
             objectType: string;

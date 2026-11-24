@@ -24,7 +24,7 @@ type ReportsData = {
   filters: { from: string; to: string; period: 'day' | 'week' | 'month'; scope: 'institution' | 'team' }
 }
 
-const toInputDate = (value: Date) => value.toISOString().slice(0, 10)
+const toInputDate = (value: Date) => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Lima', year: 'numeric', month: '2-digit', day: '2-digit' }).format(value)
 
 
 export default function ReportsPage() {
@@ -41,8 +41,8 @@ export default function ReportsPage() {
 
   const params = useMemo(() => {
     const value = new URLSearchParams()
-    value.set('from', new Date(`${applied.from}T00:00:00.000Z`).toISOString())
-    value.set('to', new Date(`${applied.to}T23:59:59.999Z`).toISOString())
+    value.set('from', new Date(`${applied.from}T00:00:00.000-05:00`).toISOString())
+    value.set('to', new Date(`${applied.to}T23:59:59.999-05:00`).toISOString())
     value.set('period', applied.period)
     if (applied.service) value.set('service', applied.service)
     if (applied.status) value.set('status', applied.status)

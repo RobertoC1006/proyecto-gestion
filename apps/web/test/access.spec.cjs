@@ -153,7 +153,7 @@ test('Alumno en móvil: el menú solo contiene sus módulos y permite cerrarlo',
   await page.getByRole('button', { name: 'Abrir menú' }).click();
   const nav = page.getByRole('navigation', { name: 'Navegación principal' });
   await expect(nav).toBeVisible();
-  await expect(nav.getByRole('link')).toHaveText(['Dashboard', 'Tickets', 'Calendario académico']);
+  await expect(nav.getByRole('link')).toHaveText(['Dashboard', 'Mis incidencias', 'Constancias', 'Calendario académico', 'Privacidad']);
   await expect(nav.getByRole('link', { name: 'Calendario académico', exact: true })).toBeInViewport();
   await page.screenshot({ path: path.join(screenshots, 'alumno-menu-movil-fixture.png'), fullPage: true, animations: 'disabled' });
   await page.keyboard.press('Escape');
@@ -182,12 +182,13 @@ test('Dashboard del administrador: recarga, login ya autenticado y capturas de e
   await expect(page).toHaveURL(/\/admin\/calendario$/);
 });
 
-test('Dashboard sin capacidades asignadas: explica el estado y solo ofrece el inicio', async ({ page }) => {
+test('Dashboard sin capacidades asignadas: conserva privacidad sin ofrecer módulos protegidos', async ({ page }) => {
   const session = sessionFor('estudiante');
   session.user.permissions = [];
-  await fixture(page, session);
+  const state = await fixture(page, session);
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: 'Todavía no tienes herramientas asignadas' })).toBeVisible();
-  await expect(page.locator('.home-module')).toHaveCount(0);
-  await expect(page.getByRole('navigation', { name: 'Navegación principal' }).getByRole('link')).toHaveText(['Dashboard']);
+  await expect(page.locator('.home-module')).toHaveCount(1);
+  await expect(page.locator('.home-module')).toHaveAttribute('href', '/admin/privacidad');
+  await expect(page.getByRole('navigation', { name: 'Navegación principal' }).getByRole('link')).toHaveText(['Dashboard', 'Privacidad']);
+  expect(state.calls.every(call => call.startsWith('auth/'))).toBe(true);
 });

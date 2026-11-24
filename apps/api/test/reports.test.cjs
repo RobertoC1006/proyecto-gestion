@@ -15,6 +15,19 @@ function principal(overrides = {}) {
   };
 }
 
+test('P15 agrupa las fronteras de día, semana y mes en hora de Lima y exporta la misma serie', async () => {
+  const row = createdAt => ({ service: 'correo', status: 'registrado', createdAt: new Date(createdAt), isDemo: true });
+  const service = new ReportsService({ ticket: { findMany: async () => [row('2026-11-02T04:59:59Z'), row('2026-11-02T05:00:00Z')] } });
+  const query = { from: '2026-11-01T05:00:00Z', to: '2026-11-03T04:59:59.999Z', period: 'day' };
+  assert.deepEqual((await service.report(principal(), query)).series.map(r => [r.period,r.observed]), [['2026-11-01',1],['2026-11-02',1]]);
+  assert.deepEqual((await service.report(principal(), {...query,period:'week'})).series.map(r => [r.period,r.observed]), [['2026-10-26',1],['2026-11-02',1]]);
+  const csv = await service.export(principal(), query);
+  assert.ok(csv.includes('"2026-11-01","1"'));
+  assert.ok(csv.includes('"2026-11-02","1"'));
+  const month = new ReportsService({ ticket: { findMany: async () => [row('2026-12-01T04:59:59Z'), row('2026-12-01T05:00:00Z')] } });
+  assert.deepEqual((await month.report(principal(), {from:'2026-11-30T05:00:00Z',to:'2026-12-02T04:59:59Z',period:'month'})).series.map(r=>[r.period,r.observed]), [['2026-11-01',1],['2026-12-01',1]]);
+});
+
 test('P15 reportes: conteos reales, porcentajes y ausencia de pronóstico', async () => {
   let capturedWhere;
   const db = {
@@ -110,7 +123,7 @@ test('P15 CSV conserva origen sintetico de la poblacion seleccionada', async () 
   }] } };
   const service = new ReportsService(db);
   const csv = await service.export(principal(), {
-    from: '2026-11-01T00:00:00Z', to: '2026-11-20T23:59:59Z', period: 'month',
+    from: '2026-11-01T00:00:00-05:00', to: '2026-11-20T23:59:59-05:00', period: 'month',
   });
   assert.equal(csv, [
     'periodo,observado,pronosticado,origen,fuente_sintetica',

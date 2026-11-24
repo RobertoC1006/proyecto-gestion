@@ -1,7 +1,7 @@
 require('reflect-metadata');
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
-const { randomUUID } = require('node:crypto');
+const { randomUUID, createHash } = require('node:crypto');
 const { mkdtemp, rm } = require('node:fs/promises');
 const { join } = require('node:path');
 const { tmpdir } = require('node:os');
@@ -82,6 +82,9 @@ test('Integrated HTTP: owned ticket, resolution, certificate, audit and reportin
     assert.equal(download.status, 200);
     assert.equal(download.contentType, 'application/pdf');
     assert.equal(download.bytes.subarray(0, 4).toString(), '%PDF');
+    assert.equal(createHash('sha256').update(download.bytes).digest('hex'), issued.body.sha256);
+    assert.deepEqual((await call(`certificates/${id}/issue`, 'student', 'POST')).body, issued.body);
+    assert.deepEqual((await call(`certificates/${issued.body.id}/download`)).bytes, download.bytes);
     const lookup = await call(`certificates/public/${issued.body.code}`, 'anonymous');
     assert.equal(lookup.status, 200);
     assert.equal(lookup.body.code, issued.body.code);
@@ -89,6 +92,30 @@ test('Integrated HTTP: owned ticket, resolution, certificate, audit and reportin
     const verified = await call(`certificates/public/${issued.body.code}/verify`, 'anonymous', 'POST', { pdfBase64: download.bytes.toString('base64') });
     assert.equal(verified.status, 200);
     assert.deepEqual(verified.body, { code: issued.body.code, status: 'valida', sha256Matches: true });
+    const changed = Buffer.concat([download.bytes, Buffer.from('\n% altered demonstration copy')]);
+    assert.deepEqual((await call(`certificates/public/${issued.body.code}/verify`, 'anonymous', 'POST', { pdfBase64: changed.toString('base64') })).body,
+      { code: issued.body.code, status: 'alterado', sha256Matches: false });
+    const certificateAuditPath = `audit?objectType=Certificate&objectId=${issued.body.id}`;
+    const certificateAudit = await call(certificateAuditPath, 'admin');
+    assert.equal(certificateAudit.status, 200);
+    assert.equal(certificateAudit.body.total, 3);
+    const issuance = certificateAudit.body.items.filter(item => item.action === 'certificate.issue');
+    assert.equal(issuance.length, 1, 'Idempotent retries produce only one issuance audit event');
+    assert.equal(issuance[0].actorId, users.student.id);
+    assert.equal(issuance[0].after.sha256, issued.body.sha256);
+    const checks = certificateAudit.body.items.filter(item => item.action === 'certificate.verify');
+    assert.deepEqual(checks.map(item => item.after.result).sort(), ['alterado', 'valida']);
+    for (const check of checks) {
+      assert.equal(check.actorId, null, 'Public verification must not impersonate the certificate owner');
+      assert.equal(check.actor, 'Consulta pública');
+      assert.deepEqual(Object.keys(check.after).sort(), ['code', 'result']);
+    }
+    assert.equal((await call(`${certificateAuditPath}&actorId=${users.student.id}`, 'admin')).body.total, 1);
+    assert.equal((await call(certificateAuditPath, 'foreign')).body.total, 0);
+    assert.equal((await call(certificateAuditPath, 'student')).status, 403);
+    const certificateCsv = await call(certificateAuditPath.replace('audit?', 'audit/export?'), 'admin');
+    assert.equal(certificateCsv.status, 200);
+    for (const item of certificateAudit.body.items) assert.ok(certificateCsv.body.includes(item.id));
     const auditPath = `audit?objectId=${id}&objectType=Ticket&action=ticket.resolve`;
     const audit = await call(auditPath, 'admin');
     assert.equal(audit.status, 200);

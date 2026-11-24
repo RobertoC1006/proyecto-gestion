@@ -14,7 +14,7 @@ export class AuditQueryDto {
 export class AuditItemDto {
   @ApiProperty({ format: 'uuid' }) id!: string;
   @ApiProperty({ format: 'date-time' }) occurredAt!: string;
-  @ApiProperty({ format: 'uuid' }) actorId!: string;
+  @ApiProperty({ nullable: true, format: 'uuid', type: String }) actorId!: string | null;
   @ApiProperty() actor!: string;
   @ApiProperty() action!: string;
   @ApiProperty() objectType!: string;
