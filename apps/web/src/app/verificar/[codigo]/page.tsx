@@ -1,4 +1,4 @@
-import { ArrowLeft, MagnifyingGlass, ShieldWarning, Warning } from '@phosphor-icons/react'
+import { ArrowLeft, CheckCircle, MagnifyingGlass, ShieldWarning, Warning } from '@phosphor-icons/react'
 import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { Button, Card, Field, FormError, Notice } from '../../../components/ui'
@@ -80,21 +80,26 @@ export default function VerifyCertificatePage() {
       setIntegrityMessage('No se pudo leer el PDF.')
       return
     }
-    const response = await fetch(`/api/v1/certificates/public/${encodeURIComponent(trimmedCode)}/verify`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ pdfBase64 }),
-    })
-    const body = await response.json().catch(() => ({}))
-    if (body.status === 'valida') {
-      setIntegrity('valida')
-      setIntegrityMessage('El PDF corresponde con la huella registrada.')
-    } else if (body.status === 'alterado') {
-      setIntegrity('alterado')
-      setIntegrityMessage('El archivo presentado no coincide con la emisión registrada.')
-    } else {
+    try {
+      const response = await fetch(`/api/v1/certificates/public/${encodeURIComponent(trimmedCode)}/verify`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pdfBase64 }),
+      })
+      const body = await response.json().catch(() => ({}))
+      if (body.status === 'valida') {
+        setIntegrity('valida')
+        setIntegrityMessage('El PDF corresponde con la huella registrada.')
+      } else if (body.status === 'alterado') {
+        setIntegrity('alterado')
+        setIntegrityMessage('El archivo presentado no coincide con la emisión registrada.')
+      } else {
+        setIntegrity('archivo_no_verificable')
+        setIntegrityMessage(body.message || 'El archivo no pudo verificarse.')
+      }
+    } catch {
       setIntegrity('archivo_no_verificable')
-      setIntegrityMessage(body.message || 'El archivo no pudo verificarse.')
+      setIntegrityMessage('No se pudo conectar al servicio de verificación. Intenta de nuevo.')
     }
   }
 
@@ -103,8 +108,8 @@ export default function VerifyCertificatePage() {
       <strong>CampusITSM</strong>
     </div>
     <Card className={`verification-card ${statusClass}`}>
-      <div className={`valid-icon verification-status-icon ${formatError || emptyCode ? 'verification-status-icon--invalid' : 'verification-status-icon--pending'}`} aria-hidden="true">
-        {formatError || emptyCode ? <Warning size={34} /> : <ShieldWarning size={34} />}
+      <div className={`valid-icon verification-status-icon ${statusClass.endsWith('--invalid') ? 'verification-status-icon--invalid' : integrity === 'valida' ? 'verification-status-icon--valid' : 'verification-status-icon--pending'}`} aria-hidden="true">
+        {statusClass.endsWith('--invalid') ? <Warning size={34} /> : integrity === 'valida' ? <CheckCircle size={34} /> : <ShieldWarning size={34} />}
       </div>
       <h1>
         {emptyCode ? 'Código requerido' : formatError ? 'Formato de código incorrecto' : notFound ? 'Constancia inexistente' : integrity === 'valida' ? 'Constancia válida e íntegra' : integrity === 'alterado' ? 'Documento alterado' : lookup ? 'Constancia encontrada' : 'Verificación pendiente'}
@@ -153,7 +158,7 @@ export default function VerifyCertificatePage() {
             aria-describedby="verification-code-help verification-code-error"
           />
           <span id="verification-code-help" className="field__hint">
-            La consulta se habilitará cuando el servicio esté disponible.
+            Busca el código impreso en la constancia para consultar su emisión.
           </span>
         </Field>
         <span id="verification-code-error" className="verification-code-error">

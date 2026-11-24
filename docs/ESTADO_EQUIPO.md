@@ -1,4 +1,18 @@
-# Estado del equipo — actualización del 12 de noviembre de 2026
+# Estado del equipo — actualización del 24 de noviembre de 2026
+
+## Revisión de las entregas del 20 de noviembre
+
+El candidato local `fix/integration-ready@9294147` incluye `main@d8ef0ca` y
+las cuatro ramas conocidas del equipo. Johan amplió P02/P05/P06 y la corrección
+manual de servicio. Jasmine entregó P09–P12, P22/P23 y P15 en sus ramas de
+constancias, privacidad/auditoría y reportes. Los apartados siguientes conservan
+el estado histórico del 12 de noviembre.
+
+Se corrigieron acceso al consentimiento, auditoría por permiso efectivo, filtros
+en hora local, consistencia del CSV, verificación pública de constancias, carga
+de PDF y estados de error. El detalle de la
+[revisión de integración](entregas/roberto-revision-equipo-20261124.md)
+conserva los límites de la evidencia y los pasos pendientes para main.
 
 ## Flujo integrado en main y aviso para los agentes
 

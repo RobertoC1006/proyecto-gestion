@@ -1,7 +1,7 @@
 .privacy-page .page-heading { min-height: 0; margin-bottom: 0; }
 .privacy-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); }
-.privacy-tabs button { padding: 12px 22px; background: transparent; color: var(--muted); font-weight: 700; border-bottom: 3px solid transparent; }
-.privacy-tabs button.is-active { color: var(--green-dark); border-color: var(--green); }
+.privacy-tabs a { text-decoration: none; padding: 12px 22px; background: transparent; color: var(--muted); font-weight: 700; border-bottom: 3px solid transparent; }
+.privacy-tabs a.is-active { color: var(--green-dark); border-color: var(--green); }
 .privacy-grid, .audit-layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 20px; align-items: start; }
 .privacy-grid .card, .audit-layout .card { padding: 22px; }
 .consent-version { display: flex; gap: 16px; padding: 18px; border: 1px solid #d5eee1; border-radius: 12px; background: var(--mint); margin-bottom: 18px; }

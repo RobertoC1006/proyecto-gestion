@@ -1,5 +1,17 @@
 # Memoria de CampusITSM
 
+## Reanudación — revisión de entregas del equipo, 24 de noviembre de 2026
+
+El flujo del caso práctico ya se integró en main mediante el merge `eccd465`.
+La publicación documental termina en `d8ef0ca`. Los avances del 20 de noviembre
+de Johan y Jasmine están reunidos en el candidato local `9294147`, con historia
+y correcciones previas. La revisión del 24 registra sus hallazgos, las correcciones
+adicionales y las pruebas disponibles. Consultar
+[estado del equipo](docs/ESTADO_EQUIPO.md) y
+[revisión de integración](docs/entregas/roberto-revision-equipo-20261124.md).
+La validación en la instalación habitual y el estado remoto de las dos nuevas
+migraciones siguen pendientes de comprobación.
+
 ## Encargo vigente — flujo del caso práctico y tres perfiles visibles
 
 12 de noviembre de 2026. Roberto autorizó implementar el recorrido profesor →
@@ -13,8 +25,8 @@ Profesor solo programa en sus cursos/secciones asignados. No es un aula virtual.
 Dos migraciones aplicadas a la base compartida por autorización específica;
 diez migraciones con checksums coincidentes. Ver REGISTRO_CAMBIOS_BD y
 CONTRATO_FLUJO_CASO_PRACTICO. 58 pruebas aisladas aprobadas y API/web compiladas.
-Instalación campusitsm activa en localhost:8080, volúmenes conservados. No se
-integra main. Profesor con sesión real se aplaza por decisión de Roberto; la
+En esa entrega se verificó campusitsm en localhost:8080 y se conservaron los volúmenes.
+Más tarde se integró en main con `eccd465`. Profesor con sesión real se aplaza por decisión de Roberto; la
 autorización se prueba con cuentas descartables. No duplicar Auth ni perfiles.
 IA, pronóstico, PDF/QR, adjuntos y consentimiento/auditoría global siguen fuera
 de este bloque. Revisar ESTADO_EQUIPO para los recorridos visuales completados.

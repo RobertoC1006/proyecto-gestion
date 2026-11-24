@@ -56,3 +56,21 @@
 .legacy-view .form-layout, .legacy-view .detail-grid { gap: 16px; }.legacy-view .form-section h2, .legacy-view .timeline-card h3, .legacy-view .side-card h3 { font-size: 14px; }.legacy-view .field label { font-size: 11px; }.legacy-view .field input, .legacy-view .field textarea { border-color: #dfe5e8; border-radius: 5px; font-size: 11px; padding: 10px; }.legacy-view .field textarea { min-height: 130px; }
 .legacy-view .queue-summary > div { border-radius: 8px; padding: 12px; }.legacy-view .queue-summary strong { font-size: 17px; }.legacy-view .queue-summary small { font-size: 10px; }.legacy-view .queue-table-row { border-radius: 7px; padding: 11px 12px; }.legacy-view .queue-table-row > span:nth-child(3) strong { font-size: 11px; }.legacy-view .queue-table-row > span:nth-child(3) small { font-size: 9px; }.legacy-view .queue-switch button { font-size: 10px; padding: 7px 9px; }.legacy-view .context-callout { font-size: 10px; }
 .legacy-view .certificate-preview { border-radius: 9px; }.legacy-view .document { min-height: 440px; }.legacy-view .verification-card { border-radius: 10px; }.legacy-view .login-card { border-radius: 10px; box-shadow: 0 8px 24px rgba(31,41,55,.07); }
+
+.certificate-page__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: start;
+  gap: 20px;
+}
+.certificate-page__hash { overflow-wrap: anywhere; }
+.certificate-page .button-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+.legacy-view.certificate-verification .public-page { margin: 0; padding: 28px 16px; }
+.legacy-view.certificate-verification .verification-card { margin-top: 28px; }
+.legacy-view.certificate-verification .verification-status-icon--valid { background: var(--mint); color: var(--green-dark); }
+@media (max-width: 950px) { .certificate-page__grid { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 480px) {
+  .certificate-row { flex-wrap: wrap; overflow-wrap: anywhere; }
+  .legacy-view.certificate-verification .verification-card { padding: 24px 16px; }
+  .verification-integrity input[type="file"] { min-width: 0; }
+}

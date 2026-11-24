@@ -85,19 +85,14 @@ export class ReportsService {
     const status = input.status == null || input.status === '' ? undefined : String(input.status) as TicketStatus;
     if (status && !Object.values(TicketStatus).includes(status)) invalid('status', 'Estado no válido.');
 
-    const institutionPermission = hasInstitution;
-    let scope: 'institution' | 'team' = institutionPermission ? 'institution' : 'team';
-    if (input.scope === 'institution' && !institutionPermission) invalid('scope', 'No tienes alcance institucional.');
-    if (input.scope === 'team') {
-      if (!actor.permissions.includes('reports:read:team') && !institutionPermission) invalid('scope', 'No tienes permiso de reportes.');
-      if (!actor.teamId) invalid('scope', 'No tienes un equipo asignado.');
-      scope = 'team';
-    }
-    if (input.scope == null || input.scope === '') scope = institutionPermission ? 'institution' : 'team';
+    const scope = input.scope == null || input.scope === '' ? (hasInstitution ? 'institution' : 'team') : input.scope;
+    if (scope !== 'institution' && scope !== 'team') invalid('scope', 'Alcance no válido.');
+    if (scope === 'institution' && !hasInstitution) invalid('scope', 'No tienes alcance institucional.');
+    if (scope === 'team' && !hasTeam) invalid('scope', 'No tienes permiso de reportes por equipo.');
     if (scope === 'team' && !actor.teamId) invalid('scope', 'No tienes un equipo asignado.');
 
     return { from, to, period: period as ReportQuery['period'], service, status, scope };
-}
+  }
 
   private async rows(actor: CampusPrincipal, q: ReportQuery) {
     if (q.scope === 'institution') requirePermission(actor, 'reports:read:institution');

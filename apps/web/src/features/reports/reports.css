@@ -8,8 +8,8 @@
 .reports-kpis span, .reports-kpis small { color: var(--muted); }
 .reports-kpis strong { color: var(--green-dark); font-size: 28px; }
 .reports-grid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(280px, 1fr); gap: 16px; margin-bottom: 18px; }
-.reports-chart { height: 260px; display: flex; align-items: flex-end; gap: 10px; border-bottom: 1px solid var(--border); padding-top: 28px; }
-.reports-bar { flex: 1 1 36px; max-width: 70px; height: 230px; display: grid; grid-template-rows: 20px 1fr 24px; align-items: end; text-align: center; }
+.reports-chart { height: 260px; display: flex; align-items: flex-end; gap: 10px; border-bottom: 1px solid var(--border); padding-top: 28px; overflow-x: auto; }
+.reports-bar { flex: 1 1 36px; min-width: 38px; max-width: 70px; height: 230px; display: grid; grid-template-rows: 20px 1fr 24px; align-items: end; text-align: center; }
 .reports-bar__track { height: 186px; display: flex; align-items: flex-end; }
 .reports-bar__fill { width: 100%; min-height: 2px; background: var(--green); border-radius: 7px 7px 0 0; }
 .reports-bar__value, .reports-bar__label { color: var(--muted); font-size: 11px; }

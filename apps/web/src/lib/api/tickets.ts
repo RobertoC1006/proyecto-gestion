@@ -21,3 +21,20 @@ export function ticketDate(value: string) {
   return new Intl.DateTimeFormat('es-PE', { timeZone: 'America/Lima',
     day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }).format(new Date(value))
 }
+
+export const ticketServices = [
+  ['aula_virtual', 'Aula virtual'],
+  ['wifi_red', 'Wi-Fi/red'],
+  ['correo', 'Correo institucional'],
+  ['equipos', 'Equipo de cómputo'],
+  ['impresoras', 'Impresora'],
+  ['cuentas_accesos', 'Cuentas y accesos'],
+  ['videoconferencia', 'Videoconferencia'],
+  ['sistemas_institucionales', 'Sistemas institucionales'],
+  ['almacenamiento_nube', 'Almacenamiento/nube'],
+  ['software_licencias', 'Software/licencias'],
+  ['otro', 'Otro'],
+] as const
+export function ticketServiceLabel(service: string) {
+  return ticketServices.find(([value]) => value === service)?.[1] ?? service
+}

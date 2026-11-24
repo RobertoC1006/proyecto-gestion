@@ -16,6 +16,7 @@ const navigation: NavigationItem[] = [
   { label: 'Constancias', description: 'Consulta tus constancias de atención.', icon: ShieldCheck, to: '/constancias', permissions: access.certificates },
   { label: 'Calendario académico', description: 'Organiza los eventos, cursos y secciones de la institución.', icon: CalendarDots, to: '/admin/calendario', permissions: [...access.personalCalendar, ...access.manageCalendar] },
   { label: 'Reportes', description: 'Consulta los reportes correspondientes a tu alcance.', icon: ChartBar, to: '/reportes', permissions: access.reports },
+  { label: 'Privacidad', description: 'Consulta y registra tu consentimiento.', icon: ShieldCheck, to: '/admin/privacidad', permissions: [] },
   { label: 'Cola de TI', description: 'Accede a la cola de atención de tu equipo.', icon: ShieldCheck, to: '/ti/cola', permissions: access.teamTickets },
 ]
 const administration: NavigationItem[] = [
@@ -23,14 +24,13 @@ const administration: NavigationItem[] = [
   { label: 'Usuarios', description: 'Administra las cuentas, sus roles y su estado de acceso.', icon: Users, to: '/admin/usuarios', permissions: access.users },
   { label: 'Permisos', description: 'Configura las capacidades y alcances de cada rol.', icon: Key, to: '/admin/permisos', permissions: access.permissions },
   { label: 'Prioridades y SLA', description: 'Configura los plazos y prepara el caso práctico.', icon: Gear, to: '/admin/configuracion', permissions: access.configuration },
-  { label: 'Auditoría', description: 'Consulta el registro de cambios y acciones.', icon: BookOpen, permissions: access.audit },
-  { label: 'Privacidad', description: 'Consulta el consentimiento vigente y su estado.', icon: ShieldCheck, to: '/admin/privacidad', permissions: access.privacy },
+  { label: 'Auditoría', description: 'Consulta el registro de cambios y acciones.', icon: BookOpen, to: '/admin/auditoria', permissions: access.audit },
 ]
 
 export function navigationFor(user: CurrentUser | null) {
   if (!user?.active) return { primary: [], administration: [] }
   return {
-    primary: [dashboard, ...navigation.filter(item => hasAccess(user, item.permissions)).map(item =>
+    primary: [dashboard, ...navigation.filter(item => !item.permissions.length || hasAccess(user, item.permissions)).map(item =>
       item.to === '/admin/calendario' && !hasAccess(user, access.manageCalendar)
         ? { ...item, to: '/calendario', description: 'Consulta los eventos de tu institución y de tus cursos.' }
         : item)],

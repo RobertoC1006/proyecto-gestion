@@ -43,7 +43,7 @@ const queryClient = new QueryClient({
 function App() {
   const { pathname } = useLocation()
   if (pathname === '/login') return <LoginPage />
-  if (/^\/verificar\/[^/]+\/?$/.test(pathname)) return <Routes><Route path="/verificar/:codigo" element={<main className="legacy-view"><VerifyCertificatePage /></main>} /></Routes>
+  if (/^\/verificar(?:\/[^/]+)?\/?$/.test(pathname)) return <Routes><Route path="/verificar/:codigo?" element={<main className="legacy-view certificate-verification"><VerifyCertificatePage /></main>} /></Routes>
   return (
     <SessionBoundary>
     <RootLayout>
@@ -56,6 +56,7 @@ function App() {
         <Route path="/profesor/calendario/:id/editar" element={<PermissionBoundary permissions={["academic:teach"]}><EventForm /></PermissionBoundary>} />
         <Route path="/admin/configuracion" element={<PermissionBoundary permissions={access.configuration}><PolicyPage /></PermissionBoundary>} />
         <Route path="/admin/privacidad" element={<PrivacyPage />} />
+        <Route path="/admin/auditoria" element={<PermissionBoundary permissions={access.audit}><PrivacyPage audit /></PermissionBoundary>} />
         <Route path="/calendario" element={<PermissionBoundary permissions={access.personalCalendar}><PersonalCalendar /></PermissionBoundary>} />
         <Route path="/admin/cursos" element={<PermissionBoundary permissions={access.manageCalendar}><CoursesPage /></PermissionBoundary>} />
         <Route path="/admin/calendario" element={<PermissionBoundary permissions={access.manageCalendar}><CalendarPage /></PermissionBoundary>} />

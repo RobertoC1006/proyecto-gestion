@@ -94,8 +94,10 @@ export class AuditService {
     const q = v.auditQuery(query);
     const matched = this.matching(actor, q);
     const escape = (value: unknown) => {
-      const text = value == null ? '' : typeof value === 'object' ? JSON.stringify(value) : String(value);
-      return `"${text.replace(/[\r\n]/g, ' ').replace(/"/g, '""')}"`;
+      const raw = String(value ?? '');
+      const text = raw.replace(/[\r\n]/g, ' ');
+      const literal = /^\s*[=+\-@＝＋－＠]|^[\t\r\n]/u.test(raw) ? "'" + text : text;
+      return `"${literal.replace(/"/g, '""')}"`;
     };
     await this.db.$transaction(async tx => {
       let cursor: AuditRow | undefined;

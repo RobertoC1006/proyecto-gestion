@@ -2,9 +2,11 @@ import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { registerCertificateVerificationBodyParser } from './certificates/certificates.upload';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  registerCertificateVerificationBodyParser(app);
   app.setGlobalPrefix('api/v1');
   app.enableShutdownHooks();
   const document = SwaggerModule.createDocument(app, new DocumentBuilder()

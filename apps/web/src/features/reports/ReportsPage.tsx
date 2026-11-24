@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { ChartLine, Download, Funnel, Info } from '@phosphor-icons/react'
 import { Button, Card, EmptyState, Field, Notice, PageHeading, Select } from '../../components/ui'
 import { request } from '../../lib/api/http'
+import { ticketServices } from '../../lib/api/tickets'
 import './reports.css'
 
 type ReportSeries = { period: string; observed: number; forecast: number | null }
@@ -24,19 +25,7 @@ type ReportsData = {
 }
 
 const toInputDate = (value: Date) => value.toISOString().slice(0, 10)
-const ticketServices = [
-  ['aula_virtual', 'Aula virtual'],
-  ['wifi_red', 'Wi-Fi/red'],
-  ['correo', 'Correo institucional'],
-  ['equipos', 'Equipo de cómputo'],
-  ['impresoras', 'Impresora'],
-  ['cuentas_accesos', 'Cuentas y accesos'],
-  ['videoconferencia', 'Videoconferencia'],
-  ['sistemas_institucionales', 'Sistemas institucionales'],
-  ['almacenamiento_nube', 'Almacenamiento/nube'],
-  ['software_licencias', 'Software/licencias'],
-  ['otro', 'Otro'],
-] as const
+
 
 export default function ReportsPage() {
   const now = new Date()
@@ -48,6 +37,7 @@ export default function ReportsPage() {
     status: '',
   })
   const [applied, setApplied] = useState(draft)
+  const [exportError, setExportError] = useState(false)
 
   const params = useMemo(() => {
     const value = new URLSearchParams()
@@ -67,9 +57,11 @@ export default function ReportsPage() {
   function submit(event: FormEvent) {
     event.preventDefault()
     setApplied(draft)
+    setExportError(false)
   }
 
   async function exportReport() {
+    setExportError(false)
     const response = await fetch(`/api/v1/reports/export?${params.toString()}`, { credentials: 'same-origin', cache: 'no-store' })
     if (!response.ok) throw new Error('No se pudo exportar el reporte.')
     const blob = await response.blob()
@@ -89,13 +81,13 @@ export default function ReportsPage() {
       title="Histórico y resultados"
       subtitle="Reportes operativos basados en los Tickets seleccionados."
       illustrationIcon={ChartLine}
-      action={<Button type="button" icon={Download} onClick={() => void exportReport().catch(() => undefined)} disabled={report.isPending || !!report.error}>Exportar reporte</Button>}
+      action={<Button type="button" icon={Download} onClick={() => void exportReport().catch(() => setExportError(true))} disabled={report.isPending || !!report.error}>Exportar reporte</Button>}
     />
 
     <Card className="reports-filter-card">
       <form className="reports-filters" onSubmit={submit}>
-        <Field label="Desde"><input type="date" value={draft.from} onChange={event => setDraft({ ...draft, from: event.target.value })} /></Field>
-        <Field label="Hasta"><input type="date" value={draft.to} onChange={event => setDraft({ ...draft, to: event.target.value })} /></Field>
+        <Field label="Desde"><input type="date" required max={draft.to || undefined} value={draft.from} onChange={event => setDraft({ ...draft, from: event.target.value })} /></Field>
+        <Field label="Hasta"><input type="date" required min={draft.from || undefined} value={draft.to} onChange={event => setDraft({ ...draft, to: event.target.value })} /></Field>
         <Field label="Periodo"><Select value={draft.period} onChange={event => setDraft({ ...draft, period: event.target.value as typeof draft.period })}><option value="day">Diario</option><option value="week">Semanal</option><option value="month">Mensual</option></Select></Field>
         <Field label="Categoría"><Select value={draft.service} onChange={event => setDraft({ ...draft, service: event.target.value })}><option value="">Todas las categorías</option>{ticketServices.map(([value, label]) => <option key={value} value={value}>{label}</option>)}</Select></Field>
         <Field label="Estado"><Select value={draft.status} onChange={event => setDraft({ ...draft, status: event.target.value })}><option value="">Todos</option><option value="registrado">Registrado</option><option value="en_atencion">En atención</option><option value="resuelto">Resuelto</option></Select></Field>
@@ -103,6 +95,7 @@ export default function ReportsPage() {
       </form>
     </Card>
 
+    {exportError && <Notice tone="amber" role="alert">No se pudo exportar el reporte.</Notice>}
     {report.isPending && <Card><p role="status">Cargando indicadores operativos…</p></Card>}
     {report.error && <Notice tone="amber" role="alert">No se pudo consultar el reporte autorizado.</Notice>}
 

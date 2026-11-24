@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Button, Card, EmptyState, Notice, PageHeading } from '../../components/ui'
 import { ApiError, request } from '../../lib/api/http'
+import { ticketServiceLabel } from '../../lib/api/tickets'
 import type { CertificateDto, CertificatesPageDto } from '../../lib/api/certificates'
 
 export default function ConstanciasPage() {
@@ -25,7 +26,10 @@ export default function ConstanciasPage() {
 
   async function download(certificate: CertificateDto) {
     const response = await fetch(`/api/v1/certificates/${certificate.id}/download`, { credentials: 'same-origin', cache: 'no-store' })
-    if (!response.ok) throw new Error('No se pudo descargar la constancia.')
+    if (!response.ok) {
+      const body = await response.json().catch(() => ({}))
+      throw new Error(body.message || 'No se pudo descargar la constancia.')
+    }
     const blob = await response.blob()
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
@@ -35,14 +39,14 @@ export default function ConstanciasPage() {
     URL.revokeObjectURL(url)
   }
 
-  return <section>
+  return <section className="certificate-page">
     <PageHeading
       title="Mis constancias"
       subtitle="Consulta las constancias asociadas a tus incidencias resueltas."
       illustrationIcon={FileText}
     />
     {error && <Notice tone="amber" icon={ShieldCheck} role="alert">{error}</Notice>}
-    <div className="content-grid content-grid--two">
+    <div className="certificate-page__grid">
       <Card>
         <h2>Constancias disponibles</h2>
         {data.isLoading && <Notice tone="amber" role="status">Consultando incidencias elegibles...</Notice>}
@@ -54,7 +58,7 @@ export default function ConstanciasPage() {
           <div className="certificate-row" key={item.ticketId}>
             <div>
               <strong>{item.ticketCode}</strong>
-              <p className="body-muted">{item.service} · Resuelto {new Date(item.resolvedAt).toLocaleString('es-PE')}</p>
+              <p className="body-muted">{ticketServiceLabel(item.service)} · Resuelto {new Date(item.resolvedAt).toLocaleString('es-PE')}</p>
             </div>
             {item.certificate ? (
               <Button type="button" variant="secondary" onClick={() => setSelected(item.certificate)}>Ver constancia</Button>
@@ -72,9 +76,9 @@ export default function ConstanciasPage() {
           <p><strong>Código:</strong> {selected.code}</p>
           <p><strong>Incidencia:</strong> {selected.ticketCode}</p>
           <p><strong>Emitida:</strong> {new Date(selected.issuedAt).toLocaleString('es-PE')}</p>
-          <p className="body-muted">Huella SHA-256: {selected.sha256}</p>
+          <p className="body-muted certificate-page__hash">Huella SHA-256: {selected.sha256}</p>
           <div className="button-row">
-            <Button type="button" icon={Download} onClick={() => void download(selected)}>Descargar PDF</Button>
+            <Button type="button" icon={Download} onClick={() => { setError(''); void download(selected).catch(reason => setError(reason.message)) }}>Descargar PDF</Button>
             <Button variant="secondary" type="button" onClick={() => window.open(`/verificar/${encodeURIComponent(selected.code)}`, '_blank', 'noopener,noreferrer')}>
               Verificación pública
             </Button>

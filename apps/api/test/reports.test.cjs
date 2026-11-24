@@ -77,6 +77,18 @@ test('P15 reportes: alcance institucional exige permiso efectivo', async () => {
   );
 });
 
+test('P15 rechaza un alcance desconocido o ajeno a las capacidades efectivas', async () => {
+  const db = { ticket: { findMany: async () => assert.fail('No debe consultar tickets fuera del alcance') } };
+  const service = new ReportsService(db);
+  const administrator = principal({ permissions: ['reports:read:institution'] });
+  for (const scope of ['unknown', 'team']) {
+    await assert.rejects(
+      () => service.report(administrator, { scope }),
+      error => error.getStatus() === 400 && Boolean(error.getResponse().fields.scope),
+    );
+  }
+});
+
 test('P15 exportación usa CSV y no incluye pronóstico falso', async () => {
   const db = { ticket: { findMany: async () => [] } };
   const service = new ReportsService(db);
