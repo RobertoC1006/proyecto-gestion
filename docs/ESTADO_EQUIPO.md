@@ -1,5 +1,41 @@
 # Estado del equipo — actualización del 24 de noviembre de 2026
 
+## Integración actual validada automáticamente; recorrido real pendiente
+
+Roberto autorizó la publicación en main después de validar. Bundle esperado
+`fb3cd26827ae7a335729f3ca7fd32bc7f76afb98` importado en
+`integracion-avances-equipo`, con el parche previo ya incluido. Correcciones
+adicionales `00eb7a2`: eventos de constancias en Auditoría, filtros del formulario,
+fechas/agrupaciones de reportes en Lima, contrato nullable para actor público y
+dependencia Effect corregida. No se alteraron migraciones existentes.
+
+GitHub consultado directamente: main `d8ef0ca`; las entregas actuales de Johan
+`622c43b` y Jasmine `7becc12`/`4ae4b6b`/`750bf86` ya están incluidas por ascendencia.
+Se conservan sus commits, ramas y worktrees; no aparecieron avances posteriores.
+
+Resultado actual del código: API/web compilan, 120 pruebas API con PostgreSQL 17
+descartable y 54 recorridos Playwright aprobados, sin omisiones; npm audit: cero
+avisos. Los tests automáticos usan proveedores/respuestas sustituidos; no son
+evidencia de login Supabase real. Los contenedores/redes de prueba se retiraron.
+
+Supabase: las dos migraciones nuevas se aplicaron mediante el rol migrador tras
+validarlas y comprobar que estaban pendientes. Doce checksums exactos y
+RLS/privilegios verificados. Ver [registro BD](REGISTRO_CAMBIOS_BD.md).
+La instalación habitual sirve el candidato y devuelve salud API/base/Python ok;
+el índice web coincide con la compilación verificada, sin otra aplicación activa.
+Volúmenes y configuración privada conservados. PostgreSQL histórico detenido.
+
+Falta el recorrido en pantalla con administrador y estudiante reales: cola,
+corrección/asignación/atención/resolución, seguimiento, emisión/descarga,
+archivo original/alterado, auditoría y reportes. El control de pantalla se
+interrumpió por no poder verificar la URL de la ventana Windows. Roberto inicia
+sesión personalmente al reanudar. Hay cuatro tickets DEMO (uno elegible), cero
+constancias y ninguna política vigente publicada; no se inventó una política.
+Main sigue en `d8ef0ca`; merge/push y reconstrucción desde main quedan pendientes
+del recorrido satisfactorio. [Entrega y continuación](entregas/roberto-integracion-equipo-20261124.md).
+
+Las secciones siguientes son evidencia histórica y no sustituyen este estado.
+
 ## Revisión de las entregas del 20 de noviembre
 
 El candidato local `fix/integration-ready@9294147` incluye `main@d8ef0ca` y

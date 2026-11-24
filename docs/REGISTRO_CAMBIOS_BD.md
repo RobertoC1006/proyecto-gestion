@@ -1,5 +1,51 @@
 # Coordinación de cambios en la base compartida
 
+## Integración autorizada de consentimiento y constancias — 24 de noviembre de 2026
+
+Roberto autorizó expresamente las migraciones compatibles necesarias para la
+integración. Ejecutor: agente de Roberto. Destino verificado:
+CampusITSM / `npjibnlxepiwfermtcmo` / esquema `campusitsm`, pooler de sesión
+`aws-1-sa-east-1.pooler.supabase.com:5432`, TLS activo y API `campusitsm_api`.
+Fuente de ambos SQL: bundle `fb3cd26827ae7a335729f3ca7fd32bc7f76afb98`, rama
+`integracion-avances-equipo`. Sin modificaciones de SQL aplicado.
+
+**Antes:** consulta real de `_prisma_migrations` con transacción READ ONLY;
+diez migraciones terminadas sin rollback, huellas coincidentes. Las siguientes
+dos no tenían entrada y sus cuatro tablas no existían. No se supuso su
+aplicación a partir de documentos históricos ni del conector (sin permiso).
+Las doce migraciones se aplicaron y probaron en PostgreSQL 17 descartable,
+red interna y almacenamiento tmpfs, sin usar configuración de Supabase.
+
+**Aplicación:** comando documentado
+`docker compose --env-file .local/supabase/migrate.env --profile tools run --rm migrate`,
+tras construir `migrate`. El validador comprueba proyecto, rol migrador, esquema,
+puerto y TLS; Prisma deploy aplicó exclusivamente:
+
+| Archivo | SHA256 exacto | Finalización del historial (UTC) |
+| --- | --- | --- |
+| `apps/api/prisma/migrations/20261112000100_consent/migration.sql` | `c7bc6e7059ece2f0502cae802acc0f4d097c80f85c55960577ed7818000a1b50` | 2026-11-24 19:50:57.886Z |
+| `apps/api/prisma/migrations/20261120000100_certificates/migration.sql` | `fdc3f6328a0393eb826b83927da0d92b60399a9424e7d0be00830bf8e2025dd9` | 2026-11-24 19:50:58.970Z |
+
+Hora de Lima: 14:50:57–14:50:58. Migraciones aditivas de ConsentVersion,
+ConsentAcceptance, Certificate y CertificateVerification, con índices, claves
+foráneas y políticas de acceso del servidor. Sin seed, reset, db push,
+migrate dev ni borrado de registros/volúmenes compartidos.
+
+**Después:** doce entradas finalizadas, sin rollback, y doce checksums idénticos
+a los archivos del candidato. Las cuatro tablas tienen RLS y política
+`campusitsm_server` para `campusitsm_api`. Sin privilegios de lectura/escritura
+para anon/authenticated. API puede leer/insertar aceptaciones y verificaciones,
+sin UPDATE/DELETE; historial Prisma solo SELECT para API. Salud de la aplicación
+con la base remota ok. Verificación conservada localmente sin secretos en
+`.local/integration-db-after.json`. No se cambió la configuración de Auth.
+
+La comprobación del candidato final `00eb7a2` completó 120 pruebas API aisladas;
+54 recorridos de navegador y compilaciones aprobados. Recorrido con cuentas
+reales pendiente, por lo que main aún no se publicó. El aviso de coordinación
+queda en este registro para su futura publicación con la integración; no se
+enviaron mensajes externos. Las tablas y sus archivos exactos deben acompañar
+el código antes de reconstruir los backend de Johan/Jasmine.
+
 ## Flujo contextual autorizado — 12 de noviembre de 2026
 
 Roberto encargó el flujo completo con tres perfiles visibles y autorizó

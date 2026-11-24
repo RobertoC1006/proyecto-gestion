@@ -1,5 +1,40 @@
 # Memoria de CampusITSM
 
+## Reanudación vigente — integración de equipo, 24 de noviembre de 2026
+
+Roberto autorizó corregir, validar, integrar y publicar los avances de Johan y
+Jasmine en main cuando termine la validación. Bundle verificado/importado:
+`integracion-avances-equipo@fb3cd26827ae7a335729f3ca7fd32bc7f76afb98`;
+el parche `CampusITSM_correcciones_9294147.patch` ya estaba incluido y no se reaplicó.
+Fetch/ls-remote actuales: main local/remoto `d8ef0ca`, sin avances posteriores
+en las entregas `622c43b`, `7becc12`, `4ae4b6b`, `750bf86`; todas son ancestros
+del candidato, al igual que Usuarios `7ab1ed7`. Worktrees y ramas ajenas conservados.
+
+Corrección funcional `00eb7a2`: Auditoría incorpora emisión y verificación de
+constancias, identificando la verificación como pública sin atribuirla al titular;
+reportes filtran y agrupan en fecha de Lima y exportan la misma selección.
+OpenAPI/tipos actualizados y Effect fijado en 3.22.1. Validación actual de ese
+código: 120 pruebas API en PostgreSQL aislado y 54 recorridos Playwright aprobados;
+npm audit sin avisos. Los recorridos automatizados usan identidades/respuestas
+de prueba y no sustituyen las sesiones reales.
+
+Aplicadas únicamente `20261112000100_consent` y `20261120000100_certificates`
+con el comando migrador documentado, tras comprobar que faltaban. Doce huellas
+coincidentes, rol/esquema/TLS y RLS/privilegios comprobados; consultar el registro BD.
+La única instalación campusitsm sirve el candidato en localhost:8080 y está
+saludable; volumen PostgreSQL histórico conservado y contenedor detenido.
+No se modificaron roles, cuentas ni claves para probar. Hay cuatro tickets DEMO,
+uno resuelto con falla confirmada, cero constancias y cero políticas publicadas.
+
+**Pendiente para publicar:** recorrido real administrador → estudiante →
+administrador, emisión/descarga y validación pública del original y copia alterada.
+Roberto inicia/cambia las cuentas personalmente. El control de pantalla de esta
+sesión se interrumpió al no poder verificar la URL de una ventana Windows.
+Main conserva `d8ef0ca`; no está publicada esta integración. La autorización de
+publicación sigue vigente para después del recorrido satisfactorio. Detalle y
+comandos en [la entrega actual](docs/entregas/roberto-integracion-equipo-20261124.md).
+Los apartados siguientes conservan su fecha y alcance histórico.
+
 ## Reanudación — revisión de entregas del equipo, 24 de noviembre de 2026
 
 El flujo del caso práctico ya se integró en main mediante el merge `eccd465`.
