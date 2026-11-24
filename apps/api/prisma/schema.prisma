@@ -256,6 +256,8 @@ enum TicketStatus {
 
 enum TicketClassificationStatus {
   pendiente
+  ia
+  revision_manual
   manual
 }
 
@@ -266,6 +268,7 @@ model Ticket {
   code                 String                     @unique @db.VarChar(40)
   description          String                     @db.Text
   service              TicketService
+  reportedService      TicketService?
   scope                TicketScope
   // SQL futuro: general => ambos nulos; curso => courseId obligatorio.
   // NestJS comprueba la asociaciÃ³n del titular; las FK no la acreditan.
@@ -273,6 +276,13 @@ model Ticket {
   sectionId            String?                    @db.Uuid
   status               TicketStatus               @default(registrado)
   classificationStatus TicketClassificationStatus @default(pendiente)
+  aiProvider           String? @db.VarChar(32)
+  aiModel              String? @db.VarChar(80)
+  aiAdapterVersion     String? @db.VarChar(24)
+  aiExplanation        String? @db.VarChar(1000)
+  aiFailureCode        String? @db.VarChar(40)
+  aiLatencyMs          Int?
+  aiEvaluatedAt        DateTime? @db.Timestamptz(3)
   idempotencyKey       String                     @db.Uuid
   requestHash          String                     @db.Char(64)
   createdAt            DateTime                   @default(now()) @db.Timestamptz(3)
