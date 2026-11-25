@@ -62,6 +62,7 @@ async function fixture(t, sentinel = false) {
       let staged = committed;
       const result = await callback({
         $queryRaw: async () => [],
+        certificateVerification: db.certificateVerification,
         ticket: { findFirst: async ({ where }) => matches(ticket, where) ? { ...ticket } : null },
         institution: { findUnique: async () => ({ name: 'Institución original' }) },
         certificate: {
@@ -115,7 +116,7 @@ test('Initial file failure rolls back publication; retry commits only after orig
   assert.deepEqual(download.bytes, f.commits[0].bytes);
   assert.deepEqual((await f.service.mine(f.actor)).issued, [issued]);
   assert.deepEqual(await readFile(sentinelPath), f.sentinelBytes);
-  assert.deepEqual(f.writes.audit, []);
+  assert.deepEqual(f.writes.audit.map(event => event.result), ['emitida', 'descargada']);
 });
 
 test('Missing, empty and directory faults preserve the original issuance and write spies', async t => {
@@ -135,9 +136,11 @@ test('Missing, empty and directory faults preserve the original issuance and wri
         () => f.service.detail(f.actor, issued.id),
         () => f.service.download(f.actor, issued.id),
       ]) {
+        const beforeRejected = structuredClone(f.writes);
         await rejectsHttp(operation, 503, unavailable);
+        assert.deepEqual(f.writes, beforeRejected, 'Rejected file operations cannot write or append events');
         assert.deepEqual(await f.publicState(issued.code), before);
-        assert.deepEqual(f.writes, beforeWrites);
+        assert.deepEqual(f.writes.certificates, beforeWrites.certificates);
         assert.equal(f.commits.length, 1);
         if (fault === 'missing') await assert.rejects(readFile(path), { code: 'ENOENT' });
         if (fault === 'empty') assert.deepEqual(await readFile(path), Buffer.alloc(0));
@@ -151,12 +154,15 @@ test('Missing, empty and directory faults preserve the original issuance and wri
     assert.deepEqual((await f.service.download(f.actor, issued.id)).bytes, original.bytes);
     assert.deepEqual(await f.service.detail(f.actor, issued.id), issued);
     assert.deepEqual(await f.service.issue(f.actor, f.ticket.id), issued);
-    assert.deepEqual(f.writes, beforeWrites);
+    assert.deepEqual(f.writes.certificates, beforeWrites.certificates);
   }
   assert.deepEqual(await f.service.verifyPdf(issued.code, original.bytes.toString('base64')),
     { code: issued.code, status: 'valida', sha256Matches: true });
   assert.deepEqual(f.writes.certificates, beforeWrites.certificates);
-  assert.deepEqual(f.writes.audit, [{ institutionId: f.actor.institutionId, certificateId: issued.id, code: issued.code, result: 'valida' }]);
+  const verifiedEvents = f.writes.audit.filter(event => event.result === 'valida');
+  assert.equal(verifiedEvents.length, 1);
+  assert.equal(verifiedEvents[0].certificateId, issued.id);
+  assert.equal(verifiedEvents[0].actorId, undefined);
   assert.deepEqual(await f.publicState(issued.code), before);
 });
 
@@ -167,21 +173,25 @@ test('Malformed identifiers and foreign owner/tenant reject without changing iss
   const before = await f.publicState(issued.code);
   const beforeWrites = structuredClone(f.writes);
   for (const [method, field] of [['issue', 'ticketId'], ['detail', 'id'], ['download', 'id']]) {
+    const auditCount = f.writes.audit.length;
     await rejectsHttp(() => f.service[method](f.actor, 'not-a-uuid'), 400, {
       code: 'VALIDATION_ERROR', message: 'Revisa los campos indicados.', fields: { [field]: 'Selecciona un valor válido.' },
     });
+    assert.equal(f.writes.audit.length, auditCount);
     assert.deepEqual(await f.publicState(issued.code), before);
-    assert.deepEqual(f.writes, beforeWrites);
+    assert.deepEqual(f.writes.certificates, beforeWrites.certificates);
   }
   for (const actor of [{ ...f.actor, id: randomUUID() }, { ...f.actor, institutionId: randomUUID() }]) {
+    const auditCount = f.writes.audit.length;
     await rejectsHttp(() => f.service.issue(actor, f.ticket.id), 404,
       { code: 'CERTIFICATE_NOT_ELIGIBLE', message: 'El ticket no está disponible para emitir una constancia.' });
     for (const method of ['detail', 'download']) {
       await rejectsHttp(() => f.service[method](actor, issued.id), 404,
         { code: 'NOT_FOUND', message: 'No se encontró la constancia.' });
     }
+    assert.equal(f.writes.audit.length, auditCount);
     assert.deepEqual(await f.publicState(issued.code), before);
-    assert.deepEqual(f.writes, beforeWrites);
+    assert.deepEqual(f.writes.certificates, beforeWrites.certificates);
   }
   assert.equal(f.commits.length, 1);
   assert.deepEqual((await f.service.download(f.actor, issued.id)).bytes, original.bytes);

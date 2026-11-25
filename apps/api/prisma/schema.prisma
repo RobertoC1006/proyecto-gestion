@@ -178,6 +178,7 @@ model AppUser {
   institution   Institution @relation(fields: [institutionId], references: [id], onDelete: Restrict)
   team          SupportTeam? @relation(fields: [institutionId, teamId], references: [institutionId, id], onDelete: Restrict)
   sessions      AuthSession[]
+  certificateEvents CertificateVerification[]
   certificates  Certificate[]
   consentAcceptances ConsentAcceptance[]
   tickets       Ticket[]
@@ -369,7 +370,7 @@ model TicketChange {
   id String @id @default(uuid()) @db.Uuid
   ticketId String @db.Uuid
   institutionId String @db.Uuid
-  actorId String @db.Uuid
+  actorId String? @db.Uuid
   action String @db.VarChar(40)
   note String @db.VarChar(2000)
   before Json?
@@ -401,6 +402,9 @@ model Certificate {
 }
 
 enum CertificateVerificationResult {
+  emitida
+  descargada
+  consultada
   valida
   inexistente
   alterado
@@ -411,12 +415,15 @@ model CertificateVerification {
   id            String   @id @default(uuid()) @db.Uuid
   institutionId String   @db.Uuid
   certificateId String?  @db.Uuid
+  actorId       String?  @db.Uuid
   code          String   @db.VarChar(64)
   result        CertificateVerificationResult
   occurredAt    DateTime @default(now()) @db.Timestamptz(3)
   certificate   Certificate? @relation(fields: [certificateId], references: [id], onDelete: Restrict)
+  actor         AppUser? @relation(fields: [institutionId, actorId], references: [institutionId, id], onDelete: Restrict)
 
   @@index([institutionId, occurredAt(sort: Desc)])
+  @@index([institutionId, actorId, occurredAt(sort: Desc)])
   @@index([code, occurredAt(sort: Desc)])
 }
 

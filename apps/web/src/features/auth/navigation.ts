@@ -20,6 +20,7 @@ const navigation: NavigationItem[] = [
   { label: 'Cola de TI', description: 'Accede a la cola de atención de tu equipo.', icon: ShieldCheck, to: '/ti/cola', permissions: access.teamTickets },
 ]
 const administration: NavigationItem[] = [
+  { label: 'Auditoría de constancias', description: 'Consulta emisiones, descargas y verificaciones.', icon: ShieldCheck, to: '/admin/constancias/auditoria', permissions: access.audit },
   { label: 'Cursos y secciones', description: 'Asigna profesores y estudiantes a sus cursos.', icon: BookOpen, to: '/admin/cursos', permissions: access.manageCalendar },
   { label: 'Usuarios', description: 'Administra las cuentas, sus roles y su estado de acceso.', icon: Users, to: '/admin/usuarios', permissions: access.users },
   { label: 'Permisos', description: 'Configura las capacidades y alcances de cada rol.', icon: Key, to: '/admin/permisos', permissions: access.permissions },

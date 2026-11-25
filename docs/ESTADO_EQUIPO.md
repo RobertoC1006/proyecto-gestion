@@ -1,4 +1,25 @@
-# Estado del equipo — actualización del 24 de noviembre de 2026
+# Estado del equipo — actualización del 25 de noviembre de 2026
+
+## Integración de nuevas entregas corregida; login real pendiente
+
+Roberto autorizó integrar todo en main y confirmó Groq. Candidato en
+integracion-avances-equipo con Johan `786154d` y Jasmine `c218cf4`; conflictos
+resueltos preservando historia y correcciones. Proyección técnica sin texto
+personal para Groq, historial atómico con actor automático, auditoría completa
+de constancias, multipart/JSON y archivo original conservado.
+
+Quince migraciones verificadas; doce SQL previos intactos y tres ampliaciones
+aplicadas por el procedimiento manual. Constancias sin UPDATE/DELETE para API.
+138 tests API y 56 recorridos de navegador distintos aprobados; actualización
+desde el esquema previo con datos existentes comprobada. npm audit sin avisos.
+La instalación campusitsm habitual está saludable en localhost:8080.
+
+Faltan login personal y recorrido real administrador → estudiante → público →
+administrador antes de publicar. Main todavía d8ef0ca. La autorización de
+publicación sigue vigente; no requiere nueva aprobación. Groq no tiene clave
+local y deriva a revisión manual hasta configurarla privadamente. Ver
+[entrega actual](entregas/roberto-integracion-equipo-20261125.md) y registro BD.
+No se retiraron ramas/worktrees del equipo. Estados siguientes históricos.
 
 ## Integración actual validada automáticamente; recorrido real pendiente
 

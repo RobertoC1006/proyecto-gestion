@@ -1,5 +1,46 @@
 # Coordinación de cambios en la base compartida
 
+## Ampliación IA y auditoría de constancias — 25 de noviembre de 2026
+
+Autorización: Roberto encargó integrar todo corregido y confirmó Groq. Ejecutor:
+agente de Roberto. Destino CampusITSM / npjibnlxepiwfermtcmo / campusitsm,
+rol de API campusitsm_api y TLS activo comprobados en consulta READ ONLY.
+Fuente: integración que conserva Johan `786154d` y Jasmine `c218cf4`, más las
+correcciones documentadas en la [entrega](entregas/roberto-integracion-equipo-20261125.md).
+
+Antes: doce entradas finalizadas y doce checksums exactos. Se conservó sin editar
+`20261120000100_certificates`; la versión modificada de Jasmine no sustituyó el
+SQL aplicado. Se retiene el enum histórico inexistente, sin borrar valores/datos.
+Validación: PostgreSQL 17 aislado, prueba de actualización desde los doce SQL con
+una constancia existente idéntica antes/después, y 138 tests API aprobados.
+
+Aplicación manual con `docker compose --env-file .local/supabase/migrate.env --profile tools run --rm migrate`
+tras construir migrate. Solo se aplicaron las tres pendientes:
+
+| Migración | SHA256 | Finalización UTC |
+| --- | --- | --- |
+| 20261120000100_ticket_ai_classification | `5e0b790f5eb980aaa86c02ce03a660b2b48b46c6d07deaa23f681ba770319769` | 2026-11-25 18:51:13.857Z |
+| 20261125000100_certificate_audit_events | `5c850d0297da6027b9590ec4ac406e40a6c31593a447133805f16d01a6c831fd` | 2026-11-25 18:51:14.938Z |
+| 20261125000200_automatic_classification_audit | `066f30d514882d21ef8c931688b9164c2b114f29a93f5d26b9d574d2b08ad55f` | 2026-11-25 18:51:16.004Z |
+
+Archivos: `apps/api/prisma/migrations/<nombre>/migration.sql`. Hora Lima:
+13:51:13–13:51:16. Añaden reportedService/metadatos IA; estados de clasificación;
+eventos de emisión/descarga/consulta, actor y restricciones de constancias;
+TicketChange admite actor automático nulo; recuperación de eventos históricos
+de emisión. Se revoca UPDATE/DELETE de Certificate para API explícitamente.
+
+Después: quince entradas sin rollback y quince checksums exactos. Cuatro tablas
+de consentimiento/constancias conservan RLS, políticas del servidor y ausencia
+de privilegios anon/authenticated. API solo SELECT/INSERT sobre Certificate y
+eventos; historial Prisma solo lectura. Web/API/Python saludables con Supabase.
+Sin borrado, reset, db push, seeds remotos o cambios en credenciales/sesiones.
+Metadatos sin secretos en `.local/team-20261125-db-after.json`.
+
+Recorrido autenticado y publicación de main pendientes. Este registro conserva
+el aviso para los compañeros; no se enviaron mensajes externos. Deben incorporar
+main y sus archivos exactos antes de reconstruir; sus ramas anteriores de
+constancias no deben desplegar la migración reescrita.
+
 ## Integración autorizada de consentimiento y constancias — 24 de noviembre de 2026
 
 Roberto autorizó expresamente las migraciones compatibles necesarias para la

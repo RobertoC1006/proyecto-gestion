@@ -49,7 +49,8 @@ export class AuditService {
   // Parsed values stay private: each public entrypoint validates exactly once.
   private matching(actor: CampusPrincipal, q: ReturnType<typeof v.auditQuery>) {
     return Prisma.sql`
-      SELECT h.*, coalesce(u."displayName", h."actorId"::text, 'Consulta pública') AS actor FROM (
+      SELECT h.*, coalesce(u."displayName", h."actorId"::text,
+        CASE WHEN h.action LIKE 'ticket.ai.%' THEN 'Sistema de clasificación' ELSE 'Consulta pública' END) AS actor FROM (
         SELECT id, "institutionId", "createdAt" AS "occurredAt", "actorId", action,
           "entityType" AS "objectType", "entityId" AS "objectId", reason, "before", "after", 1 AS source FROM "AcademicChange"
         UNION ALL
@@ -66,8 +67,10 @@ export class AuditService {
         SELECT id, "institutionId", "issuedAt", "ownerId", 'certificate.issue', 'Certificate', id, NULL, NULL::jsonb,
           jsonb_build_object('code', code, 'ticketId', "ticketId", 'sha256', sha256), 6 FROM "Certificate"
         UNION ALL
-        SELECT id, "institutionId", "occurredAt", NULL::uuid, 'certificate.verify', 'Certificate', "certificateId", NULL, NULL::jsonb,
-          jsonb_build_object('code', code, 'result', result), 7 FROM "CertificateVerification"
+        SELECT id, "institutionId", "occurredAt", "actorId",
+          CASE result WHEN 'descargada' THEN 'certificate.download' WHEN 'consultada' THEN 'certificate.lookup' ELSE 'certificate.verify' END,
+          'Certificate', "certificateId", NULL, NULL::jsonb,
+          jsonb_build_object('code', code, 'result', result), 7 FROM "CertificateVerification" WHERE result <> 'emitida'
       ) h LEFT JOIN "AppUser" u ON u.id = h."actorId" AND u."institutionId" = h."institutionId"
       WHERE h."institutionId" = ${actor.institutionId}::uuid
         ${q.from ? Prisma.sql`AND h."occurredAt" >= ${q.from}` : Prisma.empty}

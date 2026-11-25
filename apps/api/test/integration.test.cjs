@@ -98,7 +98,7 @@ test('Integrated HTTP: owned ticket, resolution, certificate, audit and reportin
     const certificateAuditPath = `audit?objectType=Certificate&objectId=${issued.body.id}`;
     const certificateAudit = await call(certificateAuditPath, 'admin');
     assert.equal(certificateAudit.status, 200);
-    assert.equal(certificateAudit.body.total, 3);
+    assert.equal(certificateAudit.body.total, 6);
     const issuance = certificateAudit.body.items.filter(item => item.action === 'certificate.issue');
     assert.equal(issuance.length, 1, 'Idempotent retries produce only one issuance audit event');
     assert.equal(issuance[0].actorId, users.student.id);
@@ -110,7 +110,7 @@ test('Integrated HTTP: owned ticket, resolution, certificate, audit and reportin
       assert.equal(check.actor, 'Consulta pública');
       assert.deepEqual(Object.keys(check.after).sort(), ['code', 'result']);
     }
-    assert.equal((await call(`${certificateAuditPath}&actorId=${users.student.id}`, 'admin')).body.total, 1);
+    assert.equal((await call(`${certificateAuditPath}&actorId=${users.student.id}`, 'admin')).body.total, 3);
     assert.equal((await call(certificateAuditPath, 'foreign')).body.total, 0);
     assert.equal((await call(certificateAuditPath, 'student')).status, 403);
     const certificateCsv = await call(certificateAuditPath.replace('audit?', 'audit/export?'), 'admin');

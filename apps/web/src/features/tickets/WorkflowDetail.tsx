@@ -9,7 +9,7 @@ import { ticketApi, ticketDate, type TicketService } from '../../lib/api/tickets
 import { useAuth } from '../auth/AuthContext'
 import './workflow.css'
 
-const actionLabels:Record<string,string>={'demo.created':'Caso de demostración',evaluate:'Prioridad evaluada',reclassify:'Servicio corregido',start:'Atención iniciada',note:'Avance de atención',assign:'Responsable asignado',resolve:'Incidencia resuelta'}
+const actionLabels:Record<string,string>={'ai.classify':'Clasificación automática','ai.fallback':'Derivada a revisión manual','demo.created':'Caso de demostración',evaluate:'Prioridad evaluada',reclassify:'Servicio corregido',start:'Atención iniciada',note:'Avance de atención',assign:'Responsable asignado',resolve:'Incidencia resuelta'}
 export default function WorkflowDetail({operational=false}:{operational?:boolean}){
  const {id=''}=useParams(),{user}=useAuth(),client=useQueryClient()
  const [urgency,setUrgency]=useState('3'),[impact,setImpact]=useState('2'),[service,setService]=useState<TicketService['id']|''>(''),[note,setNote]=useState(''),[solution,setSolution]=useState(''),[confirmed,setConfirmed]=useState(false),[assigneeId,setAssigneeId]=useState(''),[notice,setNotice]=useState('')

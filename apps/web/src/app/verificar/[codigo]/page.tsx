@@ -1,4 +1,4 @@
-import { ArrowLeft, CheckCircle, MagnifyingGlass, ShieldWarning, Warning } from '@phosphor-icons/react'
+import { ArrowLeft, MagnifyingGlass, ShieldWarning, Warning } from '@phosphor-icons/react'
 import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { Button, Card, Field, FormError, Notice } from '../../../components/ui'
@@ -14,6 +14,7 @@ export default function VerifyCertificatePage() {
   const [lookupError, setLookupError] = useState('')
   const [integrity, setIntegrity] = useState<'valida' | 'alterado' | 'archivo_no_verificable' | null>(null)
   const [integrityMessage, setIntegrityMessage] = useState('')
+  const [integrityLoading, setIntegrityLoading] = useState(false)
 
   useEffect(() => {
     setValue(codigo)
@@ -22,11 +23,13 @@ export default function VerifyCertificatePage() {
     setLookup(null)
     setLookupError('')
     setIntegrity(null)
+    setIntegrityMessage('')
+    setIntegrityLoading(false)
     if (!codigo.trim()) return
     const run = async () => {
       setLookupLoading(true)
       try {
-        const response = await fetch(`/api/v1/certificates/public/${encodeURIComponent(codigo.trim())}`, { cache: 'no-store' })
+        const response = await fetch(`/api/v1/certificates/public/${encodeURIComponent(codigo.trim())}`, { cache: 'no-store', credentials: 'omit' })
         const body = await response.json().catch(() => ({}))
         if (!response.ok) throw new Error(body.message || 'No existe una constancia para este código.')
         setLookup(body)
@@ -69,22 +72,14 @@ export default function VerifyCertificatePage() {
       setIntegrityMessage('El PDF supera el límite permitido de 5 MiB.')
       return
     }
-    const pdfBase64 = await new Promise<string>((resolve, reject) => {
-      const reader = new FileReader()
-      reader.onload = () => resolve(String(reader.result).split(',')[1] || '')
-      reader.onerror = () => reject(reader.error)
-      reader.readAsDataURL(file)
-    }).catch(() => '')
-    if (!pdfBase64) {
-      setIntegrity('archivo_no_verificable')
-      setIntegrityMessage('No se pudo leer el PDF.')
-      return
-    }
+    setIntegrityLoading(true)
+    const form = new FormData()
+    form.append('file', file, file.name)
     try {
       const response = await fetch(`/api/v1/certificates/public/${encodeURIComponent(trimmedCode)}/verify`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pdfBase64 }),
+        body: form,
+        credentials: 'omit',
       })
       const body = await response.json().catch(() => ({}))
       if (body.status === 'valida') {
@@ -99,7 +94,9 @@ export default function VerifyCertificatePage() {
       }
     } catch {
       setIntegrity('archivo_no_verificable')
-      setIntegrityMessage('No se pudo conectar al servicio de verificación. Intenta de nuevo.')
+      setIntegrityMessage('No se pudo conectar con el servicio de verificación.')
+    } finally {
+      setIntegrityLoading(false)
     }
   }
 
@@ -108,8 +105,8 @@ export default function VerifyCertificatePage() {
       <strong>CampusITSM</strong>
     </div>
     <Card className={`verification-card ${statusClass}`}>
-      <div className={`valid-icon verification-status-icon ${statusClass.endsWith('--invalid') ? 'verification-status-icon--invalid' : integrity === 'valida' ? 'verification-status-icon--valid' : 'verification-status-icon--pending'}`} aria-hidden="true">
-        {statusClass.endsWith('--invalid') ? <Warning size={34} /> : integrity === 'valida' ? <CheckCircle size={34} /> : <ShieldWarning size={34} />}
+      <div className={`valid-icon verification-status-icon ${formatError || emptyCode ? 'verification-status-icon--invalid' : 'verification-status-icon--pending'}`} aria-hidden="true">
+        {formatError || emptyCode ? <Warning size={34} /> : <ShieldWarning size={34} />}
       </div>
       <h1>
         {emptyCode ? 'Código requerido' : formatError ? 'Formato de código incorrecto' : notFound ? 'Constancia inexistente' : integrity === 'valida' ? 'Constancia válida e íntegra' : integrity === 'alterado' ? 'Documento alterado' : lookup ? 'Constancia encontrada' : 'Verificación pendiente'}
@@ -139,8 +136,9 @@ export default function VerifyCertificatePage() {
       {lookup && (
         <div className="verification-integrity">
           <Field label="Comprobar integridad de un PDF">
-            <input type="file" accept=".pdf,application/pdf" onChange={event => void verifyFile(event)} />
+            <input type="file" accept=".pdf,application/pdf" disabled={integrityLoading} onChange={event => void verifyFile(event)} />
           </Field>
+          {integrityLoading && <Notice tone="amber" role="status">Comprobando la huella SHA-256 del archivo…</Notice>}
           {integrityMessage && (
             <Notice tone={integrity === 'valida' ? 'green' : 'amber'} role="status">{integrityMessage}</Notice>
           )}
@@ -158,7 +156,7 @@ export default function VerifyCertificatePage() {
             aria-describedby="verification-code-help verification-code-error"
           />
           <span id="verification-code-help" className="field__hint">
-            Busca el código impreso en la constancia para consultar su emisión.
+            Se consulta el registro de emisión y se muestran solo datos mínimos del titular.
           </span>
         </Field>
         <span id="verification-code-error" className="verification-code-error">

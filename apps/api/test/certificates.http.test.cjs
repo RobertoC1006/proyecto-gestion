@@ -161,7 +161,7 @@ test('Constancias: HTTP con persistencia real aislada', async t => {
       const publicLookup = await request(`certificates/public/${certificate.code}`);
       assert.equal(publicLookup.status, 200);
       assert.deepEqual(publicLookup.body, {code:certificate.code,holder:'Y***',service:'Equipo de cómputo',
-        resolvedAt:certificate.resolvedAt,issuedAt:certificate.issuedAt,status:'valida'});
+        resolvedAt:certificate.resolvedAt,issuedAt:certificate.issuedAt,status:'encontrada'});
 
       const download = await request(`certificates/${certificate.id}/download`, { session: ownerSession, raw: true });
       const valid = await request(`certificates/public/${certificate.code}/verify`, {
@@ -236,7 +236,7 @@ test('Constancias: HTTP con persistencia real aislada', async t => {
         }
         const lookup = await request(`certificates/public/${issued.body.code}`);
         assert.equal(lookup.status, 200);
-        assert.deepEqual(lookup.body, {code:issued.body.code,holder:changedName[0]+'***',service:'Equipo de cómputo',resolvedAt:issued.body.resolvedAt,issuedAt:issued.body.issuedAt,status:'valida'});
+        assert.deepEqual(lookup.body, {code:issued.body.code,holder:changedName[0]+'***',service:'Equipo de cómputo',resolvedAt:issued.body.resolvedAt,issuedAt:issued.body.issuedAt,status:'encontrada'});
         const valid = await request(`certificates/public/${issued.body.code}/verify`, {method:'POST',body:{pdfBase64:original.bytes.toString('base64')}});
         assert.equal(valid.status, 200);
         assert.deepEqual(valid.body, {code:issued.body.code,status:'valida',sha256Matches:true});

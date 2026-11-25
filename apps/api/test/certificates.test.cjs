@@ -57,7 +57,7 @@ test('Constancias: emisión reutilizable, huella e integridad', async t => {
     await t.test('La consulta pública no expone datos privados', async () => {
       assert.deepEqual(await service.publicLookup(issued.code), {
         code: issued.code, holder: 'Y***', service: 'Equipo de cómputo',
-        resolvedAt: ticket.resolvedAt.toISOString(), issuedAt: issued.issuedAt, status: 'valida',
+        resolvedAt: ticket.resolvedAt.toISOString(), issuedAt: issued.issuedAt, status: 'encontrada',
       });
     });
   } finally {

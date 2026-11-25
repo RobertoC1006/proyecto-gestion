@@ -1,0 +1,65 @@
+require('reflect-metadata');
+const { test } = require('node:test');
+const assert = require('node:assert/strict');
+const { randomUUID } = require('node:crypto');
+const { PrismaClient } = require('@prisma/client');
+const { TicketAiService } = require('../dist/tickets/ticket-ai.service');
+const { AuditService } = require('../dist/audit/audit.service');
+const { technicalDescription } = require('../dist/tickets/groq-ticket.adapter');
+
+test('IA: proyección privada, cambios atómicos auditados y respuesta tardía preservada en PostgreSQL', async () => {
+  assert.match(process.env.DATABASE_URL ?? '', /@db:5432\/workflow_test(?:\?|$)/);
+  const db = new PrismaClient(), institutionId = randomUUID(), ownerId = randomUUID();
+  const previousFetch = global.fetch, previousKey = process.env.GROQ_API_KEY;
+  process.env.GROQ_API_KEY = 'fixture-only';
+  try {
+    await db.institution.create({ data: { id: institutionId, code: randomUUID(), name: 'Prueba aislada IA' } });
+    await db.appUser.create({ data: { id: ownerId, institutionId, email: `${ownerId}@example.test`, displayName: 'Titular ficticio', role: 'estudiante' } });
+    const description = 'Soy Nombre Privado, DNI 12345678, celular +51 999111222, correo persona@example.test. No puedo entrar a Moodle y falla el examen.';
+    const projection = technicalDescription(description);
+    for (const privateValue of ['Nombre Privado','12345678','999111222','persona@example.test']) assert.ok(!projection.includes(privateValue));
+    assert.match(projection, /aula virtual/);
+    let sent;
+    global.fetch = async (_url, options) => {
+      sent = JSON.parse(options.body);
+      return { ok: true, json: async () => ({ choices: [{ message: { content: JSON.stringify({service:'aula_virtual',urgency:3,impact:2,explanation:'Propuesta ficticia de aula virtual.'}) } }] }) };
+    };
+    const create = () => db.ticket.create({data:{institutionId,ownerId,code:randomUUID(),description,service:'correo',scope:'general',idempotencyKey:randomUUID(),requestHash:'a'.repeat(64)}});
+    const academic = {context:async()=>({factor:1,reason:'Sin contexto académico aplicable'})};
+    const service = new TicketAiService(db, academic);
+    const original = await create(), classified = await service.classify(original);
+    assert.equal(sent.messages[1].content, projection);
+    assert.equal(classified.classificationStatus, 'ia');
+    assert.equal(classified.reportedService, 'correo');
+    assert.equal(classified.service, 'aula_virtual');
+    const events = await db.ticketChange.findMany({where:{ticketId:original.id}});
+    assert.equal(events.length,1);assert.equal(events[0].actorId,null);
+    assert.equal(events[0].action,'ai.classify');assert.equal(events[0].before.service,'correo');assert.equal(events[0].after.service,'aula_virtual');
+    assert.ok(!JSON.stringify(events).includes('persona@example.test'));
+    const audit = await new AuditService(db).list({institutionId},{objectId:original.id});
+    assert.equal(audit.items[0].actor,'Sistema de clasificación');
+    await service.classify(original);
+    assert.equal(await db.ticketChange.count({where:{ticketId:original.id}}),1);
+    delete process.env.GROQ_API_KEY;
+    const fallback = await create();
+    assert.equal((await service.classify(fallback)).classificationStatus,'revision_manual');
+    assert.equal((await db.ticketChange.findFirst({where:{ticketId:fallback.id}})).action,'ai.fallback');
+    const corrected = await create();
+    await db.ticket.update({where:{id:corrected.id},data:{version:{increment:1},service:'equipos',classificationStatus:'manual'}});
+    assert.equal((await service.classify(corrected)).service,'equipos');
+    assert.equal(await db.ticketChange.count({where:{ticketId:corrected.id}}),0);
+    process.env.GROQ_API_KEY='fixture-only';
+    const contextFailure=await create();
+    const failedService=new TicketAiService(db,{context:async()=>{throw new Error('Fallo aislado');}});
+    assert.equal((await failedService.classify(contextFailure)).classificationStatus,'revision_manual');
+    assert.equal(await db.ticketChange.count({where:{ticketId:contextFailure.id}}),1);
+  } finally {
+    global.fetch=previousFetch;
+    if(previousKey===undefined)delete process.env.GROQ_API_KEY;else process.env.GROQ_API_KEY=previousKey;
+    await db.ticketChange.deleteMany({where:{institutionId}});
+    await db.ticket.deleteMany({where:{institutionId}});
+    await db.appUser.deleteMany({where:{institutionId}});
+    await db.institution.deleteMany({where:{id:institutionId}});
+    await db.$disconnect();
+  }
+});

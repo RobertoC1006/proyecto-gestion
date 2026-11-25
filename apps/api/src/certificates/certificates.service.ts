@@ -1,13 +1,13 @@
 import { ConflictException, Injectable, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
-import { Prisma, TicketService } from '@prisma/client';
-import { createHash, randomBytes } from 'node:crypto';
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { CertificateVerificationResult, Prisma, TicketService } from '@prisma/client';
+import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
+import { lstat, mkdir, readFile, rename, rm, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve, sep } from 'node:path';
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import QRCode from 'qrcode';
-import { CampusPrincipal } from '../auth/auth.policy';
+import { CampusPrincipal, requirePermission } from '../auth/auth.policy';
 import { PrismaService } from '../database/prisma.service';
-import { uuid } from '../academic/academic.validation';
+import { date, invalid, object, positive, text, uuid } from '../academic/academic.validation';
 
 export const certificateServiceLabels: Record<TicketService, string> = {
   aula_virtual: 'Aula virtual',
@@ -38,10 +38,26 @@ type CertificateRecord = {
 };
 
 const validCode = (value: unknown) => typeof value === 'string' && /^CITS-[A-Z0-9]{20}$/.test(value);
-const fileUnavailable = (cause?: unknown) => new ServiceUnavailableException({
-  code: 'CERTIFICATE_FILE_UNAVAILABLE',
-  message: 'El PDF original no está disponible. La emisión y su huella se conservan para verificar el archivo original.',
-}, { cause });
+const auditActions = Object.values(CertificateVerificationResult);
+
+function auditQuery(value: unknown) {
+  const query = object(value);
+  const allowed = ['page', 'pageSize', 'from', 'to', 'code', 'actorId', 'action'];
+  for (const key of Object.keys(query)) if (!allowed.includes(key)) invalid(key, 'Campo no admitido en la consulta.');
+  const page = query.page == null ? 1 : positive(query.page, 'page', 100000);
+  const pageSize = query.pageSize == null ? 20 : positive(query.pageSize, 'pageSize', 100);
+  const from = query.from == null || query.from === '' ? undefined : date(query.from, 'from');
+  const to = query.to == null || query.to === '' ? undefined : date(query.to, 'to');
+  if (from && to && (to <= from || to.getTime() - from.getTime() > 93 * 86400000)) {
+    invalid('to', 'Consulta un intervalo de hasta 93 días, con fin posterior al inicio.');
+  }
+  const code = query.code == null || query.code === '' ? undefined : text(query.code, 'code', 64);
+  if (code && !validCode(code.toUpperCase())) invalid('code', 'Indica un código de constancia válido.');
+  const actorId = query.actorId == null || query.actorId === '' ? undefined : uuid(query.actorId, 'actorId');
+  const action = query.action == null || query.action === '' ? undefined : text(query.action, 'action');
+  if (action && !auditActions.includes(action as CertificateVerificationResult)) invalid('action', 'Selecciona una acción válida.');
+  return { page, pageSize, from, to, code: code?.toUpperCase(), actorId, action: action as CertificateVerificationResult | undefined };
+}
 
 @Injectable()
 export class CertificatesService {
@@ -52,6 +68,9 @@ export class CertificatesService {
   }
 
   private storagePath(storageKey: string) {
+    if (!/^certificates\/[0-9a-f-]{36}\/[0-9a-f-]{36}\.pdf$/i.test(storageKey)) {
+      throw new Error('La clave del archivo de constancia no es válida.');
+    }
     const root = this.filesDir();
     const full = resolve(root, storageKey);
     if (full !== root && !full.startsWith(root + sep)) throw new Error('Ruta de archivo fuera del almacenamiento permitido.');
@@ -75,7 +94,7 @@ export class CertificatesService {
   async mine(actor: CampusPrincipal) {
     const [tickets, issued] = await Promise.all([
       this.db.ticket.findMany({
-        where: { institutionId: actor.institutionId, ownerId: actor.id, status: 'resuelto', failureConfirmed: true },
+        where: { institutionId: actor.institutionId, ownerId: actor.id, status: 'resuelto', failureConfirmed: true, resolvedAt: { not: null } },
         include: { certificate: true },
         orderBy: [{ resolvedAt: 'desc' }, { id: 'desc' }],
       }),
@@ -101,7 +120,7 @@ export class CertificatesService {
     const ticketId = uuid(rawTicketId, 'ticketId');
     const existing = await this.db.certificate.findFirst({ where: { institutionId: actor.institutionId, ticketId, ownerId: actor.id } });
     if (existing) {
-      await this.ensurePdf(existing);
+      await this.readStoredPdf(existing);
       return this.response(existing);
     }
 
@@ -135,7 +154,7 @@ export class CertificatesService {
           ticketCreatedAt: ticket.createdAt,
         });
         const sha256 = createHash('sha256').update(pdf).digest('hex');
-        const created = await tx.certificate.create({
+        const certificate = await tx.certificate.create({
           data: {
             institutionId: actor.institutionId,
             ticketId,
@@ -149,18 +168,18 @@ export class CertificatesService {
             storageKey,
           },
         });
-        // Publish the issued row only after its original bytes exist. Concurrent requests
-        // waiting on the ticket lock can then reuse that same document, never regenerate it.
-        await this.writePdf(created, pdf);
-        return created;
+        await this.writePdf(certificate, pdf);
+        await tx.certificateVerification.create({
+          data: { institutionId: actor.institutionId, certificateId: certificate.id, actorId: actor.id, code, result: 'emitida' },
+        });
+        return certificate;
       });
-      await this.ensurePdf(row);
       return this.response(row);
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
-        const winner = await this.db.certificate.findUnique({ where: { ticketId } });
+        const winner = await this.db.certificate.findFirst({ where: { institutionId: actor.institutionId, ticketId, ownerId: actor.id } });
         if (winner) {
-          await this.ensurePdf(winner);
+          await this.readStoredPdf(winner);
           return this.response(winner);
         }
       }
@@ -172,7 +191,7 @@ export class CertificatesService {
     const id = uuid(rawId, 'id');
     const row = await this.db.certificate.findFirst({ where: { id, institutionId: actor.institutionId, ownerId: actor.id } });
     if (!row) throw new NotFoundException({ code: 'NOT_FOUND', message: 'No se encontró la constancia.' });
-    await this.ensurePdf(row);
+    await this.readStoredPdf(row);
     return this.response(row);
   }
 
@@ -180,8 +199,9 @@ export class CertificatesService {
     const id = uuid(rawId, 'id');
     const row = await this.db.certificate.findFirst({ where: { id, institutionId: actor.institutionId, ownerId: actor.id } });
     if (!row) throw new NotFoundException({ code: 'NOT_FOUND', message: 'No se encontró la constancia.' });
-    const file = await this.ensurePdf(row);
-    return { ...file, code: row.code }; // Return the exact bytes whose hash was checked.
+    const bytes = await this.readStoredPdf(row);
+    await this.recordVerification(row, 'descargada', actor.id);
+    return { bytes, code: row.code };
   }
 
   async publicLookup(rawCode: unknown) {
@@ -192,34 +212,29 @@ export class CertificatesService {
       include: { owner: { select: { displayName: true } } },
     });
     if (!row) throw new NotFoundException({ code: 'CERTIFICATE_NOT_FOUND', message: 'No existe una constancia para el código indicado.' });
-    return {
+    const result = {
       code: row.code,
       holder: this.maskName(row.owner.displayName),
       service: certificateServiceLabels[row.service],
       resolvedAt: row.resolvedAt.toISOString(),
       issuedAt: row.issuedAt.toISOString(),
-      status: 'valida',
+      status: 'encontrada',
     };
+    await this.recordVerification(row, 'consultada');
+    return result;
   }
 
-  async verifyPdf(rawCode: unknown, pdfBase64: unknown) {
+  async verifyPdf(rawCode: unknown, pdf: unknown) {
     const code = typeof rawCode === 'string' ? rawCode.trim().toUpperCase() : '';
     const row = validCode(code) ? await this.db.certificate.findUnique({ where: { code } }) : null;
     if (!row) throw new NotFoundException({ code: 'CERTIFICATE_NOT_FOUND', message: 'No existe una constancia para el código indicado.' });
-    if (typeof pdfBase64 !== 'string' || pdfBase64.length > 7_000_000) {
+    if (typeof pdf === 'string' && pdf.length <= 7_000_000) pdf = Buffer.from(pdf, 'base64');
+    if (!Buffer.isBuffer(pdf) || pdf.length < 5 || pdf.length > 5_242_880 || pdf.subarray(0, 5).toString('ascii') !== '%PDF-') {
       await this.recordVerification(row, 'archivo_no_verificable');
       throw new ConflictException({ code: 'FILE_NOT_VERIFIABLE', message: 'El archivo no pudo verificarse.' });
     }
-    let bytes: Buffer;
-    try {
-      bytes = Buffer.from(pdfBase64, 'base64');
-      if (bytes.length < 4 || bytes.length > 5_242_880 || bytes.subarray(0, 4).toString('ascii') !== '%PDF') throw new Error('invalid-pdf');
-    } catch {
-      await this.recordVerification(row, 'archivo_no_verificable');
-      throw new ConflictException({ code: 'FILE_NOT_VERIFIABLE', message: 'El archivo no pudo verificarse.' });
-    }
-    const actual = createHash('sha256').update(bytes).digest('hex');
-    const result = actual === row.sha256 ? 'valida' : 'alterado';
+    const actual = createHash('sha256').update(pdf).digest('hex');
+    const result = this.hashMatches(actual, row.sha256) ? 'valida' : 'alterado';
     await this.recordVerification(row, result);
     return {
       code: row.code,
@@ -228,10 +243,52 @@ export class CertificatesService {
     };
   }
 
-  private async recordVerification(row: CertificateRecord, result: 'valida' | 'alterado' | 'archivo_no_verificable') {
+  private hashMatches(actual: string, expected: string) {
+    const normalized = expected.trim();
+    if (!/^[0-9a-f]{64}$/i.test(normalized)) return false;
+    return timingSafeEqual(Buffer.from(actual, 'hex'), Buffer.from(normalized, 'hex'));
+  }
+
+  private async recordVerification(row: CertificateRecord, result: CertificateVerificationResult, actorId?: string) {
     await this.db.certificateVerification.create({
-      data: { institutionId: row.institutionId, certificateId: row.id, code: row.code, result },
+      data: { institutionId: row.institutionId, certificateId: row.id, actorId, code: row.code, result },
     });
+  }
+
+  async audit(actor: CampusPrincipal, input: unknown) {
+    requirePermission(actor, 'audit:read:institution');
+    const { page, pageSize, from, to, code, actorId, action } = auditQuery(input);
+    const where: Prisma.CertificateVerificationWhereInput = {
+      institutionId: actor.institutionId,
+      ...(code ? { code: { contains: code } } : {}),
+      ...(actorId ? { actorId } : {}),
+      ...(action ? { result: action } : {}),
+      ...(from || to ? { occurredAt: { ...(from ? { gte: from } : {}), ...(to ? { lte: to } : {}) } } : {}),
+    };
+    const [rows, total] = await this.db.$transaction([
+      this.db.certificateVerification.findMany({
+        where,
+        include: { certificate: { select: { ticketCode: true } } },
+        orderBy: [{ occurredAt: 'desc' }, { id: 'desc' }],
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+      }),
+      this.db.certificateVerification.count({ where }),
+    ]);
+    return {
+      items: rows.map(row => ({
+        id: row.id,
+        code: row.code,
+        certificateId: row.certificateId,
+        ticketCode: row.certificate?.ticketCode ?? null,
+        actorId: row.actorId,
+        action: row.result,
+        occurredAt: row.occurredAt.toISOString(),
+      })),
+      total,
+      page,
+      pageSize,
+    };
   }
 
   private maskName(name: string) {
@@ -241,24 +298,44 @@ export class CertificatesService {
 
   private async writePdf(row: CertificateRecord, bytes: Buffer) {
     const path = this.storagePath(row.storageKey);
+    const temporaryPath = `${path}.${randomBytes(8).toString('hex')}.tmp`;
     await mkdir(dirname(path), { recursive: true });
-    await writeFile(path, bytes, { flag: 'w', mode: 0o600 });
+    try {
+      await writeFile(temporaryPath, bytes, { flag: 'wx', mode: 0o600 });
+      await rename(temporaryPath, path);
+    } finally {
+      await rm(temporaryPath, { force: true });
+    }
   }
 
-  private async ensurePdf(row: CertificateRecord) {
+  private async readStoredPdf(row: CertificateRecord) {
     const path = this.storagePath(row.storageKey);
     let bytes: Buffer;
     try {
+      const info = await lstat(path);
+      if (!info.isFile() || info.isSymbolicLink()) throw new ServiceUnavailableException({
+        code: 'CERTIFICATE_FILE_UNAVAILABLE',
+        message: 'El PDF original no está disponible. La emisión y su huella se conservan para verificar el archivo original.',
+      });
       bytes = await readFile(path);
-    } catch (cause) {
-      throw fileUnavailable(cause);
+    } catch (error) {
+      if (error instanceof ServiceUnavailableException) throw error;
+      if (error && typeof error === 'object' && 'code' in error && error.code === 'ENOENT') {
+        throw new ServiceUnavailableException({
+          code: 'CERTIFICATE_FILE_UNAVAILABLE',
+          message: 'El PDF original no está disponible. La emisión y su huella se conservan para verificar el archivo original.',
+        });
+      }
+      throw error;
     }
-    if (createHash('sha256').update(bytes).digest('hex') !== row.sha256) {
-      throw fileUnavailable(new Error('El archivo almacenado no coincide con la huella emitida.'));
+    const actual = createHash('sha256').update(bytes).digest('hex');
+    if (!this.hashMatches(actual, row.sha256)) {
+      throw new ServiceUnavailableException({
+        code: 'CERTIFICATE_FILE_UNAVAILABLE',
+        message: 'El PDF original no está disponible. La emisión y su huella se conservan para verificar el archivo original.',
+      });
     }
-    // No issuance snapshot exists for every rendered field. Regeneration could silently
-    // replace a legitimate original, so recovery requires the exact original backup.
-    return { path, bytes };
+    return bytes;
   }
 
   private async createPdf(input: {

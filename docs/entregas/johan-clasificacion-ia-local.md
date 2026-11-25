@@ -1,5 +1,14 @@
 # Johan — clasificación de incidencias con Groq (revisión local)
 
+## Actualización de integración — 25 de noviembre
+
+Roberto confirmó Groq. La integración agrega proyección de vocabulario técnico
+sin texto libre/identificadores y auditoría atómica de clasificación/fallback.
+La migración de IA está validada y aplicada a CampusITSM, junto con el actor
+automático nullable. Falta la clave privada de Groq en esta instalación y el
+recorrido con sesión real. La documentación debajo describe la entrega local
+original; el estado vigente está en [la integración](roberto-integracion-equipo-20261125.md).
+
 **Rama:** `gestion-incidencias`. **Estado:** cambios preparados para revisión de Roberto; no integrados en `main`. La elección del proveedor y la publicación del módulo siguen sujetas a la coordinación indicada en `planes/PLAN_JOHAN.md`.
 
 ## Alcance implementado

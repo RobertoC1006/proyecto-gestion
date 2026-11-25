@@ -1919,6 +1919,32 @@
         ]
       }
     },
+    "/api/v1/certificates/audit": {
+      "get": {
+        "operationId": "CertificatesController_audit",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CertificateAuditPageDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Constancias"
+        ]
+      }
+    },
     "/api/v1/certificates/{ticketId}/issue": {
       "post": {
         "operationId": "CertificatesController_issue",
@@ -2070,6 +2096,69 @@
             }
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "file": {
+                        "type": "string",
+                        "format": "binary"
+                      }
+                    },
+                    "required": [
+                      "file"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "pdfBase64": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "pdfBase64"
+                    ]
+                  }
+                ]
+              }
+            },
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "file": {
+                        "type": "string",
+                        "format": "binary"
+                      }
+                    },
+                    "required": [
+                      "file"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "pdfBase64": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "pdfBase64"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": ""
@@ -4105,6 +4194,83 @@
         "required": [
           "eligible",
           "issued"
+        ]
+      },
+      "CertificateAuditItemDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "code": {
+            "type": "string"
+          },
+          "certificateId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "ticketCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "actorId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "emitida",
+              "descargada",
+              "consultada",
+              "valida",
+              "inexistente",
+              "alterado",
+              "archivo_no_verificable"
+            ]
+          },
+          "occurredAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "certificateId",
+          "ticketCode",
+          "actorId",
+          "action",
+          "occurredAt"
+        ]
+      },
+      "CertificateAuditPageDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CertificateAuditItemDto"
+            }
+          },
+          "total": {
+            "type": "number"
+          },
+          "page": {
+            "type": "number"
+          },
+          "pageSize": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "page",
+          "pageSize"
         ]
       },
       "SupportTeamItemDto": {

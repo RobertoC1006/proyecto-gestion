@@ -516,6 +516,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/certificates/audit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["CertificatesController_audit"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/certificates/{ticketId}/issue": {
         parameters: {
             query?: never;
@@ -1173,6 +1189,26 @@ export interface components {
         CertificatesPageDto: {
             eligible: components["schemas"]["CertificateEligibilityDto"][];
             issued: components["schemas"]["CertificateDto"][];
+        };
+        CertificateAuditItemDto: {
+            /** Format: uuid */
+            id: string;
+            code: string;
+            /** Format: uuid */
+            certificateId: string | null;
+            ticketCode: string | null;
+            /** Format: uuid */
+            actorId: string | null;
+            /** @enum {string} */
+            action: "emitida" | "descargada" | "consultada" | "valida" | "inexistente" | "alterado" | "archivo_no_verificable";
+            /** Format: date-time */
+            occurredAt: string;
+        };
+        CertificateAuditPageDto: {
+            items: components["schemas"]["CertificateAuditItemDto"][];
+            total: number;
+            page: number;
+            pageSize: number;
         };
         SupportTeamItemDto: {
             /**
@@ -3153,6 +3189,25 @@ export interface operations {
             };
         };
     };
+    CertificatesController_audit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CertificateAuditPageDto"];
+                };
+            };
+        };
+    };
     CertificatesController_issue: {
         parameters: {
             query?: never;
@@ -3265,7 +3320,22 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    file: string;
+                } | {
+                    pdfBase64: string;
+                };
+                "application/json": {
+                    /** Format: binary */
+                    file: string;
+                } | {
+                    pdfBase64: string;
+                };
+            };
+        };
         responses: {
             200: {
                 headers: {

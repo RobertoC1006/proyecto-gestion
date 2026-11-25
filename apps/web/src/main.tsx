@@ -9,6 +9,7 @@ import NuevaIncidenciaPage from './app/incidencias/nueva/page'
 import ReporteRecibidoPage from './app/incidencias/registrada/page'
 import ConstanciasPage from './app/constancias/page'
 import VerifyCertificatePage from './app/verificar/[codigo]/page'
+import CertificateAuditPage from './features/certificates/CertificateAuditPage'
 import TiQueuePage from './features/tickets/QueuePage'
 import WorkflowDetail from './features/tickets/WorkflowDetail'
 import PolicyPage from './features/tickets/PolicyPage'
@@ -67,6 +68,7 @@ function App() {
         <Route path="/incidencias/registrada/:id" element={<PermissionBoundary permissions={access.personalTickets}><ReporteRecibidoPage /></PermissionBoundary>} />
         <Route path="/incidencias/:id" element={<PermissionBoundary permissions={access.personalTickets}><WorkflowDetail /></PermissionBoundary>} />
         <Route path="/constancias" element={<PermissionBoundary permissions={access.certificates}><ConstanciasPage /></PermissionBoundary>} />
+        <Route path="/admin/constancias/auditoria" element={<PermissionBoundary permissions={access.audit}><CertificateAuditPage /></PermissionBoundary>} />
         <Route path="/ti/cola" element={<PermissionBoundary permissions={access.teamTickets}><TiQueuePage /></PermissionBoundary>} />
         <Route path="/ti/tickets/:id" element={<PermissionBoundary permissions={access.teamTickets}><WorkflowDetail operational /></PermissionBoundary>} />
         <Route path="*" element={<Notice tone="amber" role="alert">Esta página no está disponible.</Notice>} />

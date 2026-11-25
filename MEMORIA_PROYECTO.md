@@ -1,5 +1,28 @@
 # Memoria de CampusITSM
 
+## Reanudación vigente — 25 de noviembre de 2026
+
+Roberto pidió integrar todo corregido en main y confirmó Groq como proveedor.
+Se incorporaron Johan `786154d` y Jasmine `c218cf4` en integracion-avances-equipo,
+preservando historia y ramas. Conflictos resueltos conservando las correcciones
+previas. Groq recibe señales técnicas de vocabulario cerrado; no texto libre.
+Clasificación/fallback guardan antes/después atómicos con actor automático nulo.
+Constancias incorpora auditoría de emisiones/descargas/consultas/verificaciones
+y multipart con compatibilidad JSON. No se regenera el original ni su huella.
+
+Quince migraciones aplicadas y verificadas. Las doce anteriores están intactas;
+no se aceptó la reescritura de SQL aplicado de Jasmine. Actualización con datos
+existentes validada en PostgreSQL aislado, 138 pruebas API y 56 recorridos de
+navegador distintos aprobados. Instalación habitual saludable en localhost:8080.
+Groq confirmado pero falta clave local privada; funciona revisión manual.
+
+Pendiente: login personal de Roberto para recorrido administrador/estudiante,
+PDF original/alterado, auditoría/reportes. La pestaña actual está en login.
+Después del recorrido satisfactorio, merge/push ya autorizados: publicar main,
+verificar SHA remoto y reconstruir desde main. Main aún conserva d8ef0ca.
+Detalle y evidencia: [entrega del 25](docs/entregas/roberto-integracion-equipo-20261125.md).
+Las secciones siguientes conservan el contexto histórico.
+
 ## Reanudación vigente — integración de equipo, 24 de noviembre de 2026
 
 Roberto autorizó corregir, validar, integrar y publicar los avances de Johan y

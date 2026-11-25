@@ -1,10 +1,11 @@
-import { BadRequestException, Body, Controller, Get, HttpCode, Param, Post, Req, Res, StreamableFile, UseGuards } from '@nestjs/common';
-import { ApiCookieAuth, ApiOkResponse, ApiServiceUnavailableResponse, ApiTags } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { BadRequestException, Body, Controller, Get, HttpCode, Param, Post, Query, Req, Res, StreamableFile, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { ApiBody, ApiConsumes, ApiCookieAuth, ApiOkResponse, ApiServiceUnavailableResponse, ApiTags } from '@nestjs/swagger';
 import type { Response } from 'express';
 import { AuthRequest } from '../auth/auth.service';
 import { CampusSessionGuard, RequirePermissions } from '../auth/auth.guard';
 import { CertificatesService } from './certificates.service';
-import { CertificatesPageDto, CertificateDto, CertificateEligibilityDto } from './certificates.dto';
+import { CertificatesPageDto, CertificateDto, CertificateAuditPageDto } from './certificates.dto';
 
 @ApiTags('Constancias')
 @ApiCookieAuth('campus_session')
@@ -18,6 +19,13 @@ export class CertificatesController {
   @ApiOkResponse({ type: CertificatesPageDto })
   mine(@Req() request: AuthRequest) {
     return this.certificates.mine(request.campusPrincipal!);
+  }
+
+  @Get('audit')
+  @RequirePermissions('audit:read:institution')
+  @ApiOkResponse({ type: CertificateAuditPageDto })
+  audit(@Req() request: AuthRequest, @Query() query: unknown) {
+    return this.certificates.audit(request.campusPrincipal!, query);
   }
 
   @Post(':ticketId/issue')
@@ -62,8 +70,13 @@ export class PublicCertificatesController {
 
   @Post(':code/verify')
   @HttpCode(200)
-  verify(@Param('code') code: string, @Body() body: { pdfBase64?: unknown }) {
-    if (!body || typeof body !== 'object') throw new BadRequestException({ code: 'VALIDATION_ERROR', message: 'Proporciona el PDF para verificar.' });
-    return this.certificates.verifyPdf(code, body.pdfBase64);
+  @UseInterceptors(FileInterceptor('file', { limits: { fileSize: 5_242_880, files: 1, fields: 0 } }))
+  @ApiConsumes('multipart/form-data', 'application/json')
+  @ApiBody({ schema: { oneOf: [
+    { type: 'object', properties: { file: { type: 'string', format: 'binary' } }, required: ['file'] },
+    { type: 'object', properties: { pdfBase64: { type: 'string' } }, required: ['pdfBase64'] },
+  ] } })
+  verify(@Param('code') code: string, @UploadedFile() file: { buffer: Buffer } | undefined, @Body() body: { pdfBase64?: unknown } | undefined) {
+    return this.certificates.verifyPdf(code, file?.buffer ?? body?.pdfBase64);
   }
 }

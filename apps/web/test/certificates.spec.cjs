@@ -41,7 +41,7 @@ test('Comprobar bytes distingue original, alteración y archivo no verificable',
   await fixture(page);
   const original = Buffer.from('%PDF-original de prueba');
   await page.route(`**/api/v1/certificates/public/${code}/verify`, route => {
-    const matches = route.request().postDataJSON().pdfBase64 === original.toString('base64');
+    const matches = route.request().postDataBuffer().includes(original);
     return json(route, { code, status: matches ? 'valida' : 'alterado', sha256Matches: matches });
   });
   await page.goto(`/verificar/${code}`);

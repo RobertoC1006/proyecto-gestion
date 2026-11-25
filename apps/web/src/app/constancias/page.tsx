@@ -36,7 +36,7 @@ export default function ConstanciasPage() {
     link.href = url
     link.download = `${certificate.code}.pdf`
     link.click()
-    URL.revokeObjectURL(url)
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000)
   }
 
   return <section className="certificate-page">

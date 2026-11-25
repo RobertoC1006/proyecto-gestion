@@ -15,7 +15,8 @@ test('Groq recibe solo el texto y devuelve una propuesta validada', async () => 
   });
   assert.deepEqual(result, proposal);
   assert.equal(sent.model, 'openai/gpt-oss-20b');
-  assert.equal(sent.messages[1].content, 'No puedo entrar al aula virtual.');
+  assert.match(sent.messages[1].content, /aula virtual/);
+  assert.ok(!sent.messages[1].content.includes('No puedo entrar'));
   assert.equal(sent.response_format.json_schema.strict, true);
   assert.equal(JSON.stringify(sent).includes('test-key'), false);
 });

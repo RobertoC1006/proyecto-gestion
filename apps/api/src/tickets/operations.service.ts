@@ -79,7 +79,7 @@ export class OperationsService {
    } else if (b.action==='reclassify') {
     if (typeof b.service!=='string' || !Object.values(TicketService).includes(b.service as TicketService)) invalid('service','Selecciona un servicio válido.');
     if (b.service===before.service) invalid('service','Selecciona un servicio distinto para registrar la corrección.');
-    patch={...patch,service:b.service as TicketService,classificationStatus:'manual'};
+    patch={...patch,service:b.service as TicketService,reportedService:before.reportedService??before.service,classificationStatus:'manual'};
    } else if (b.action==='start') {
     if (!before.priority || before.status!=='registrado') invalid('action','Evalúa la prioridad antes de iniciar la atención.');
     patch={...patch,status:'en_atencion',assigneeId:actor.id,firstResponseAt:before.firstResponseAt??now};

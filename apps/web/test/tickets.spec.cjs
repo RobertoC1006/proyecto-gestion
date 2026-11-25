@@ -95,7 +95,7 @@ test('P02–P05 muestran un ticket real, sin prioridad ni clasificación inventa
   await expect(page).toHaveURL(new RegExp(`/incidencias/registrada/${id}$`));
   await expect(page.getByText(`Ticket: ${ticket.code}`)).toBeVisible();
   await expect(page.getByText('Evaluación', { exact: true })).toBeVisible();
-  await expect(page.getByText('Pendiente', { exact: true })).toBeVisible();
+  await expect(page.getByText('Clasificación pendiente', { exact: true })).toBeVisible();
   await expect(page.getByText('Aún no calculada')).toBeVisible();
   await page.screenshot({ path: path.join(shots, 'p04-desktop.png'), fullPage: true });
   expect(calls).toBe(1);
