@@ -1,5 +1,45 @@
 # Memoria de CampusITSM
 
+## Cierre del bloque de Roberto — 25 de noviembre de 2026
+
+Encargo vigente: terminar su parte completa, sin depender de nuevos desarrollos
+de Johan/Jasmine. Código validado `d8d0a37`, sobre la integración del equipo.
+CSV atómico en el calendario existente; demanda P13, alertas P14, evaluación P16
+y notificaciones P24 conectadas a Nest/Prisma/Python. No se creó otro login,
+catálogo académico ni motor de prioridad. Contratos analítico y de avisos en docs.
+
+SARIMAX semanal frente a referencia semanal, tres cortes temporales de 14 días,
+selección por MAE y MAPE con ceros excluidos. Dataset reproducible de 24 meses y
+43 000 registros solo en models_data, separado de Ticket. Datos operativos sin
+cobertura suficiente responden unavailable; no se inventa eficacia real.
+pg-boss 12.39.0, SQL manual, diario 06:00 y domingo 02:00 America/Lima; recuperación,
+reintentos y último resultado válido. Corregida la adaptación de resultados SQL
+multisentencia del mantenimiento, comprobada también contra el destino habitual.
+
+18 migraciones finalizadas/checksums idénticos. Las tres nuevas se aplicaron
+manualmente con campusitsm_migrator y TLS el 25/11 a las 20:25 UTC; ver registro BD.
+Volúmenes/sesiones conservados y base/archivos/modelos respaldados/restaurados
+solo en PostgreSQL temporal. 149 pruebas API, 62 navegador y 5 Python aprobadas.
+Prueba aparte de 500 consultas concurrentes aisladas: cero errores/cruces,
+p95 501 ms. No mide 500 sesiones de Supabase Auth ni disponibilidad productiva.
+
+La sesión real del administrador se conservó al reconstruir localhost:8080.
+Se ejecutaron pronóstico/evaluación sintéticos, alerta revisada con motivo DEMO,
+lectura personal de avisos y detalle de la revisión en Auditoría. El login
+pendiente del registro anterior queda resuelto para administrador. No se
+atribuye a esta sesión un recorrido real de estudiante/constancia: aún pendiente
+para la aceptación conjunta. Las pruebas de PDF actuales sí están en la regresión.
+
+Johan: configurar Groq privadamente (sin clave en esta instalación al comprobar),
+prueba real del proveedor, evaluación etiquetada y evidencia de CU01. Su texto
+completo no sale al proveedor y su historial conserva las correcciones.
+Jasmine: conectar P15 con CONTRATO_ANALITICA, cerrar preparación analítica de
+privacidad/consentimiento y aceptación CU02. La migración aplicada de constancias
+se conservó; no volver a sustituirla por su versión reescrita.
+
+Publicación en main autorizada por Roberto; comprobar siempre el SHA remoto.
+Ramas/worktrees activos del equipo y outputs existentes conservados.
+
 ## Reanudación vigente — 25 de noviembre de 2026
 
 Durante el intento de login real se detectó un fallo del parser: el middleware

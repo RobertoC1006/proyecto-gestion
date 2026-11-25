@@ -1,5 +1,33 @@
 # Operación de CampusITSM con la base compartida
 
+## Ampliación de operación — 25/11/2026
+
+Demanda y avisos usan las mismas credenciales/instalación, con 18 migraciones
+verificadas; no ejecutar otra semilla al actualizar. pg-boss 12.39.0 reside en el
+esquema campusitsm y no migra automáticamente al arrancar. Sus colas se crearon
+mediante la credencial manual separada; la API conserva únicamente los permisos
+necesarios de datos/funciones, sin CREATE sobre el esquema.
+Al actualizar pg-boss, revisar/generar una nueva migración; nunca activar migrate
+automático ni editar la migración aplicada. En PostgreSQL aislado cuyo negocio
+use public, preparar explícitamente el esquema campusitsm de colas antes del
+comando de migración (el runner de pruebas ya lo hace).
+
+Programaciones persistidas: 06:00 diario, domingo 02:00 para evaluación, cada
+minuto para SLA/avisos; America/Lima. El histórico sintético es opt-in mediante
+una corrida manual y nunca se inserta en Ticket. Se recupera la última ejecución
+programada omitida y se mantienen resultados válidos si falla Python.
+La cobertura real se declara en Demanda → Configurar capacidad y cobertura.
+Fechas anteriores son desconocidas; no se rellenan con ceros ni sintéticos.
+
+`node scripts/backup-shared.cjs` crea una copia privada de solo lectura del
+esquema y archivos/modelos; `scripts/verify-backup.ps1 -BackupFolder <carpeta>`
+restaura exclusivamente en PostgreSQL temporal sin red y comprueba archivos y
+huellas. La carpeta debe estar dentro de .local/backups. Nunca publicar copias
+privadas ni restaurarlas sobre Supabase como prueba. El respaldo final del 25/11
+fue recuperado satisfactoriamente; ver REGISTRO_CAMBIOS_BD.
+
+Los detalles fechados del traslado conservados a continuación son históricos.
+
 Estado verificado el 7 de noviembre de 2026 en `base-compartida-supabase`.
 Proyecto [CampusITSM](https://supabase.com/dashboard/project/npjibnlxepiwfermtcmo),
 organización exclusiva CampusITSM (exhurkcxcrjlskvldchp), esquema de negocio **campusitsm**. Seleccionar ese

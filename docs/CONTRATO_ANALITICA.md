@@ -17,6 +17,11 @@ artefacto y su SHA-256. Rango 95 % exclusivamente si existe en SARIMAX;
 la referencia semanal devuelve límites null. No sumar límites diarios para
 presentar un intervalo semanal: no son un intervalo de la suma.
 
+La evaluación nueva conserva provenance con runId, origin, datasetHash y
+engineVersion propios; el pronóstico puede reutilizar la última evaluación
+válida sin presentar su huella como si correspondiera al nuevo corte. Las
+corridas históricas anteriores a ese campo conservan sus cortes originales.
+
 La evaluación compara tres cortes temporales de 14 días sin solaparse,
 misma ventana de prueba para ambos métodos. MAE en tickets/día; MAPE excluye
 reales cero y comunica zeroExcluded. Un ajuste fallido invalida al candidato;

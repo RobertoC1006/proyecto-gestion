@@ -1,5 +1,39 @@
 # Coordinación de cambios en la base compartida
 
+## Demanda, tareas y notificaciones — 25 de noviembre de 2026
+
+Autorización: «termina mi parte» y autorización previa de correcciones, migraciones
+compatibles e integración/publicación tras validación. Ejecutor: agente de Roberto.
+Destino comprobado con conexión real: proyecto CampusITSM npjibnlxepiwfermtcmo,
+esquema campusitsm, campusitsm_migrator y TLS activo. Fuente SQL `fa21b15`;
+código final validado `d8d0a37`. Quince checksums aplicados coincidentes antes.
+
+| Migración | SHA256 | Finalización UTC |
+| --- | --- | --- |
+| 20261125000300_demand_forecasts | 7fbcb594d5343dc8a074f4bfcef98b55b0470f6a6ca7b3c02b31c6420326ea90 | 2026-11-25 20:25:14.567 |
+| 20261125000400_demand_jobs | 325e3e9c6e7441b68422e21cee60e4fa2eea52e60791258050c7388e6b2f88f4 | 2026-11-25 20:25:15.562 |
+| 20261125000500_alerts_notifications | 0a3e755265b59a39b4f7e7516454878914f0701486924445ba3aac96b5a6894d | 2026-11-25 20:25:16.376 |
+
+Aplicadas solo estas pendientes mediante build y run --rm de migrate con
+`.local/supabase/migrate.env`. Resultado: 18 migraciones finalizadas sin rollback,
+18 checksums exactos, historial sin escrituras de API. RLS de las tablas nuevas,
+sin lectura anon/authenticated y sin conceder DDL al rol de API. pg-boss arranca
+con migrate:false/createSchema:false; colas creadas por SQL versionado en el
+esquema campusitsm ya existente. No editar este SQL tras su aplicación.
+
+Validación previa: 18 migraciones bajo migrador limitado en PostgreSQL aislado,
+actualización desde doce SQL históricos conservando una constancia y huella,
+149 pruebas API finales, 62 navegador, 5 Python y mantenimiento real de colas.
+No se ejecutaron reset, db push ni semillas masivas contra Supabase. El histórico
+sintético vive solo en models_data; Ticket conserva sus nueve filas al verificar.
+Sesiones, credenciales, datos y volúmenes existentes conservados.
+
+Respaldo privado previo y copia final en `.local/backups/shared-2026-11-25T20-39-30-423Z`:
+dump del esquema, files y models, manifiesto SHA-256 y restauración aislada
+comprobada. Sin restauración contra la base compartida. No compartir esos archivos
+ni subirlos a Git. Contratos actualizados en este repositorio; entrega/aviso al
+equipo mediante la documentación, sin mensajes externos enviados por el agente.
+
 ## Ampliación IA y auditoría de constancias — 25 de noviembre de 2026
 
 Autorización: Roberto encargó integrar todo corregido y confirmó Groq. Ejecutor:

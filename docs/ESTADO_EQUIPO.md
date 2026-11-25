@@ -1,5 +1,36 @@
 # Estado del equipo — actualización del 25 de noviembre de 2026
 
+## Bloque de Roberto completado y validado
+
+Código `d8d0a37`, preparado para la integración/publicación autorizada en main.
+CSV del calendario, P13/P14/P16/P24, tareas persistentes y contratos analíticos
+implementados. 149 pruebas API, 62 recorridos de navegador y 5 pruebas Python
+aprobados. PostgreSQL 17 aislado, actualización conservando constancia histórica,
+roles limitados/RLS, recuperación de respaldo y 500 lecturas concurrentes sin
+errores ni datos cruzados. Las latencias de la prueba local no acreditan Auth
+externo ni rendimiento en Supabase. localhost:8080 saludable, sin otra instalación.
+
+Administrador real: pronóstico y evaluación sintéticos guardados, revisión de
+alerta con motivo DEMO, avisos propios y registro en Auditoría comprobados.
+Sin pérdida de sesión al reconstruir. Tres migraciones aditivas de Roberto
+aplicadas mediante el procedimiento manual; 18 checksums verificados.
+
+| Responsable | Entregado | Pendiente concreto |
+| --- | --- | --- |
+| Roberto | Identidad/base/permisos; calendario/CSV; contexto/prioridad/SLA comunes; pronóstico/evaluación; alertas y avisos; operación/recuperación | Publicación Git final autorizada y coordinación de aceptación conjunta. El histórico real requiere cobertura y suficientes días; no es una función pendiente de programar. |
+| Johan | Incidencias, seguimiento/cola/atención, adaptador Groq y metadatos; privacidad e historial corregidos en integración | Clave/configuración privada de Groq, prueba real y evaluación independiente etiquetada de clasificación; evidencia CU01. No depende del pronóstico. |
+| Jasmine | Usuarios/permisos, consentimiento/auditoría, PDF/QR verificable y reportes operativos; SQL aplicado conservado | Consumir resultados de Roberto en P15, preparación analítica de privacidad y aceptación de sus pantallas/CU02 con cuentas reales. |
+
+Para Jasmine están disponibles [analítica](CONTRATO_ANALITICA.md) y
+[avisos](CONTRATO_NOTIFICACIONES.md). Mantener filtros/alcances de reportes;
+no presentar un agregado institucional como pronóstico por categoría/equipo.
+Para Johan, [especificaciones de cierre](entregas/johan-pendientes-cierre-20261125.md).
+No hace falta esperar nuevos módulos de los compañeros para usar lo de Roberto.
+
+Los apartados siguientes son registros de versiones anteriores; sus cifras y
+pendientes no reemplazan este cierre. El recorrido real de estudiante y la
+emisión/verificación con PDF propio siguen pendientes para aceptación conjunta.
+
 ## Integración de nuevas entregas corregida; login real pendiente
 
 Corregido durante el login real: el parser especial de PDFs hacía que Nest
