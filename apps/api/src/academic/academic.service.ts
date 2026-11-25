@@ -1,9 +1,10 @@
-import { ConflictException, ForbiddenException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, ForbiddenException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../database/prisma.service';
 import { AcademicDirectory, AcademicPrincipal, requireAdministrator, requireAcademicRead } from './academic.access';
 import { contextualFactor } from '../tickets/priority';
 import * as v from './academic.validation';
+import { csvHeader, parseCalendarCsv } from './academic.csv';
 
 const missing = () => new NotFoundException({ code: 'NOT_FOUND', message: 'El recurso no existe o no está disponible.' });
 const conflict = () => new ConflictException({ code: 'CONFLICT', message: 'El registro cambió o ya existe. Actualiza la información antes de continuar.' });
@@ -219,6 +220,46 @@ export class AcademicService {
       if (removed.count !== 1) throw conflict();
       await this.record(tx, actor, 'event', id, 'delete', reason, before);
       return { id, deleted: true };
+    });
+  }
+  async importCsv(actor: AcademicPrincipal, input: unknown, confirm: boolean) {
+    requireAdministrator(actor);
+    const b = v.object(input), reason = v.reason(b), records = parseCalendarCsv(b.csv);
+    return this.write(async tx => {
+      // Serializa importaciones y revalida duplicados al confirmar, sin confiar en la vista previa.
+      await tx.$queryRaw`SELECT "id" FROM "Institution" WHERE "id"=${actor.institutionId}::uuid FOR UPDATE`;
+      const courses = await tx.academicCourse.findMany({ where: { institutionId: actor.institutionId } });
+      const sections = await tx.academicSection.findMany({ where: { institutionId: actor.institutionId } });
+      const seen = new Set<string>();
+      const rows = []; const pending = [];
+      for (const [i, values] of records.entries()) {
+        const result = { row: i + 2, title: values[0] || '', duplicate: false, error: undefined as string | undefined };
+        try {
+          if (values.length !== csvHeader.length) v.invalid('csv', 'Cantidad de columnas incorrecta.');
+          const [title, type, scope, courseCode, sectionCode, startsAt, endsAt] = values.map(s => s.trim());
+          const course = courses.find(c => c.code === courseCode), section = sections.find(s => s.courseId === course?.id && s.code === sectionCode);
+          if (courseCode && !course) v.invalid('courseCode', 'Curso no disponible en esta institución.');
+          if (sectionCode && !section) v.invalid('sectionCode', 'Sección no disponible en ese curso.');
+          const { reason: _, ...data } = v.eventInput({ title, type, scope, courseId: course?.id, sectionId: section?.id, startsAt, endsAt, reason });
+          const key = JSON.stringify(data);
+          result.duplicate = seen.has(key) || !!await tx.academicEvent.findFirst({ where: { institutionId: actor.institutionId, ...data } });
+          seen.add(key);
+          if (!result.duplicate) pending.push(data);
+        } catch (e) {
+          if (!(e instanceof Error) || !('getResponse' in e)) throw e;
+          const response = (e as import('@nestjs/common').HttpException).getResponse() as { fields?: Record<string, string>; message?: string };
+          result.error = Object.values(response.fields || {}).join(' ') || response.message || 'Evento inválido.';
+        }
+        rows.push(result);
+      }
+      const valid = rows.every(r => !r.error);
+      if (confirm && !valid) throw new BadRequestException({ code: 'CSV_INVALID', message: 'Corrige los errores del CSV; ningún evento fue importado.', rows });
+      let imported = 0;
+      if (confirm) for (const data of pending) {
+        const row = await tx.academicEvent.create({ data: { institutionId: actor.institutionId, createdById: actor.id, ...data } });
+        await tx.academicChange.create({ data: { institutionId: actor.institutionId, actorId: actor.id, entityType: 'event', entityId: row.id, action: 'create', source: 'csv', reason, after: json(row) } }); imported++;
+      }
+      return { valid, rows, imported, duplicates: rows.filter(r => r.duplicate).length };
     });
   }
   private requireTeacher(actor: AcademicPrincipal) {
