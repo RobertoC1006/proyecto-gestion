@@ -5,6 +5,12 @@ la validación. También confirmó expresamente Groq como proveedor en esta sesi
 Estado: código combinado, migraciones aplicadas y validación automática aprobada;
 recorrido con cuentas reales y publicación pendientes.
 
+Merge funcional verificado: `9a3eaf4120a5689f7a75a66e465322cde7d550d9`, padres
+`0f4927f` (integración de Johan) y `c218cf4` (Jasmine). Todas las entregas remotas
+revisadas son ancestros. La ejecución final conjunta de navegador aprobó los
+56 recorridos en 20.8 s, sin omisiones; supera el resultado por bloques detallado
+más abajo. El índice servido coincide con el dist verificado y la salud sigue ok.
+
 ## Historia y resolución
 
 Partida `integracion-avances-equipo@001864a`, main remoto `d8ef0ca` comprobado

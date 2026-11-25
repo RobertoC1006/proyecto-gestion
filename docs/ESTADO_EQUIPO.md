@@ -2,6 +2,10 @@
 
 ## Integración de nuevas entregas corregida; login real pendiente
 
+Merge funcional `9a3eaf4` guardado, sin conflictos; todas las entregas revisadas
+son ancestros. Resultado final conjunto: 138 pruebas API y 56 de navegador
+aprobadas, sin omisiones. Índice servido igual al dist validado y salud ok.
+
 Roberto autorizó integrar todo en main y confirmó Groq. Candidato en
 integracion-avances-equipo con Johan `786154d` y Jasmine `c218cf4`; conflictos
 resueltos preservando historia y correcciones. Proyección técnica sin texto

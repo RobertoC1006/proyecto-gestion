@@ -3,6 +3,10 @@
 ## Reanudación vigente — 25 de noviembre de 2026
 
 Roberto pidió integrar todo corregido en main y confirmó Groq como proveedor.
+Merge funcional preparado `9a3eaf4`, con 138 pruebas API y 56 recorridos de
+navegador en una ejecución conjunta final, sin fallos/omisiones. La aplicación
+sirve ese código; el índice coincide con dist. Falta login personal para la
+comprobación real, antes de main/push ya autorizados.
 Se incorporaron Johan `786154d` y Jasmine `c218cf4` en integracion-avances-equipo,
 preservando historia y ramas. Conflictos resueltos conservando las correcciones
 previas. Groq recibe señales técnicas de vocabulario cerrado; no texto libre.
