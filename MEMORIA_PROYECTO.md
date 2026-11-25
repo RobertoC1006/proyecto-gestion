@@ -2,6 +2,12 @@
 
 ## Reanudación vigente — 25 de noviembre de 2026
 
+Durante el intento de login real se detectó un fallo del parser: el middleware
+JSON específico de PDFs impedía el registro automático del parser general de
+Nest. Corregido con parser normal explícito de 100 KiB tras el específico.
+Regresión que reproduce el fallo antes del cambio y 139 tests API aprobados.
+Sin cambios de credenciales/cuentas ni migraciones nuevas por esta corrección.
+
 Roberto pidió integrar todo corregido en main y confirmó Groq como proveedor.
 Merge funcional preparado `9a3eaf4`, con 138 pruebas API y 56 recorridos de
 navegador en una ejecución conjunta final, sin fallos/omisiones. La aplicación

@@ -5,6 +5,20 @@ la validación. También confirmó expresamente Groq como proveedor en esta sesi
 Estado: código combinado, migraciones aplicadas y validación automática aprobada;
 recorrido con cuentas reales y publicación pendientes.
 
+## Corrección del acceso detectada durante la prueba personal
+
+El formulario devolvía VALIDATION_ERROR para correo y contraseña aun con un
+correo ficticio sintácticamente válido. Causa confirmada en el código instalado
+de Nest: el jsonParser registrado solo para verificación de PDFs hacía que se
+omitiera el parser JSON general. Las pruebas HTTP anteriores creaban Nest sin
+ese middleware de arranque, por lo que no cubrían esta combinación.
+
+Se registra explícitamente el parser normal de 100 KiB después del específico
+de PDFs de 7 MiB. La nueva prueba `http-body-parser.test.cjs` usa AuthController
+y la misma configuración de middleware con un proveedor ficticio: reprodujo
+el fallo antes del cambio y pasó después. Suite completa: 139 tests aprobados,
+sin fallos/omisiones. No se cambian usuarios, contraseñas ni límites de PDF.
+
 Merge funcional verificado: `9a3eaf4120a5689f7a75a66e465322cde7d550d9`, padres
 `0f4927f` (integración de Johan) y `c218cf4` (Jasmine). Todas las entregas remotas
 revisadas son ancestros. La ejecución final conjunta de navegador aprobó los

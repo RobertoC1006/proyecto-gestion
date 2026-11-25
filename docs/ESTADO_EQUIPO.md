@@ -2,6 +2,12 @@
 
 ## Integración de nuevas entregas corregida; login real pendiente
 
+Corregido durante el login real: el parser especial de PDFs hacía que Nest
+omitiera el parser JSON general y login recibiera campos vacíos. Ahora se
+registra el parser normal explícitamente, manteniendo límites de PDF.
+Regresión RED/GREEN y suite completa de 139 tests API aprobados. Sin nuevas
+migraciones ni cambios de cuentas/contraseñas por esta corrección.
+
 Merge funcional `9a3eaf4` guardado, sin conflictos; todas las entregas revisadas
 son ancestros. Resultado final conjunto: 138 pruebas API y 56 de navegador
 aprobadas, sin omisiones. Índice servido igual al dist validado y salud ok.
