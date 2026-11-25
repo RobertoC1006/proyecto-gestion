@@ -22,6 +22,7 @@ import RolePermissionsPage from './features/permissions/RolePermissionsPage'
 import UsersPage from './features/users/UsersPage'
 import PrivacyPage from './features/privacy/PrivacyPage'
 import ReportsPage from './features/reports/ReportsPage'
+import DemandPage from './features/demand/DemandPage'
 import { AuthProvider } from './features/auth/AuthContext'
 import { SessionBoundary, PermissionBoundary } from './features/auth/AccessBoundary'
 import { access } from './features/auth/access'
@@ -53,6 +54,8 @@ function App() {
         <Route path="/admin/permisos" element={<PermissionBoundary permissions={access.permissions}><RolePermissionsPage /></PermissionBoundary>} />
         <Route path="/admin/usuarios" element={<PermissionBoundary permissions={access.users}><UsersPage /></PermissionBoundary>} />
         <Route path="/reportes" element={<PermissionBoundary permissions={access.reports}><ReportsPage /></PermissionBoundary>} />
+        <Route path="/demanda" element={<PermissionBoundary permissions={['reports:read:institution']}><DemandPage /></PermissionBoundary>} />
+        <Route path="/modelos" element={<PermissionBoundary permissions={['reports:read:institution']}><DemandPage evaluation /></PermissionBoundary>} />
         <Route path="/profesor/calendario/nuevo" element={<PermissionBoundary permissions={["academic:teach"]}><EventForm /></PermissionBoundary>} />
         <Route path="/profesor/calendario/:id/editar" element={<PermissionBoundary permissions={["academic:teach"]}><EventForm /></PermissionBoundary>} />
         <Route path="/admin/configuracion" element={<PermissionBoundary permissions={access.configuration}><PolicyPage /></PermissionBoundary>} />

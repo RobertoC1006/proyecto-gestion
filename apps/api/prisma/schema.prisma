@@ -433,3 +433,29 @@ model WorkflowPolicy {
   version Int @default(1)
   updatedAt DateTime @updatedAt @db.Timestamptz(3)
 }
+
+// Analítica agregada: sin nombres ni descripciones; sintético separado de Ticket.
+model DemandConfig {
+  institutionId String @id @db.Uuid
+  weeklyCapacity Int @default(350)
+  observedFrom DateTime? @db.Date
+  version Int @default(1)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+}
+
+model ForecastRun {
+  id String @id @default(uuid()) @db.Uuid
+  institutionId String @db.Uuid
+  source String @db.VarChar(20)
+  kind String @db.VarChar(20)
+  slot String @db.VarChar(80)
+  origin DateTime @db.Date
+  status String @default("queued") @db.VarChar(20)
+  result Json?
+  errorCode String? @db.VarChar(40)
+  attempts Int @default(0)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  finishedAt DateTime? @db.Timestamptz(3)
+  @@unique([institutionId, source, kind, slot])
+  @@index([institutionId, source, status, createdAt(sort: Desc)])
+}

@@ -30,7 +30,7 @@ def main():
                 break
             time.sleep(1)
         base = ['docker','run','--rm','--network',network,'-e',f'DATABASE_URL={connection}',
-                '-e','APP_ORIGIN=http://localhost:8080','-e','SUPABASE_URL=https://test.supabase.co',
+                '-e','CAMPUS_JOBS_ENABLED=0','-e','APP_ORIGIN=http://localhost:8080','-e','SUPABASE_URL=https://test.supabase.co',
                 '-e','SUPABASE_PUBLISHABLE_KEY=sb_publishable_test_only',
                 '-e','AUTH_ENCRYPTION_KEY=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=',
                 '-e','AUTH_INSTITUTION_CODE=AUTH-TEST','campusitsm-workflow-test:local']

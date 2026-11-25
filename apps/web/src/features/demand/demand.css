@@ -1,0 +1,21 @@
+.demand-page {display:grid;gap:22px;min-width:0;padding-bottom:28px}
+.demand-page .card {padding:24px;min-width:0}
+.demand-toolbar {display:flex;align-items:end;gap:18px;flex-wrap:wrap}
+.demand-toolbar .field {max-width:330px;flex:1;min-width:170px}
+.demand-stats {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.demand-stats .card {display:grid;grid-template-columns:36px 1fr;gap:5px 12px}
+.demand-stats svg {grid-row:span 2;color:#008b55;align-self:center;width:30px;height:30px}
+.demand-stats span {font-size:13px;color:#536779}
+.demand-stats strong {font-family:Manrope,sans-serif;font-size:22px}
+.demand-grid {display:grid;grid-template-columns:1.35fr 1fr;gap:22px;min-width:0}
+.demand-chart {height:320px;width:100%;min-width:0;margin-top:16px;font-size:12px}
+.demand-table {overflow:auto}.demand-page table {width:100%;border-collapse:collapse;font-size:13px;text-align:left}
+.demand-page th,.demand-page td {padding:13px 10px;border-bottom:1px solid #e4ebf0;white-space:nowrap}
+.selected-model {background:#e8f8f0}.demand-folds {padding-left:22px;line-height:1.8}.demand-folds li {margin:12px 0}
+.demand-metadata {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin:20px 0}
+.demand-metadata dt {font-size:12px;color:#536779}.demand-metadata dd {margin:4px 0;overflow-wrap:anywhere}
+.demand-page pre {white-space:pre-wrap;font-size:12px;background:#f3f7f9;padding:16px}
+.demand-page summary {cursor:pointer;font-weight:600;min-height:32px}
+.demand-alert-list {display:grid;gap:12px}.demand-alert {border:1px solid #efcf9e;border-radius:12px;padding:20px;display:flex;align-items:center;justify-content:space-between;gap:16px;background:#fffbf4}
+@media(max-width:900px){.demand-grid{grid-template-columns:1fr}.demand-stats strong{font-size:18px}}
+@media(max-width:600px){.demand-stats,.demand-metadata{grid-template-columns:1fr}.demand-page .card{padding:18px}.demand-chart{height:260px}.demand-alert{align-items:start;flex-direction:column}.demand-toolbar .field{max-width:none}}
