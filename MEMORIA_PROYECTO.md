@@ -37,7 +37,9 @@ Jasmine: conectar P15 con CONTRATO_ANALITICA, cerrar preparación analítica de
 privacidad/consentimiento y aceptación CU02. La migración aplicada de constancias
 se conservó; no volver a sustituirla por su versión reescrita.
 
-Publicación en main autorizada por Roberto; comprobar siempre el SHA remoto.
+Publicado y verificado origin/main en merge `5ce401dae4d61f8e8e03fc2c9dca1d439d3ec0e9`.
+Reconstrucción desde main saludable; este registro documental es posterior al
+merge. Comprobar siempre el SHA remoto vigente al continuar.
 Ramas/worktrees activos del equipo y outputs existentes conservados.
 
 ## Reanudación vigente — 25 de noviembre de 2026

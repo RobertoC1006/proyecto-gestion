@@ -2,7 +2,13 @@
 
 ## Bloque de Roberto completado y validado
 
-Código `d8d0a37`, preparado para la integración/publicación autorizada en main.
+Publicación comprobada: merge `5ce401dae4d61f8e8e03fc2c9dca1d439d3ec0e9`
+en origin/main, conservando como ancestros las ocho referencias de equipo
+revisadas. Instalación reconstruida desde main: web/api/predictions saludables
+en localhost:8080, mismas sesiones/volúmenes y 18 migraciones coincidentes.
+Este registro documental posterior forma parte del cierre de esa publicación.
+
+Código `d8d0a37`, integrado y publicado mediante el merge indicado arriba.
 CSV del calendario, P13/P14/P16/P24, tareas persistentes y contratos analíticos
 implementados. 149 pruebas API, 62 recorridos de navegador y 5 pruebas Python
 aprobados. PostgreSQL 17 aislado, actualización conservando constancia histórica,
@@ -17,7 +23,7 @@ aplicadas mediante el procedimiento manual; 18 checksums verificados.
 
 | Responsable | Entregado | Pendiente concreto |
 | --- | --- | --- |
-| Roberto | Identidad/base/permisos; calendario/CSV; contexto/prioridad/SLA comunes; pronóstico/evaluación; alertas y avisos; operación/recuperación | Publicación Git final autorizada y coordinación de aceptación conjunta. El histórico real requiere cobertura y suficientes días; no es una función pendiente de programar. |
+| Roberto | Identidad/base/permisos; calendario/CSV; contexto/prioridad/SLA comunes; pronóstico/evaluación; alertas y avisos; operación/recuperación; integración y publicación en main | Coordinar aceptación conjunta. El histórico real requiere cobertura y suficientes días; no es una función pendiente de programar. |
 | Johan | Incidencias, seguimiento/cola/atención, adaptador Groq y metadatos; privacidad e historial corregidos en integración | Clave/configuración privada de Groq, prueba real y evaluación independiente etiquetada de clasificación; evidencia CU01. No depende del pronóstico. |
 | Jasmine | Usuarios/permisos, consentimiento/auditoría, PDF/QR verificable y reportes operativos; SQL aplicado conservado | Consumir resultados de Roberto en P15, preparación analítica de privacidad y aceptación de sus pantallas/CU02 con cuentas reales. |
 
