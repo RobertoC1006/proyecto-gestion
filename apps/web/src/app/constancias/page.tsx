@@ -1,29 +1,94 @@
-import { CheckCircle as CheckCircle2, DownloadSimple as Download, ArrowSquareOut as ExternalLink, FileText as FileCheck2, QrCode } from '@phosphor-icons/react';
-import { tickets } from "../../data/mock";
-import { PriorityBadge } from "../../components/PriorityBadge";
+import { Download, FileText, ShieldCheck } from '@phosphor-icons/react'
+import { useState } from 'react'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { Button, Card, EmptyState, Notice, PageHeading } from '../../components/ui'
+import { ApiError, request } from '../../lib/api/http'
+import type { CertificateDto, CertificatesPageDto } from '../../lib/api/certificates'
 
 export default function ConstanciasPage() {
-  const ticket = tickets[0];
+  const client = useQueryClient()
+  const [selected, setSelected] = useState<CertificateDto | null>(null)
+  const [error, setError] = useState('')
+  const data = useQuery({
+    queryKey: ['certificates', 'mine'],
+    queryFn: () => request<CertificatesPageDto>('certificates'),
+  })
+  const issue = useMutation({
+    mutationFn: (ticketId: string) => request<CertificateDto>(`certificates/${ticketId}/issue`, { method: 'POST', body: '{}' }),
+    onSuccess: async certificate => {
+      setSelected(certificate)
+      setError('')
+      await client.invalidateQueries({ queryKey: ['certificates', 'mine'] })
+    },
+    onError: (reason: unknown) => setError(reason instanceof ApiError ? reason.message : 'No se pudo emitir la constancia.'),
+  })
+
+  async function download(certificate: CertificateDto) {
+    try {
+      const response = await fetch(`/api/v1/certificates/${certificate.id}/download`, { credentials: 'same-origin', cache: 'no-store' })
+      if (!response.ok) {
+        const result = await response.json().catch(() => ({}))
+        throw new Error(result.message || 'No se pudo descargar la constancia.')
+      }
+      const blob = await response.blob()
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `${certificate.code}.pdf`
+      link.click()
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000)
+      setError('')
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : 'No se pudo descargar la constancia.')
+    }
+  }
+
   return <section>
-    <div className="page-intro"><div><h2>Mis constancias</h2><p>Descarga los comprobantes de tus incidencias resueltas.</p></div></div>
-    <div className="certificate-layout">
-      <div className="page-card">
-        <div className="certificate-list-head"><div><h3>Constancia disponible</h3><p>Generada para la incidencia resuelta.</p></div><span className="verified-label"><CheckCircle2 size={15} />Verificada</span></div>
-        <div className="certificate-row"><span className="certificate-icon"><FileCheck2 size={23} /></span><div><strong>Constancia de atención · {ticket.id}</strong><small>Emitida el martes, 10:18 a. m. · PDF</small></div><button className="icon-text-button" type="button"><Download size={16} />Descargar</button></div>
-        <a className="certificate-link" href="/verificar/CC-T1-2024"><ExternalLink size={14} />Abrir verificación pública</a>
-      </div>
-      <div className="certificate-preview">
-        <div className="preview-toolbar"><span>VISTA PREVIA</span><span>1 de 1</span></div>
-        <div className="document">
-          <div className="document-brand"><span className="document-mark">C</span><strong>CampusCare</strong><span>CONSTANCIA DE ATENCIÓN</span></div>
-          <div className="document-rule" />
-          <span className="document-kicker">CONSTANCIA No. CC-T1-2024</span>
-          <h3>Atención de incidencia</h3>
-          <p>Se hace constar que <strong>Johan Rodríguez</strong> recibió atención por la incidencia registrada en CampusCare.</p>
-          <div className="document-details"><div><small>INCIDENCIA</small><strong>{ticket.id} · {ticket.title}</strong></div><div><small>SERVICIO AFECTADO</small><strong>{ticket.category}</strong></div><div><small>FECHA Y DURACIÓN</small><strong>Martes 8 · 16 minutos</strong></div></div>
-          <div className="document-footer"><div><small>HASH SHA-256</small><code>8f3a9c2e...7b12d04a</code><span>Firma institucional · CampusCare</span></div><div className="qr-drawing" aria-label="Código QR ilustrativo">{Array.from({ length: 25 }).map((_, index) => <i key={index} className={index % 3 === 0 || index % 7 === 0 ? "filled" : ""} />)}</div></div>
-        </div>
-      </div>
+    <PageHeading
+      title="Mis constancias"
+      subtitle="Consulta las constancias asociadas a tus incidencias resueltas."
+      illustrationIcon={FileText}
+    />
+    {error && <Notice tone="amber" icon={ShieldCheck} role="alert">{error}</Notice>}
+    <div className="content-grid content-grid--two">
+      <Card>
+        <h2>Constancias disponibles</h2>
+        {data.isLoading && <Notice tone="amber" role="status">Consultando incidencias elegibles...</Notice>}
+        {data.error && <Notice tone="amber" role="alert">No se pudo consultar las constancias.</Notice>}
+        {!data.isLoading && data.data && data.data.eligible.length === 0 && (
+          <EmptyState title="Sin constancias disponibles" description="Solo aparecen tickets resueltos con una falla confirmada." />
+        )}
+        {!data.isLoading && data.data?.eligible.map(item => (
+          <div className="certificate-row" key={item.ticketId}>
+            <div>
+              <strong>{item.ticketCode}</strong>
+              <p className="body-muted">{item.service} · Resuelto {new Date(item.resolvedAt).toLocaleString('es-PE')}</p>
+            </div>
+            {item.certificate ? (
+              <Button type="button" variant="secondary" onClick={() => setSelected(item.certificate)}>Ver constancia</Button>
+            ) : (
+              <Button type="button" onClick={() => issue.mutate(item.ticketId)} disabled={issue.isPending}>
+                {issue.isPending ? 'Emitiendo...' : 'Emitir constancia'}
+              </Button>
+            )}
+          </div>
+        ))}
+      </Card>
+      <Card>
+        <h2>Detalle de constancia</h2>
+        {selected ? <>
+          <p><strong>Código:</strong> {selected.code}</p>
+          <p><strong>Incidencia:</strong> {selected.ticketCode}</p>
+          <p><strong>Emitida:</strong> {new Date(selected.issuedAt).toLocaleString('es-PE')}</p>
+          <p className="body-muted">Huella SHA-256: {selected.sha256}</p>
+          <div className="button-row">
+            <Button type="button" icon={Download} onClick={() => void download(selected)}>Descargar PDF</Button>
+            <Button variant="secondary" type="button" onClick={() => window.open(`/verificar/${encodeURIComponent(selected.code)}`, '_blank', 'noopener,noreferrer')}>
+              Verificación pública
+            </Button>
+          </div>
+        </> : <EmptyState title="Selecciona una constancia" description="El detalle y la descarga aparecerán después de emitir o seleccionar una constancia." />}
+      </Card>
     </div>
   </section>;
 }
