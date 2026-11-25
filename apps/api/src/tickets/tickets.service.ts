@@ -5,6 +5,7 @@ import { CampusPrincipal } from '../auth/auth.policy';
 import { PrismaService } from '../database/prisma.service';
 import { invalid, uuid } from '../academic/academic.validation';
 import { createTicketInput, ticketsQuery } from './tickets.validation';
+import { TicketAiService } from './ticket-ai.service';
 
 const labels: Record<TicketService, string> = {
   aula_virtual: 'Aula virtual', wifi_red: 'Wi-Fi/red', correo: 'Correo institucional',
@@ -14,13 +15,16 @@ const labels: Record<TicketService, string> = {
 };
 export const ticketResponse = (t: Ticket, operational = false) => ({
   id: t.id, code: t.code, description: t.description, service: t.service, scope: t.scope,
+  reportedService: t.reportedService ?? t.service,
   courseId: t.courseId, sectionId: t.sectionId, status: t.status,
   classificationStatus: t.classificationStatus, priority: t.priority ?? null,
+  aiExplanation: operational ? t.aiExplanation : null,
   version: t.version, academicContext: t.academicContext, academicFactor: t.academicFactor,
   ...(operational ? { urgency:t.urgency, impact:t.impact, technicalScore:t.technicalScore, score:t.score } : {}),
   responseDueAt:t.responseDueAt?.toISOString()??null, resolutionDueAt:t.resolutionDueAt?.toISOString()??null,
   firstResponseAt:t.firstResponseAt?.toISOString()??null, resolvedAt:t.resolvedAt?.toISOString()??null,
-  solution:t.solution, failureConfirmed:t.failureConfirmed, assigneeId:t.assigneeId, isDemo:t.isDemo,
+  solution:t.solution, failureConfirmed:t.failureConfirmed,
+  ...(operational ? { assigneeId:t.assigneeId } : {}), isDemo:t.isDemo,
   createdAt: t.createdAt.toISOString(), updatedAt: t.updatedAt.toISOString(),
 });
 const uniqueOn = (error: unknown, field: string) => error instanceof Prisma.PrismaClientKnownRequestError &&
@@ -28,7 +32,7 @@ const uniqueOn = (error: unknown, field: string) => error instanceof Prisma.Pris
 
 @Injectable()
 export class TicketsService {
-  constructor(private readonly db: PrismaService) {}
+  constructor(private readonly db: PrismaService, private readonly ai?: TicketAiService) {}
   services() { return Object.values(TicketService).map(id => ({ id, label: labels[id] })); }
 
   private async academicAccess(principal: CampusPrincipal, input: ReturnType<typeof createTicketInput>) {
@@ -64,8 +68,8 @@ export class TicketsService {
       const code = `INC-${new Date().getUTCFullYear()}-${randomBytes(12).toString('hex').toUpperCase()}`;
       try {
         // Una inserción es atómica. Tras P2002 se consulta fuera de la transacción fallida.
-        const ticket = await this.db.ticket.create({ data: { ...identity, ...input, code, requestHash } });
-        return { created: true, ticket: ticketResponse(ticket) };
+        const ticket = await this.db.ticket.create({ data: { ...identity, ...input, reportedService: input.service, code, requestHash } });
+        return { created: true, ticket: ticketResponse(this.ai ? await this.ai.classify(ticket) : ticket) };
       } catch (error) {
         if (uniqueOn(error, 'idempotencyKey')) {
           for (let read = 0; read < 3; read++) {
@@ -89,7 +93,7 @@ export class TicketsService {
   async list(principal: CampusPrincipal, raw: unknown) {
     const { page, pageSize, status, search } = ticketsQuery(raw);
     const where: Prisma.TicketWhereInput = { institutionId: principal.institutionId, ownerId: principal.id,
-      ...(status ? { status } : {}),
+      ...(status === 'active' ? { status: { not: 'resuelto' } } : status ? { status } : {}),
       ...(search ? { OR: [{ code: { contains: search, mode: 'insensitive' } },
         { description: { contains: search, mode: 'insensitive' } }] } : {}) };
     const [items, total] = await this.db.$transaction([
@@ -98,11 +102,26 @@ export class TicketsService {
     ]);
     return { items: items.map(t => ticketResponse(t)), total, page, pageSize };
   }
+  async summary(principal: CampusPrincipal) {
+    const rows = await this.db.ticket.groupBy({
+      by: ['status'],
+      where: { institutionId: principal.institutionId, ownerId: principal.id },
+      _count: { _all: true },
+    });
+    const count = (status: Ticket['status']) => rows.find(row => row.status === status)?._count._all ?? 0;
+    const registered = count('registrado');
+    const inAttention = count('en_atencion');
+    const resolved = count('resuelto');
+    return { total: registered + inAttention + resolved, registered, inAttention, resolved };
+  }
   async get(principal: CampusPrincipal, id: unknown) {
     const ticketId = uuid(id, 'id');
     const ticket = await this.db.ticket.findFirst({ where: { id: ticketId,
       institutionId: principal.institutionId, ownerId: principal.id }, include:{course:{select:{name:true}},changes:{orderBy:[{createdAt:'asc'},{id:'asc'}]}} });
     if (!ticket) throw new NotFoundException({ code: 'NOT_FOUND', message: 'No se encontró el ticket.' });
-    return {...ticketResponse(ticket),courseName:ticket.course?.name,changes:ticket.changes.map(c=>({id:c.id,action:c.action,note:c.note,createdAt:c.createdAt.toISOString()}))};
+    const assignee = ticket.assigneeId ? await this.db.appUser.findFirst({
+      where: { id: ticket.assigneeId, institutionId: principal.institutionId }, select: { displayName: true },
+    }) : null;
+    return {...ticketResponse(ticket),assigneeName:assignee?.displayName??null,courseName:ticket.course?.name,changes:ticket.changes.map(c=>({id:c.id,action:c.action,note:c.note,createdAt:c.createdAt.toISOString()}))};
   }
 }

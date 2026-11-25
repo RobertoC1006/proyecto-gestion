@@ -104,5 +104,10 @@ test('OpenAPI se genera con las rutas de tickets', async () => {
     assert.ok(document.paths['/api/v1/tickets']);
     assert.ok(document.paths['/api/v1/tickets/services']);
     assert.ok(document.paths['/api/v1/tickets/{id}']);
+    assert.equal(document.paths['/api/v1/tickets/summary'].get.responses['200'].content['application/json'].schema.$ref,
+      '#/components/schemas/TicketSummaryDto');
+    assert.deepEqual(Object.keys(document.components.schemas.TicketSummaryDto.properties).sort(),
+      ['inAttention', 'registered', 'resolved', 'total']);
+    assert.equal(document.components.schemas.TicketDto.properties.assigneeName.nullable, true);
   } finally { await app.close(); }
 });

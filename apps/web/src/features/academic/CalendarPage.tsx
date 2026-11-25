@@ -35,6 +35,7 @@ import {
 import { Funnel, Info, CheckCircle } from '@phosphor-icons/react'
 import { AcademicBanner } from './AcademicBanner'
 import { AcademicError } from './AcademicError'
+import CalendarImport from './CalendarImport'
 import { addDays, dateLabel, dayKey, monday, time, weekLabel } from './dates'
 
 export const typeLabels = {
@@ -78,6 +79,7 @@ function segments(events: AcademicEvent[], day: string) {
 }
 
 export default function CalendarPage() {
+  const [importing, setImporting] = useState(false)
   const [start, setStart] = useState(() => monday(initialDay()))
   const [courseId, setCourseId] = useState('')
   const [sectionId, setSectionId] = useState('')
@@ -258,12 +260,12 @@ export default function CalendarPage() {
             </ButtonLink>
             <Button
               variant="secondary"
-              disabled
-              title="La importación CSV se habilitará en una próxima entrega"
+              onClick={() => setImporting(true)}
               icon={Upload}
             >
               Importar CSV
             </Button>
+            {importing && <CalendarImport onClose={() => setImporting(false)} />}
             <Button
               variant="secondary"
               onClick={refresh}

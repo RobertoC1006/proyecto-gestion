@@ -165,19 +165,29 @@ paths:
 principales documentarán también 400, 401, 403 y 503 según la sección de errores; el
 OpenAPI generado incluirá parámetros y DTO completos.
 
-## GET /api/v1/tickets y GET /api/v1/tickets/{id}
+## GET /api/v1/tickets, /summary y GET /api/v1/tickets/{id}
 
 El listado acepta `page` (predeterminado 1), `pageSize` (predeterminado 20,
-máximo 100), `status` y `search` sobre código/descripción propios. Devuelve
+máximo 100), `status` y `search` sobre código/descripción propios. `status=active`
+incluye `registrado` y `en_atencion`; los demás valores corresponden a un estado
+concreto. Devuelve
 `{items,total,page,pageSize}`, ordenado por `createdAt DESC,id DESC` y filtrado
 por titular e institución antes de contar o paginar. La vista resumida incluye
 `id`, `code`, `description`, `service`, `scope`, `status`,
 `classificationStatus`, `priority: null`, `createdAt` y `updatedAt`.
 
-El detalle acepta UUID y devuelve el reporte propio con curso/sección y,
-cuando exista el flujo acordado, metadatos de evidencia visibles al titular.
-Nunca incluye `storageKey` ni rutas locales. ID ajeno o inexistente: el mismo 404.
-Ninguna ruta acepta un parámetro de titular arbitrario.
+`GET /api/v1/tickets/summary` devuelve los conteos `total`, `registered`,
+`inAttention` y `resolved` exclusivamente para el titular autenticado y su
+institución. P02 usa esos conteos; P05 usa el total para «Todas», la suma de
+registradas y en atención para «Activas», y `resolved` para «Resueltas».
+
+El detalle acepta UUID y devuelve el reporte propio con curso/sección y el
+nombre visible del responsable de TI asignado (`assigneeName`), o `null` si
+todavía no hay responsable. La consulta del nombre se limita a la institución
+del titular; la respuesta personal no expone el UUID interno del responsable.
+Cuando exista el flujo acordado, también podrá incluir metadatos de evidencia
+visibles al titular. Nunca incluye `storageKey` ni rutas locales. ID ajeno o
+inexistente: el mismo 404. Ninguna ruta acepta un parámetro de titular arbitrario.
 
 ## Servicios para P03 y evidencia opcional
 
@@ -186,13 +196,15 @@ del módulo, sin una tabla nueva. El cliente consume esta respuesta para el
 selector de P03. El curso se selecciona de los datos académicos autorizados; no
 se crea un catálogo de cursos paralelo.
 
-Para Corte 2, P02–P05 consumen las rutas reales de tickets. P03 puede enviar
-reportes generales. La selección de `scope: curso` permanece deshabilitada en
-la interfaz porque las rutas actuales de cursos y secciones exigen
-`academic:manage`; Roberto debe proporcionar o acordar una consulta autorizada
-de los cursos y secciones del titular. El backend ya valida las asociaciones
-cuando recibe un reporte de curso. No se deducen cursos desde eventos ni se
-aceptan identificadores escritos a mano como sustituto del selector.
+Para Corte 2, P02–P05 consumen las rutas reales de tickets. P03 admite reporte
+general y selección de cursos/secciones propios mediante `/academic/me/courses`
+y `/academic/me/sections`; el backend vuelve a validar la asociación al crear
+el reporte. General envía curso y sección nulos. No se deducen cursos desde
+eventos ni se aceptan identificadores escritos a mano como sustituto del selector.
+
+P04 muestra el estado real del reporte. Un reporte recién creado permanece
+`registrado` con clasificación pendiente; la pantalla no afirma que ya fue
+clasificado ni que tiene prioridad antes de la evaluación de TI.
 
 La captura opcional de P03 sigue pendiente de cerrar con Roberto: flujo de
 carga, límites definitivos, almacenamiento privado y descarga autorizada. El

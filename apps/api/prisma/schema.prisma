@@ -19,6 +19,8 @@ model Institution {
   users     AppUser[]
   roleAccess RoleAccess[]
   rolePermissionChanges RolePermissionChange[]
+  certificates Certificate[]
+  consentAcceptances ConsentAcceptance[]
 }
 
 enum AcademicEventType {
@@ -176,6 +178,9 @@ model AppUser {
   institution   Institution @relation(fields: [institutionId], references: [id], onDelete: Restrict)
   team          SupportTeam? @relation(fields: [institutionId, teamId], references: [institutionId, id], onDelete: Restrict)
   sessions      AuthSession[]
+  certificateEvents CertificateVerification[]
+  certificates  Certificate[]
+  consentAcceptances ConsentAcceptance[]
   tickets       Ticket[]
 
   @@unique([institutionId, id])
@@ -227,6 +232,34 @@ model IdentityChange {
   @@index([institutionId, createdAt])
 }
 
+model ConsentVersion {
+  id          String              @id @default(uuid()) @db.Uuid
+  version     String              @unique @db.VarChar(40)
+  title       String              @db.VarChar(160)
+  summary     String              @db.VarChar(1000)
+  effectiveAt DateTime            @db.Timestamptz(3)
+  active      Boolean             @default(true)
+  createdAt   DateTime            @default(now()) @db.Timestamptz(3)
+  acceptances ConsentAcceptance[]
+
+  @@index([active, effectiveAt])
+}
+
+model ConsentAcceptance {
+  id             String        @id @default(uuid()) @db.Uuid
+  institutionId  String        @db.Uuid
+  userId         String        @db.Uuid
+  consentVersionId String      @db.Uuid
+  acceptedAt     DateTime      @default(now()) @db.Timestamptz(3)
+  institution    Institution   @relation(fields: [institutionId], references: [id], onDelete: Restrict)
+  user           AppUser       @relation(fields: [userId], references: [id], onDelete: Restrict)
+  consentVersion ConsentVersion @relation(fields: [consentVersionId], references: [id], onDelete: Restrict)
+
+  @@unique([userId, consentVersionId])
+  @@index([institutionId, acceptedAt])
+  @@index([institutionId, userId, acceptedAt])
+}
+
 // Identificadores iniciales aislados en incidencias. Si Roberto publica un
 // catÃ¡logo canÃ³nico, sustituir esta fuente mediante una migraciÃ³n coordinada.
 enum TicketService {
@@ -256,6 +289,8 @@ enum TicketStatus {
 
 enum TicketClassificationStatus {
   pendiente
+  ia
+  revision_manual
   manual
 }
 
@@ -266,6 +301,7 @@ model Ticket {
   code                 String                     @unique @db.VarChar(40)
   description          String                     @db.Text
   service              TicketService
+  reportedService      TicketService?
   scope                TicketScope
   // SQL futuro: general => ambos nulos; curso => courseId obligatorio.
   // NestJS comprueba la asociaciÃ³n del titular; las FK no la acreditan.
@@ -273,6 +309,13 @@ model Ticket {
   sectionId            String?                    @db.Uuid
   status               TicketStatus               @default(registrado)
   classificationStatus TicketClassificationStatus @default(pendiente)
+  aiProvider           String? @db.VarChar(32)
+  aiModel              String? @db.VarChar(80)
+  aiAdapterVersion     String? @db.VarChar(24)
+  aiExplanation        String? @db.VarChar(1000)
+  aiFailureCode        String? @db.VarChar(40)
+  aiLatencyMs          Int?
+  aiEvaluatedAt        DateTime? @db.Timestamptz(3)
   idempotencyKey       String                     @db.Uuid
   requestHash          String                     @db.Char(64)
   createdAt            DateTime                   @default(now()) @db.Timestamptz(3)
@@ -299,6 +342,7 @@ model Ticket {
   isDemo               Boolean @default(false)
   changes              TicketChange[]
   attachment           TicketAttachment?
+  certificate          Certificate?
 
   @@unique([institutionId, ownerId, idempotencyKey])
   @@index([institutionId, ownerId, createdAt(sort: Desc), id(sort: Desc)])
@@ -326,7 +370,7 @@ model TicketChange {
   id String @id @default(uuid()) @db.Uuid
   ticketId String @db.Uuid
   institutionId String @db.Uuid
-  actorId String @db.Uuid
+  actorId String? @db.Uuid
   action String @db.VarChar(40)
   note String @db.VarChar(2000)
   before Json?
@@ -335,9 +379,130 @@ model TicketChange {
   ticket Ticket @relation(fields: [ticketId], references: [id], onDelete: Restrict)
   @@index([institutionId, ticketId, createdAt])
 }
+
+model Certificate {
+  id            String   @id @default(uuid()) @db.Uuid
+  institutionId String   @db.Uuid
+  ticketId      String   @unique @db.Uuid
+  ownerId       String   @db.Uuid
+  code          String   @unique @db.VarChar(64)
+  ticketCode    String   @db.VarChar(40)
+  service       TicketService
+  resolvedAt    DateTime @db.Timestamptz(3)
+  issuedAt      DateTime @default(now()) @db.Timestamptz(3)
+  sha256        String   @db.Char(64)
+  storageKey    String   @unique @db.VarChar(120)
+  institution   Institution @relation(fields: [institutionId], references: [id], onDelete: Restrict)
+  ticket        Ticket      @relation(fields: [ticketId], references: [id], onDelete: Restrict)
+  owner         AppUser     @relation(fields: [institutionId, ownerId], references: [institutionId, id], onDelete: Restrict)
+  verifications CertificateVerification[]
+
+  @@index([institutionId, ownerId, issuedAt(sort: Desc), id(sort: Desc)])
+  @@index([institutionId, ticketId])
+}
+
+enum CertificateVerificationResult {
+  emitida
+  descargada
+  consultada
+  valida
+  inexistente
+  alterado
+  archivo_no_verificable
+}
+
+model CertificateVerification {
+  id            String   @id @default(uuid()) @db.Uuid
+  institutionId String   @db.Uuid
+  certificateId String?  @db.Uuid
+  actorId       String?  @db.Uuid
+  code          String   @db.VarChar(64)
+  result        CertificateVerificationResult
+  occurredAt    DateTime @default(now()) @db.Timestamptz(3)
+  certificate   Certificate? @relation(fields: [certificateId], references: [id], onDelete: Restrict)
+  actor         AppUser? @relation(fields: [institutionId, actorId], references: [institutionId, id], onDelete: Restrict)
+
+  @@index([institutionId, occurredAt(sort: Desc)])
+  @@index([institutionId, actorId, occurredAt(sort: Desc)])
+  @@index([code, occurredAt(sort: Desc)])
+}
+
 model WorkflowPolicy {
   institutionId String @id @db.Uuid
   rules Json
   version Int @default(1)
   updatedAt DateTime @updatedAt @db.Timestamptz(3)
+}
+
+// Analítica agregada: sin nombres ni descripciones; sintético separado de Ticket.
+model DemandConfig {
+  institutionId String @id @db.Uuid
+  weeklyCapacity Int @default(350)
+  observedFrom DateTime? @db.Date
+  version Int @default(1)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+}
+
+model ForecastRun {
+  id String @id @default(uuid()) @db.Uuid
+  institutionId String @db.Uuid
+  source String @db.VarChar(20)
+  kind String @db.VarChar(20)
+  slot String @db.VarChar(80)
+  origin DateTime @db.Date
+  status String @default("queued") @db.VarChar(20)
+  result Json?
+  errorCode String? @db.VarChar(40)
+  attempts Int @default(0)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  finishedAt DateTime? @db.Timestamptz(3)
+  @@unique([institutionId, source, kind, slot])
+  @@index([institutionId, source, status, createdAt(sort: Desc)])
+}
+
+model DemandAlert {
+ id String @id @default(uuid()) @db.Uuid
+ institutionId String @db.Uuid
+ source String @db.VarChar(20)
+ weekStart DateTime @db.Date
+ runId String @db.Uuid
+ expected Float
+ capacity Int
+ active Boolean @default(true)
+ reviewedAt DateTime? @db.Timestamptz(3)
+ reviewedById String? @db.Uuid
+ reviewReason String? @db.VarChar(500)
+ updatedAt DateTime @updatedAt @db.Timestamptz(3)
+ @@unique([institutionId,source,weekStart])
+}
+
+model Notification {
+ id String @id @default(uuid()) @db.Uuid
+ institutionId String @db.Uuid
+ recipientId String @db.Uuid
+ eventKey String @db.VarChar(180)
+ type String @db.VarChar(32)
+ title String @db.VarChar(160)
+ body String @db.VarChar(500)
+ href String @db.VarChar(200)
+ isDemo Boolean @default(false)
+ readAt DateTime? @db.Timestamptz(3)
+ createdAt DateTime @default(now()) @db.Timestamptz(3)
+ @@unique([recipientId,eventKey])
+ @@index([institutionId,recipientId,createdAt(sort: Desc)])
+}
+
+// Outbox transaccional: los módulos publican en la misma transacción que el cambio.
+model NotificationEvent {
+ id String @id @db.VarChar(180)
+ institutionId String @db.Uuid
+ recipientId String @db.Uuid
+ type String @db.VarChar(32)
+ title String @db.VarChar(160)
+ body String @db.VarChar(500)
+ href String @db.VarChar(200)
+ isDemo Boolean @default(false)
+ createdAt DateTime @default(now()) @db.Timestamptz(3)
+ processedAt DateTime? @db.Timestamptz(3)
+ @@index([processedAt,createdAt])
 }

@@ -1,5 +1,126 @@
 # Coordinación de cambios en la base compartida
 
+## Demanda, tareas y notificaciones — 25 de noviembre de 2026
+
+Autorización: «termina mi parte» y autorización previa de correcciones, migraciones
+compatibles e integración/publicación tras validación. Ejecutor: agente de Roberto.
+Destino comprobado con conexión real: proyecto CampusITSM npjibnlxepiwfermtcmo,
+esquema campusitsm, campusitsm_migrator y TLS activo. Fuente SQL `fa21b15`;
+código final validado `d8d0a37`. Quince checksums aplicados coincidentes antes.
+
+| Migración | SHA256 | Finalización UTC |
+| --- | --- | --- |
+| 20261125000300_demand_forecasts | 7fbcb594d5343dc8a074f4bfcef98b55b0470f6a6ca7b3c02b31c6420326ea90 | 2026-11-25 20:25:14.567 |
+| 20261125000400_demand_jobs | 325e3e9c6e7441b68422e21cee60e4fa2eea52e60791258050c7388e6b2f88f4 | 2026-11-25 20:25:15.562 |
+| 20261125000500_alerts_notifications | 0a3e755265b59a39b4f7e7516454878914f0701486924445ba3aac96b5a6894d | 2026-11-25 20:25:16.376 |
+
+Aplicadas solo estas pendientes mediante build y run --rm de migrate con
+`.local/supabase/migrate.env`. Resultado: 18 migraciones finalizadas sin rollback,
+18 checksums exactos, historial sin escrituras de API. RLS de las tablas nuevas,
+sin lectura anon/authenticated y sin conceder DDL al rol de API. pg-boss arranca
+con migrate:false/createSchema:false; colas creadas por SQL versionado en el
+esquema campusitsm ya existente. No editar este SQL tras su aplicación.
+
+Validación previa: 18 migraciones bajo migrador limitado en PostgreSQL aislado,
+actualización desde doce SQL históricos conservando una constancia y huella,
+149 pruebas API finales, 62 navegador, 5 Python y mantenimiento real de colas.
+No se ejecutaron reset, db push ni semillas masivas contra Supabase. El histórico
+sintético vive solo en models_data; Ticket conserva sus nueve filas al verificar.
+Sesiones, credenciales, datos y volúmenes existentes conservados.
+
+Respaldo privado previo y copia final en `.local/backups/shared-2026-11-25T20-39-30-423Z`:
+dump del esquema, files y models, manifiesto SHA-256 y restauración aislada
+comprobada. Sin restauración contra la base compartida. No compartir esos archivos
+ni subirlos a Git. Contratos actualizados en este repositorio; entrega/aviso al
+equipo mediante la documentación, sin mensajes externos enviados por el agente.
+
+## Ampliación IA y auditoría de constancias — 25 de noviembre de 2026
+
+Autorización: Roberto encargó integrar todo corregido y confirmó Groq. Ejecutor:
+agente de Roberto. Destino CampusITSM / npjibnlxepiwfermtcmo / campusitsm,
+rol de API campusitsm_api y TLS activo comprobados en consulta READ ONLY.
+Fuente: integración que conserva Johan `786154d` y Jasmine `c218cf4`, más las
+correcciones documentadas en la [entrega](entregas/roberto-integracion-equipo-20261125.md).
+
+Antes: doce entradas finalizadas y doce checksums exactos. Se conservó sin editar
+`20261120000100_certificates`; la versión modificada de Jasmine no sustituyó el
+SQL aplicado. Se retiene el enum histórico inexistente, sin borrar valores/datos.
+Validación: PostgreSQL 17 aislado, prueba de actualización desde los doce SQL con
+una constancia existente idéntica antes/después, y 138 tests API aprobados.
+
+Aplicación manual con `docker compose --env-file .local/supabase/migrate.env --profile tools run --rm migrate`
+tras construir migrate. Solo se aplicaron las tres pendientes:
+
+| Migración | SHA256 | Finalización UTC |
+| --- | --- | --- |
+| 20261120000100_ticket_ai_classification | `5e0b790f5eb980aaa86c02ce03a660b2b48b46c6d07deaa23f681ba770319769` | 2026-11-25 18:51:13.857Z |
+| 20261125000100_certificate_audit_events | `5c850d0297da6027b9590ec4ac406e40a6c31593a447133805f16d01a6c831fd` | 2026-11-25 18:51:14.938Z |
+| 20261125000200_automatic_classification_audit | `066f30d514882d21ef8c931688b9164c2b114f29a93f5d26b9d574d2b08ad55f` | 2026-11-25 18:51:16.004Z |
+
+Archivos: `apps/api/prisma/migrations/<nombre>/migration.sql`. Hora Lima:
+13:51:13–13:51:16. Añaden reportedService/metadatos IA; estados de clasificación;
+eventos de emisión/descarga/consulta, actor y restricciones de constancias;
+TicketChange admite actor automático nulo; recuperación de eventos históricos
+de emisión. Se revoca UPDATE/DELETE de Certificate para API explícitamente.
+
+Después: quince entradas sin rollback y quince checksums exactos. Cuatro tablas
+de consentimiento/constancias conservan RLS, políticas del servidor y ausencia
+de privilegios anon/authenticated. API solo SELECT/INSERT sobre Certificate y
+eventos; historial Prisma solo lectura. Web/API/Python saludables con Supabase.
+Sin borrado, reset, db push, seeds remotos o cambios en credenciales/sesiones.
+Metadatos sin secretos en `.local/team-20261125-db-after.json`.
+
+Recorrido autenticado y publicación de main pendientes. Este registro conserva
+el aviso para los compañeros; no se enviaron mensajes externos. Deben incorporar
+main y sus archivos exactos antes de reconstruir; sus ramas anteriores de
+constancias no deben desplegar la migración reescrita.
+
+## Integración autorizada de consentimiento y constancias — 24 de noviembre de 2026
+
+Roberto autorizó expresamente las migraciones compatibles necesarias para la
+integración. Ejecutor: agente de Roberto. Destino verificado:
+CampusITSM / `npjibnlxepiwfermtcmo` / esquema `campusitsm`, pooler de sesión
+`aws-1-sa-east-1.pooler.supabase.com:5432`, TLS activo y API `campusitsm_api`.
+Fuente de ambos SQL: bundle `fb3cd26827ae7a335729f3ca7fd32bc7f76afb98`, rama
+`integracion-avances-equipo`. Sin modificaciones de SQL aplicado.
+
+**Antes:** consulta real de `_prisma_migrations` con transacción READ ONLY;
+diez migraciones terminadas sin rollback, huellas coincidentes. Las siguientes
+dos no tenían entrada y sus cuatro tablas no existían. No se supuso su
+aplicación a partir de documentos históricos ni del conector (sin permiso).
+Las doce migraciones se aplicaron y probaron en PostgreSQL 17 descartable,
+red interna y almacenamiento tmpfs, sin usar configuración de Supabase.
+
+**Aplicación:** comando documentado
+`docker compose --env-file .local/supabase/migrate.env --profile tools run --rm migrate`,
+tras construir `migrate`. El validador comprueba proyecto, rol migrador, esquema,
+puerto y TLS; Prisma deploy aplicó exclusivamente:
+
+| Archivo | SHA256 exacto | Finalización del historial (UTC) |
+| --- | --- | --- |
+| `apps/api/prisma/migrations/20261112000100_consent/migration.sql` | `c7bc6e7059ece2f0502cae802acc0f4d097c80f85c55960577ed7818000a1b50` | 2026-11-24 19:50:57.886Z |
+| `apps/api/prisma/migrations/20261120000100_certificates/migration.sql` | `fdc3f6328a0393eb826b83927da0d92b60399a9424e7d0be00830bf8e2025dd9` | 2026-11-24 19:50:58.970Z |
+
+Hora de Lima: 14:50:57–14:50:58. Migraciones aditivas de ConsentVersion,
+ConsentAcceptance, Certificate y CertificateVerification, con índices, claves
+foráneas y políticas de acceso del servidor. Sin seed, reset, db push,
+migrate dev ni borrado de registros/volúmenes compartidos.
+
+**Después:** doce entradas finalizadas, sin rollback, y doce checksums idénticos
+a los archivos del candidato. Las cuatro tablas tienen RLS y política
+`campusitsm_server` para `campusitsm_api`. Sin privilegios de lectura/escritura
+para anon/authenticated. API puede leer/insertar aceptaciones y verificaciones,
+sin UPDATE/DELETE; historial Prisma solo SELECT para API. Salud de la aplicación
+con la base remota ok. Verificación conservada localmente sin secretos en
+`.local/integration-db-after.json`. No se cambió la configuración de Auth.
+
+La comprobación del candidato final `00eb7a2` completó 120 pruebas API aisladas;
+54 recorridos de navegador y compilaciones aprobados. Recorrido con cuentas
+reales pendiente, por lo que main aún no se publicó. El aviso de coordinación
+queda en este registro para su futura publicación con la integración; no se
+enviaron mensajes externos. Las tablas y sus archivos exactos deben acompañar
+el código antes de reconstruir los backend de Johan/Jasmine.
+
 ## Flujo contextual autorizado — 12 de noviembre de 2026
 
 Roberto encargó el flujo completo con tres perfiles visibles y autorizó

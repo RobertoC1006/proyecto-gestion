@@ -1,5 +1,5 @@
 import CoursesPage from './features/academic/CoursesPage'
-import { StrictMode } from 'react'
+import { lazy, StrictMode, Suspense } from 'react'
 import { createRoot } from 'react-dom/client'
 import RootLayout from './app/layout'
 import HomePage from './app/page'
@@ -9,6 +9,7 @@ import NuevaIncidenciaPage from './app/incidencias/nueva/page'
 import ReporteRecibidoPage from './app/incidencias/registrada/page'
 import ConstanciasPage from './app/constancias/page'
 import VerifyCertificatePage from './app/verificar/[codigo]/page'
+import CertificateAuditPage from './features/certificates/CertificateAuditPage'
 import TiQueuePage from './features/tickets/QueuePage'
 import WorkflowDetail from './features/tickets/WorkflowDetail'
 import PolicyPage from './features/tickets/PolicyPage'
@@ -19,6 +20,11 @@ import EventForm from './features/academic/EventForm'
 import PersonalCalendar from './features/academic/PersonalCalendar'
 import RolePermissionsPage from './features/permissions/RolePermissionsPage'
 import UsersPage from './features/users/UsersPage'
+import PrivacyPage from './features/privacy/PrivacyPage'
+import ReportsPage from './features/reports/ReportsPage'
+import NotificationsPage from './features/notifications/NotificationsPage'
+const DemandPage = lazy(() => import('./features/demand/DemandPage'))
+const AlertsPage = lazy(() => import('./features/demand/AlertsPage'))
 import { AuthProvider } from './features/auth/AuthContext'
 import { SessionBoundary, PermissionBoundary } from './features/auth/AccessBoundary'
 import { access } from './features/auth/access'
@@ -41,17 +47,26 @@ const queryClient = new QueryClient({
 function App() {
   const { pathname } = useLocation()
   if (pathname === '/login') return <LoginPage />
-  if (/^\/verificar\/[^/]+\/?$/.test(pathname)) return <main className="legacy-view"><VerifyCertificatePage /></main>
+  if (/^\/verificar(?:\/[^/]+)?\/?$/.test(pathname)) return <Routes><Route path="/verificar/:codigo?" element={<main className="legacy-view certificate-verification"><VerifyCertificatePage /></main>} /></Routes>
   return (
     <SessionBoundary>
     <RootLayout>
+      <Suspense fallback={<Notice>Cargando la pantalla…</Notice>}>
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/admin/permisos" element={<PermissionBoundary permissions={access.permissions}><RolePermissionsPage /></PermissionBoundary>} />
         <Route path="/admin/usuarios" element={<PermissionBoundary permissions={access.users}><UsersPage /></PermissionBoundary>} />
+        <Route path="/reportes" element={<PermissionBoundary permissions={access.reports}><ReportsPage /></PermissionBoundary>} />
+        <Route path="/demanda" element={<PermissionBoundary permissions={['reports:read:institution']}><DemandPage /></PermissionBoundary>} />
+        <Route path="/modelos" element={<PermissionBoundary permissions={['reports:read:institution']}><DemandPage evaluation /></PermissionBoundary>} />
+        <Route path="/alertas" element={<PermissionBoundary permissions={['reports:read:institution']}><AlertsPage /></PermissionBoundary>} />
+        <Route path="/alertas/:id" element={<PermissionBoundary permissions={['reports:read:institution']}><AlertsPage /></PermissionBoundary>} />
+        <Route path="/notificaciones" element={<NotificationsPage />} />
         <Route path="/profesor/calendario/nuevo" element={<PermissionBoundary permissions={["academic:teach"]}><EventForm /></PermissionBoundary>} />
         <Route path="/profesor/calendario/:id/editar" element={<PermissionBoundary permissions={["academic:teach"]}><EventForm /></PermissionBoundary>} />
         <Route path="/admin/configuracion" element={<PermissionBoundary permissions={access.configuration}><PolicyPage /></PermissionBoundary>} />
+        <Route path="/admin/privacidad" element={<PrivacyPage />} />
+        <Route path="/admin/auditoria" element={<PermissionBoundary permissions={access.audit}><PrivacyPage audit /></PermissionBoundary>} />
         <Route path="/calendario" element={<PermissionBoundary permissions={access.personalCalendar}><PersonalCalendar /></PermissionBoundary>} />
         <Route path="/admin/cursos" element={<PermissionBoundary permissions={access.manageCalendar}><CoursesPage /></PermissionBoundary>} />
         <Route path="/admin/calendario" element={<PermissionBoundary permissions={access.manageCalendar}><CalendarPage /></PermissionBoundary>} />
@@ -62,10 +77,12 @@ function App() {
         <Route path="/incidencias/registrada/:id" element={<PermissionBoundary permissions={access.personalTickets}><ReporteRecibidoPage /></PermissionBoundary>} />
         <Route path="/incidencias/:id" element={<PermissionBoundary permissions={access.personalTickets}><WorkflowDetail /></PermissionBoundary>} />
         <Route path="/constancias" element={<PermissionBoundary permissions={access.certificates}><ConstanciasPage /></PermissionBoundary>} />
+        <Route path="/admin/constancias/auditoria" element={<PermissionBoundary permissions={access.audit}><CertificateAuditPage /></PermissionBoundary>} />
         <Route path="/ti/cola" element={<PermissionBoundary permissions={access.teamTickets}><TiQueuePage /></PermissionBoundary>} />
         <Route path="/ti/tickets/:id" element={<PermissionBoundary permissions={access.teamTickets}><WorkflowDetail operational /></PermissionBoundary>} />
         <Route path="*" element={<Notice tone="amber" role="alert">Esta página no está disponible.</Notice>} />
       </Routes>
+      </Suspense>
     </RootLayout>
     </SessionBoundary>
   )

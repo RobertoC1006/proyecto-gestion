@@ -3,11 +3,13 @@ import { request } from './http'
 
 export type Ticket = components['schemas']['TicketDto']
 export type TicketPage = components['schemas']['TicketPageDto']
+export type TicketSummary = components['schemas']['TicketSummaryDto']
 export type TicketService = components['schemas']['TicketServiceDto']
 export type CreateTicket = components['schemas']['CreateTicketDto']
 
 export const ticketApi = {
   services: () => request<TicketService[]>('tickets/services'),
+  summary: () => request<TicketSummary>('tickets/summary'),
   list: (params: URLSearchParams) => request<TicketPage>(`tickets?${params}`),
   get: (id: string) => request<Ticket>(`tickets/${encodeURIComponent(id)}`),
   create: (body: CreateTicket, key: string) => request<Ticket>('tickets', {
@@ -18,4 +20,21 @@ export const ticketApi = {
 export function ticketDate(value: string) {
   return new Intl.DateTimeFormat('es-PE', { timeZone: 'America/Lima',
     day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }).format(new Date(value))
+}
+
+export const ticketServices = [
+  ['aula_virtual', 'Aula virtual'],
+  ['wifi_red', 'Wi-Fi/red'],
+  ['correo', 'Correo institucional'],
+  ['equipos', 'Equipo de cómputo'],
+  ['impresoras', 'Impresora'],
+  ['cuentas_accesos', 'Cuentas y accesos'],
+  ['videoconferencia', 'Videoconferencia'],
+  ['sistemas_institucionales', 'Sistemas institucionales'],
+  ['almacenamiento_nube', 'Almacenamiento/nube'],
+  ['software_licencias', 'Software/licencias'],
+  ['otro', 'Otro'],
+] as const
+export function ticketServiceLabel(service: string) {
+  return ticketServices.find(([value]) => value === service)?.[1] ?? service
 }

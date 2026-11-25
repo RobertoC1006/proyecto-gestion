@@ -2,7 +2,7 @@
 .tickets-view .page-heading { margin-bottom: 0; }
 .tickets-view .card { padding: 24px; }
 .tickets-view .card > h2 { margin-bottom: 16px; }
-.tickets-summary { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.tickets-summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
 .tickets-summary .card { display: grid; grid-template-columns: 34px 1fr; column-gap: 12px; row-gap: 3px; align-items: center; }
 .tickets-summary svg { grid-row: span 2; color: var(--green); }
 .tickets-summary strong { font-size: 21px; }
@@ -23,6 +23,7 @@
 .ticket-list__tools .ticket-list__filter { width: auto; display: inline-flex; align-items: center; gap: 8px; }
 .ticket-list__filter select { min-width: 145px; }
 .ticket-list__tools input { max-width: 370px; flex: 1 1 230px; }
+.ticket-list__status-filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
 .ticket-pages, .ticket-form-actions, .ticket-receipt__actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 22px; }
 .ticket-pages { justify-content: flex-end; }
 .tickets-back { display: inline-flex; align-items: center; gap: 8px; color: var(--green); font-weight: 700; width: fit-content; }

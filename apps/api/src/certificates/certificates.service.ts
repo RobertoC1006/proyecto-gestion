@@ -1,0 +1,386 @@
+import { ConflictException, Injectable, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
+import { CertificateVerificationResult, Prisma, TicketService } from '@prisma/client';
+import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
+import { lstat, mkdir, readFile, rename, rm, writeFile } from 'node:fs/promises';
+import { dirname, join, resolve, sep } from 'node:path';
+import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
+import QRCode from 'qrcode';
+import { CampusPrincipal, requirePermission } from '../auth/auth.policy';
+import { PrismaService } from '../database/prisma.service';
+import { publishNotification } from '../notifications/notification.events';
+import { date, invalid, object, positive, text, uuid } from '../academic/academic.validation';
+
+export const certificateServiceLabels: Record<TicketService, string> = {
+  aula_virtual: 'Aula virtual',
+  wifi_red: 'Wi-Fi/red',
+  correo: 'Correo institucional',
+  equipos: 'Equipo de cómputo',
+  impresoras: 'Impresora',
+  cuentas_accesos: 'Cuentas y accesos',
+  videoconferencia: 'Videoconferencia',
+  sistemas_institucionales: 'Sistemas institucionales',
+  almacenamiento_nube: 'Almacenamiento/nube',
+  software_licencias: 'Software/licencias',
+  otro: 'Otro servicio',
+};
+
+type CertificateRecord = {
+  id: string;
+  institutionId: string;
+  ticketId: string;
+  ownerId: string;
+  code: string;
+  ticketCode: string;
+  service: TicketService;
+  resolvedAt: Date;
+  issuedAt: Date;
+  sha256: string;
+  storageKey: string;
+};
+
+const validCode = (value: unknown) => typeof value === 'string' && /^CITS-[A-Z0-9]{20}$/.test(value);
+const auditActions = Object.values(CertificateVerificationResult);
+
+function auditQuery(value: unknown) {
+  const query = object(value);
+  const allowed = ['page', 'pageSize', 'from', 'to', 'code', 'actorId', 'action'];
+  for (const key of Object.keys(query)) if (!allowed.includes(key)) invalid(key, 'Campo no admitido en la consulta.');
+  const page = query.page == null ? 1 : positive(query.page, 'page', 100000);
+  const pageSize = query.pageSize == null ? 20 : positive(query.pageSize, 'pageSize', 100);
+  const from = query.from == null || query.from === '' ? undefined : date(query.from, 'from');
+  const to = query.to == null || query.to === '' ? undefined : date(query.to, 'to');
+  if (from && to && (to <= from || to.getTime() - from.getTime() > 93 * 86400000)) {
+    invalid('to', 'Consulta un intervalo de hasta 93 días, con fin posterior al inicio.');
+  }
+  const code = query.code == null || query.code === '' ? undefined : text(query.code, 'code', 64);
+  if (code && !validCode(code.toUpperCase())) invalid('code', 'Indica un código de constancia válido.');
+  const actorId = query.actorId == null || query.actorId === '' ? undefined : uuid(query.actorId, 'actorId');
+  const action = query.action == null || query.action === '' ? undefined : text(query.action, 'action');
+  if (action && !auditActions.includes(action as CertificateVerificationResult)) invalid('action', 'Selecciona una acción válida.');
+  return { page, pageSize, from, to, code: code?.toUpperCase(), actorId, action: action as CertificateVerificationResult | undefined };
+}
+
+@Injectable()
+export class CertificatesService {
+  constructor(private readonly db: PrismaService) {}
+
+  private filesDir() {
+    return resolve(process.env.FILES_DIR || join(process.cwd(), 'files'));
+  }
+
+  private storagePath(storageKey: string) {
+    if (!/^certificates\/[0-9a-f-]{36}\/[0-9a-f-]{36}\.pdf$/i.test(storageKey)) {
+      throw new Error('La clave del archivo de constancia no es válida.');
+    }
+    const root = this.filesDir();
+    const full = resolve(root, storageKey);
+    if (full !== root && !full.startsWith(root + sep)) throw new Error('Ruta de archivo fuera del almacenamiento permitido.');
+    return full;
+  }
+
+  private response(row: CertificateRecord) {
+    return {
+      id: row.id,
+      code: row.code,
+      ticketId: row.ticketId,
+      ticketCode: row.ticketCode,
+      service: row.service,
+      resolvedAt: row.resolvedAt.toISOString(),
+      issuedAt: row.issuedAt.toISOString(),
+      sha256: row.sha256,
+      status: 'emitida' as const,
+    };
+  }
+
+  async mine(actor: CampusPrincipal) {
+    const [tickets, issued] = await Promise.all([
+      this.db.ticket.findMany({
+        where: { institutionId: actor.institutionId, ownerId: actor.id, status: 'resuelto', failureConfirmed: true, resolvedAt: { not: null } },
+        include: { certificate: true },
+        orderBy: [{ resolvedAt: 'desc' }, { id: 'desc' }],
+      }),
+      this.db.certificate.findMany({
+        where: { institutionId: actor.institutionId, ownerId: actor.id },
+        orderBy: [{ issuedAt: 'desc' }, { id: 'desc' }],
+      }),
+    ]);
+    return {
+      eligible: tickets.map(ticket => ({
+        ticketId: ticket.id,
+        ticketCode: ticket.code,
+        service: ticket.service,
+        resolvedAt: ticket.resolvedAt!.toISOString(),
+        eligible: true as const,
+        certificate: ticket.certificate ? this.response(ticket.certificate) : null,
+      })),
+      issued: issued.map(row => this.response(row)),
+    };
+  }
+
+  async issue(actor: CampusPrincipal, rawTicketId: unknown) {
+    const ticketId = uuid(rawTicketId, 'ticketId');
+    const existing = await this.db.certificate.findFirst({ where: { institutionId: actor.institutionId, ticketId, ownerId: actor.id } });
+    if (existing) {
+      await this.readStoredPdf(existing);
+      return this.response(existing);
+    }
+
+    try {
+      const issuedAt = new Date();
+      const row = await this.db.$transaction(async tx => {
+        await tx.$queryRaw`SELECT "id" FROM "Ticket" WHERE "id"=${ticketId}::uuid AND "institutionId"=${actor.institutionId}::uuid AND "ownerId"=${actor.id}::uuid FOR UPDATE`;
+        const ticket = await tx.ticket.findFirst({
+          where: { id: ticketId, institutionId: actor.institutionId, ownerId: actor.id },
+          include: { owner: { select: { displayName: true } } },
+        });
+        if (!ticket) throw new NotFoundException({ code: 'CERTIFICATE_NOT_ELIGIBLE', message: 'El ticket no está disponible para emitir una constancia.' });
+        if (ticket.status !== 'resuelto' || !ticket.failureConfirmed || !ticket.resolvedAt) {
+          throw new ConflictException({ code: 'CERTIFICATE_NOT_ELIGIBLE', message: 'La constancia requiere un ticket resuelto y una falla confirmada.' });
+        }
+        const current = await tx.certificate.findUnique({ where: { ticketId } });
+        if (current) return current;
+        const institution = await tx.institution.findUnique({ where: { id: actor.institutionId }, select: { name: true } });
+
+        const code = `CITS-${randomBytes(10).toString('hex').toUpperCase()}`;
+        const storageKey = `certificates/${actor.institutionId}/${ticketId}.pdf`;
+        const pdf = await this.createPdf({
+          code,
+          ticketCode: ticket.code,
+          service: ticket.service,
+          ownerName: ticket.owner.displayName,
+          resolvedAt: ticket.resolvedAt,
+          issuedAt,
+          institutionId: actor.institutionId,
+          institutionName: institution?.name,
+          ticketCreatedAt: ticket.createdAt,
+        });
+        const sha256 = createHash('sha256').update(pdf).digest('hex');
+        const certificate = await tx.certificate.create({
+          data: {
+            institutionId: actor.institutionId,
+            ticketId,
+            ownerId: actor.id,
+            code,
+            ticketCode: ticket.code,
+            service: ticket.service,
+            resolvedAt: ticket.resolvedAt,
+            issuedAt,
+            sha256,
+            storageKey,
+          },
+        });
+        await this.writePdf(certificate, pdf);
+        await tx.certificateVerification.create({
+          data: { institutionId: actor.institutionId, certificateId: certificate.id, actorId: actor.id, code, result: 'emitida' },
+        });
+        await publishNotification(tx,{id:`certificate:${certificate.id}`,institutionId:actor.institutionId,recipientId:actor.id,type:'certificate',title:'Tu constancia está disponible',body:`Constancia de la incidencia ${ticket.code}. Puedes descargar el PDF original.`,href:'/constancias',isDemo:ticket.isDemo});
+        return certificate;
+      });
+      return this.response(row);
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+        const winner = await this.db.certificate.findFirst({ where: { institutionId: actor.institutionId, ticketId, ownerId: actor.id } });
+        if (winner) {
+          await this.readStoredPdf(winner);
+          return this.response(winner);
+        }
+      }
+      throw error;
+    }
+  }
+
+  async detail(actor: CampusPrincipal, rawId: unknown) {
+    const id = uuid(rawId, 'id');
+    const row = await this.db.certificate.findFirst({ where: { id, institutionId: actor.institutionId, ownerId: actor.id } });
+    if (!row) throw new NotFoundException({ code: 'NOT_FOUND', message: 'No se encontró la constancia.' });
+    await this.readStoredPdf(row);
+    return this.response(row);
+  }
+
+  async download(actor: CampusPrincipal, rawId: unknown) {
+    const id = uuid(rawId, 'id');
+    const row = await this.db.certificate.findFirst({ where: { id, institutionId: actor.institutionId, ownerId: actor.id } });
+    if (!row) throw new NotFoundException({ code: 'NOT_FOUND', message: 'No se encontró la constancia.' });
+    const bytes = await this.readStoredPdf(row);
+    await this.recordVerification(row, 'descargada', actor.id);
+    return { bytes, code: row.code };
+  }
+
+  async publicLookup(rawCode: unknown) {
+    const code = typeof rawCode === 'string' ? rawCode.trim().toUpperCase() : '';
+    if (!validCode(code)) throw new NotFoundException({ code: 'CERTIFICATE_NOT_FOUND', message: 'No existe una constancia para el código indicado.' });
+    const row = await this.db.certificate.findUnique({
+      where: { code },
+      include: { owner: { select: { displayName: true } } },
+    });
+    if (!row) throw new NotFoundException({ code: 'CERTIFICATE_NOT_FOUND', message: 'No existe una constancia para el código indicado.' });
+    const result = {
+      code: row.code,
+      holder: this.maskName(row.owner.displayName),
+      service: certificateServiceLabels[row.service],
+      resolvedAt: row.resolvedAt.toISOString(),
+      issuedAt: row.issuedAt.toISOString(),
+      status: 'encontrada',
+    };
+    await this.recordVerification(row, 'consultada');
+    return result;
+  }
+
+  async verifyPdf(rawCode: unknown, pdf: unknown) {
+    const code = typeof rawCode === 'string' ? rawCode.trim().toUpperCase() : '';
+    const row = validCode(code) ? await this.db.certificate.findUnique({ where: { code } }) : null;
+    if (!row) throw new NotFoundException({ code: 'CERTIFICATE_NOT_FOUND', message: 'No existe una constancia para el código indicado.' });
+    if (typeof pdf === 'string' && pdf.length <= 7_000_000) pdf = Buffer.from(pdf, 'base64');
+    if (!Buffer.isBuffer(pdf) || pdf.length < 5 || pdf.length > 5_242_880 || pdf.subarray(0, 5).toString('ascii') !== '%PDF-') {
+      await this.recordVerification(row, 'archivo_no_verificable');
+      throw new ConflictException({ code: 'FILE_NOT_VERIFIABLE', message: 'El archivo no pudo verificarse.' });
+    }
+    const actual = createHash('sha256').update(pdf).digest('hex');
+    const result = this.hashMatches(actual, row.sha256) ? 'valida' : 'alterado';
+    await this.recordVerification(row, result);
+    return {
+      code: row.code,
+      status: result,
+      sha256Matches: result === 'valida',
+    };
+  }
+
+  private hashMatches(actual: string, expected: string) {
+    const normalized = expected.trim();
+    if (!/^[0-9a-f]{64}$/i.test(normalized)) return false;
+    return timingSafeEqual(Buffer.from(actual, 'hex'), Buffer.from(normalized, 'hex'));
+  }
+
+  private async recordVerification(row: CertificateRecord, result: CertificateVerificationResult, actorId?: string) {
+    await this.db.certificateVerification.create({
+      data: { institutionId: row.institutionId, certificateId: row.id, actorId, code: row.code, result },
+    });
+  }
+
+  async audit(actor: CampusPrincipal, input: unknown) {
+    requirePermission(actor, 'audit:read:institution');
+    const { page, pageSize, from, to, code, actorId, action } = auditQuery(input);
+    const where: Prisma.CertificateVerificationWhereInput = {
+      institutionId: actor.institutionId,
+      ...(code ? { code: { contains: code } } : {}),
+      ...(actorId ? { actorId } : {}),
+      ...(action ? { result: action } : {}),
+      ...(from || to ? { occurredAt: { ...(from ? { gte: from } : {}), ...(to ? { lte: to } : {}) } } : {}),
+    };
+    const [rows, total] = await this.db.$transaction([
+      this.db.certificateVerification.findMany({
+        where,
+        include: { certificate: { select: { ticketCode: true } } },
+        orderBy: [{ occurredAt: 'desc' }, { id: 'desc' }],
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+      }),
+      this.db.certificateVerification.count({ where }),
+    ]);
+    return {
+      items: rows.map(row => ({
+        id: row.id,
+        code: row.code,
+        certificateId: row.certificateId,
+        ticketCode: row.certificate?.ticketCode ?? null,
+        actorId: row.actorId,
+        action: row.result,
+        occurredAt: row.occurredAt.toISOString(),
+      })),
+      total,
+      page,
+      pageSize,
+    };
+  }
+
+  private maskName(name: string) {
+    const first = name.trim().split(/\s+/)[0] || 'Titular';
+    return `${first.charAt(0).toLocaleUpperCase('es-PE')}***`;
+  }
+
+  private async writePdf(row: CertificateRecord, bytes: Buffer) {
+    const path = this.storagePath(row.storageKey);
+    const temporaryPath = `${path}.${randomBytes(8).toString('hex')}.tmp`;
+    await mkdir(dirname(path), { recursive: true });
+    try {
+      await writeFile(temporaryPath, bytes, { flag: 'wx', mode: 0o600 });
+      await rename(temporaryPath, path);
+    } finally {
+      await rm(temporaryPath, { force: true });
+    }
+  }
+
+  private async readStoredPdf(row: CertificateRecord) {
+    const path = this.storagePath(row.storageKey);
+    let bytes: Buffer;
+    try {
+      const info = await lstat(path);
+      if (!info.isFile() || info.isSymbolicLink()) throw new ServiceUnavailableException({
+        code: 'CERTIFICATE_FILE_UNAVAILABLE',
+        message: 'El PDF original no está disponible. La emisión y su huella se conservan para verificar el archivo original.',
+      });
+      bytes = await readFile(path);
+    } catch (error) {
+      if (error instanceof ServiceUnavailableException) throw error;
+      if (error && typeof error === 'object' && 'code' in error && error.code === 'ENOENT') {
+        throw new ServiceUnavailableException({
+          code: 'CERTIFICATE_FILE_UNAVAILABLE',
+          message: 'El PDF original no está disponible. La emisión y su huella se conservan para verificar el archivo original.',
+        });
+      }
+      throw error;
+    }
+    const actual = createHash('sha256').update(bytes).digest('hex');
+    if (!this.hashMatches(actual, row.sha256)) {
+      throw new ServiceUnavailableException({
+        code: 'CERTIFICATE_FILE_UNAVAILABLE',
+        message: 'El PDF original no está disponible. La emisión y su huella se conservan para verificar el archivo original.',
+      });
+    }
+    return bytes;
+  }
+
+  private async createPdf(input: {
+    code: string;
+    ticketCode: string;
+    service: TicketService;
+    ownerName: string;
+    resolvedAt: Date;
+    issuedAt: Date;
+    institutionId: string;
+    institutionName?: string;
+    ticketCreatedAt?: Date;
+  }) {
+    const pdf = await PDFDocument.create();
+    pdf.setTitle(`Constancia CampusITSM ${input.code}`);
+    pdf.setAuthor(input.institutionName || 'CampusITSM');
+    pdf.setSubject('Constancia de atención de incidencia');
+    pdf.setCreator('CampusITSM');
+    const page = pdf.addPage([595.28, 841.89]);
+    const regular = await pdf.embedFont(StandardFonts.Helvetica);
+    const bold = await pdf.embedFont(StandardFonts.HelveticaBold);
+    const qrUrl = `${(process.env.APP_ORIGIN || 'http://localhost:8080').replace(/\/$/, '')}/verificar/${encodeURIComponent(input.code)}`;
+    const qrPng = await QRCode.toBuffer(qrUrl, { type: 'png', width: 180, margin: 1, errorCorrectionLevel: 'M' });
+    const qr = await pdf.embedPng(qrPng);
+
+    page.drawText('CampusITSM', { x: 50, y: 790, size: 22, font: bold, color: rgb(0.12, 0.22, 0.38) });
+    page.drawText(input.institutionName || 'Universidad Privada Tallán', { x: 50, y: 765, size: 11, font: regular, color: rgb(0.35, 0.35, 0.35) });
+    page.drawText('CONSTANCIA DE ATENCIÓN', { x: 50, y: 710, size: 18, font: bold });
+    page.drawText(`Código: ${input.code}`, { x: 50, y: 670, size: 11, font: regular });
+    page.drawText(`Incidencia: ${input.ticketCode}`, { x: 50, y: 645, size: 11, font: regular });
+    page.drawText(`Servicio: ${certificateServiceLabels[input.service]}`, { x: 50, y: 620, size: 11, font: regular });
+    page.drawText(`Resolución: ${input.resolvedAt.toISOString()}`, { x: 50, y: 595, size: 11, font: regular });
+    page.drawText(`Emisión: ${input.issuedAt.toISOString()}`, { x: 50, y: 570, size: 11, font: regular });
+    page.drawText(`Titular: ${input.ownerName}`, { x: 50, y: 520, size: 11, font: regular });
+    const start = input.ticketCreatedAt?.getTime() ?? input.issuedAt.getTime();
+    const durationMinutes = Math.max(0, Math.round((input.resolvedAt.getTime() - start) / 60000));
+    page.drawText(`Duración registrada: ${durationMinutes} minutos`, { x: 50, y: 545, size: 11, font: regular });
+    page.drawText('La incidencia fue resuelta y la falla tecnológica fue confirmada.', { x: 50, y: 500, size: 11, font: regular });
+    page.drawText('Firma institucional · prototipo', { x: 50, y: 455, size: 12, font: bold });
+    page.drawText('QR de verificación pública', { x: 398, y: 330, size: 9, font: regular });
+    page.drawImage(qr, { x: 390, y: 350, width: 150, height: 150 });
+    page.drawText('Este documento no constituye una firma digital certificada.', { x: 50, y: 70, size: 8, font: regular, color: rgb(0.45, 0.45, 0.45) });
+    const bytes = await pdf.save({ useObjectStreams: true });
+    return Buffer.from(bytes);
+  }
+}

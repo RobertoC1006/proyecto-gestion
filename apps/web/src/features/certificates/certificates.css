@@ -1,0 +1,7 @@
+.certificate-audit { display: grid; gap: 20px; min-width: 0; }
+.certificate-audit-filters { display: grid; grid-template-columns: repeat(5, minmax(140px, 1fr)) auto; align-items: end; gap: 14px; }
+.certificate-audit-filters .input { min-width: 0; width: 100%; }
+.certificate-audit-pagination { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 18px; color: var(--muted); font-size: 13px; }
+.certificate-audit-pagination > div { display: flex; gap: 8px; }
+@media (max-width: 1100px) { .certificate-audit-filters { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 640px) { .certificate-audit-filters { grid-template-columns: minmax(0, 1fr); } .certificate-audit-pagination { align-items: flex-start; flex-direction: column; } .certificate-audit-pagination .button { flex: 1; } }

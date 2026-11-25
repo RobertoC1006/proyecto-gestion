@@ -19,8 +19,8 @@ export function ticketsQuery(value: unknown) {
   const q = object(value);
   const page = q.page === undefined ? 1 : positive(q.page, 'page', 100000);
   const pageSize = q.pageSize === undefined ? 20 : positive(q.pageSize, 'pageSize', 100);
-  const status = q.status === undefined ? undefined : text(q.status, 'status') as TicketStatus;
-  if (status && !Object.values(TicketStatus).includes(status)) invalid('status', 'Estado no válido.');
+  const status = q.status === undefined ? undefined : text(q.status, 'status');
+  if (status && status !== 'active' && !Object.values(TicketStatus).includes(status as TicketStatus)) invalid('status', 'Estado no válido.');
   const search = q.search === undefined ? undefined : text(q.search, 'search', 100);
-  return { page, pageSize, status, search };
+  return { page, pageSize, status: status as TicketStatus | 'active' | undefined, search };
 }

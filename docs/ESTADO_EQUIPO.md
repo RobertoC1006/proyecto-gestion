@@ -1,4 +1,116 @@
-# Estado del equipo — actualización del 12 de noviembre de 2026
+# Estado del equipo — actualización del 25 de noviembre de 2026
+
+## Bloque de Roberto completado y validado
+
+Código `d8d0a37`, preparado para la integración/publicación autorizada en main.
+CSV del calendario, P13/P14/P16/P24, tareas persistentes y contratos analíticos
+implementados. 149 pruebas API, 62 recorridos de navegador y 5 pruebas Python
+aprobados. PostgreSQL 17 aislado, actualización conservando constancia histórica,
+roles limitados/RLS, recuperación de respaldo y 500 lecturas concurrentes sin
+errores ni datos cruzados. Las latencias de la prueba local no acreditan Auth
+externo ni rendimiento en Supabase. localhost:8080 saludable, sin otra instalación.
+
+Administrador real: pronóstico y evaluación sintéticos guardados, revisión de
+alerta con motivo DEMO, avisos propios y registro en Auditoría comprobados.
+Sin pérdida de sesión al reconstruir. Tres migraciones aditivas de Roberto
+aplicadas mediante el procedimiento manual; 18 checksums verificados.
+
+| Responsable | Entregado | Pendiente concreto |
+| --- | --- | --- |
+| Roberto | Identidad/base/permisos; calendario/CSV; contexto/prioridad/SLA comunes; pronóstico/evaluación; alertas y avisos; operación/recuperación | Publicación Git final autorizada y coordinación de aceptación conjunta. El histórico real requiere cobertura y suficientes días; no es una función pendiente de programar. |
+| Johan | Incidencias, seguimiento/cola/atención, adaptador Groq y metadatos; privacidad e historial corregidos en integración | Clave/configuración privada de Groq, prueba real y evaluación independiente etiquetada de clasificación; evidencia CU01. No depende del pronóstico. |
+| Jasmine | Usuarios/permisos, consentimiento/auditoría, PDF/QR verificable y reportes operativos; SQL aplicado conservado | Consumir resultados de Roberto en P15, preparación analítica de privacidad y aceptación de sus pantallas/CU02 con cuentas reales. |
+
+Para Jasmine están disponibles [analítica](CONTRATO_ANALITICA.md) y
+[avisos](CONTRATO_NOTIFICACIONES.md). Mantener filtros/alcances de reportes;
+no presentar un agregado institucional como pronóstico por categoría/equipo.
+Para Johan, [especificaciones de cierre](entregas/johan-pendientes-cierre-20261125.md).
+No hace falta esperar nuevos módulos de los compañeros para usar lo de Roberto.
+
+Los apartados siguientes son registros de versiones anteriores; sus cifras y
+pendientes no reemplazan este cierre. El recorrido real de estudiante y la
+emisión/verificación con PDF propio siguen pendientes para aceptación conjunta.
+
+## Integración de nuevas entregas corregida; login real pendiente
+
+Corregido durante el login real: el parser especial de PDFs hacía que Nest
+omitiera el parser JSON general y login recibiera campos vacíos. Ahora se
+registra el parser normal explícitamente, manteniendo límites de PDF.
+Regresión RED/GREEN y suite completa de 139 tests API aprobados. Sin nuevas
+migraciones ni cambios de cuentas/contraseñas por esta corrección.
+
+Merge funcional `9a3eaf4` guardado, sin conflictos; todas las entregas revisadas
+son ancestros. Resultado final conjunto: 138 pruebas API y 56 de navegador
+aprobadas, sin omisiones. Índice servido igual al dist validado y salud ok.
+
+Roberto autorizó integrar todo en main y confirmó Groq. Candidato en
+integracion-avances-equipo con Johan `786154d` y Jasmine `c218cf4`; conflictos
+resueltos preservando historia y correcciones. Proyección técnica sin texto
+personal para Groq, historial atómico con actor automático, auditoría completa
+de constancias, multipart/JSON y archivo original conservado.
+
+Quince migraciones verificadas; doce SQL previos intactos y tres ampliaciones
+aplicadas por el procedimiento manual. Constancias sin UPDATE/DELETE para API.
+138 tests API y 56 recorridos de navegador distintos aprobados; actualización
+desde el esquema previo con datos existentes comprobada. npm audit sin avisos.
+La instalación campusitsm habitual está saludable en localhost:8080.
+
+Faltan login personal y recorrido real administrador → estudiante → público →
+administrador antes de publicar. Main todavía d8ef0ca. La autorización de
+publicación sigue vigente; no requiere nueva aprobación. Groq no tiene clave
+local y deriva a revisión manual hasta configurarla privadamente. Ver
+[entrega actual](entregas/roberto-integracion-equipo-20261125.md) y registro BD.
+No se retiraron ramas/worktrees del equipo. Estados siguientes históricos.
+
+## Integración actual validada automáticamente; recorrido real pendiente
+
+Roberto autorizó la publicación en main después de validar. Bundle esperado
+`fb3cd26827ae7a335729f3ca7fd32bc7f76afb98` importado en
+`integracion-avances-equipo`, con el parche previo ya incluido. Correcciones
+adicionales `00eb7a2`: eventos de constancias en Auditoría, filtros del formulario,
+fechas/agrupaciones de reportes en Lima, contrato nullable para actor público y
+dependencia Effect corregida. No se alteraron migraciones existentes.
+
+GitHub consultado directamente: main `d8ef0ca`; las entregas actuales de Johan
+`622c43b` y Jasmine `7becc12`/`4ae4b6b`/`750bf86` ya están incluidas por ascendencia.
+Se conservan sus commits, ramas y worktrees; no aparecieron avances posteriores.
+
+Resultado actual del código: API/web compilan, 120 pruebas API con PostgreSQL 17
+descartable y 54 recorridos Playwright aprobados, sin omisiones; npm audit: cero
+avisos. Los tests automáticos usan proveedores/respuestas sustituidos; no son
+evidencia de login Supabase real. Los contenedores/redes de prueba se retiraron.
+
+Supabase: las dos migraciones nuevas se aplicaron mediante el rol migrador tras
+validarlas y comprobar que estaban pendientes. Doce checksums exactos y
+RLS/privilegios verificados. Ver [registro BD](REGISTRO_CAMBIOS_BD.md).
+La instalación habitual sirve el candidato y devuelve salud API/base/Python ok;
+el índice web coincide con la compilación verificada, sin otra aplicación activa.
+Volúmenes y configuración privada conservados. PostgreSQL histórico detenido.
+
+Falta el recorrido en pantalla con administrador y estudiante reales: cola,
+corrección/asignación/atención/resolución, seguimiento, emisión/descarga,
+archivo original/alterado, auditoría y reportes. El control de pantalla se
+interrumpió por no poder verificar la URL de la ventana Windows. Roberto inicia
+sesión personalmente al reanudar. Hay cuatro tickets DEMO (uno elegible), cero
+constancias y ninguna política vigente publicada; no se inventó una política.
+Main sigue en `d8ef0ca`; merge/push y reconstrucción desde main quedan pendientes
+del recorrido satisfactorio. [Entrega y continuación](entregas/roberto-integracion-equipo-20261124.md).
+
+Las secciones siguientes son evidencia histórica y no sustituyen este estado.
+
+## Revisión de las entregas del 20 de noviembre
+
+El candidato local `fix/integration-ready@9294147` incluye `main@d8ef0ca` y
+las cuatro ramas conocidas del equipo. Johan amplió P02/P05/P06 y la corrección
+manual de servicio. Jasmine entregó P09–P12, P22/P23 y P15 en sus ramas de
+constancias, privacidad/auditoría y reportes. Los apartados siguientes conservan
+el estado histórico del 12 de noviembre.
+
+Se corrigieron acceso al consentimiento, auditoría por permiso efectivo, filtros
+en hora local, consistencia del CSV, verificación pública de constancias, carga
+de PDF y estados de error. El detalle de la
+[revisión de integración](entregas/roberto-revision-equipo-20261124.md)
+conserva los límites de la evidencia y los pasos pendientes para main.
 
 ## Flujo integrado en main y aviso para los agentes
 
@@ -344,3 +456,47 @@ y su configuración de servidor siguen sin habilitarse: carga/descarga no forman
 parte de este avance. `ticket.created` continúa como futura integración de
 Jasmine y no bloquea la creación ni introduce auditoría paralela. Detalle:
 [entrega de Johan, Corte 4](entregas/johan-semana-01-corte-04.md).
+
+## Seguimiento personal de incidencias — responsable asignado — 19 de noviembre
+
+En `gestion-incidencias`, el detalle personal de `GET /tickets/:id` ahora
+incluye `assigneeName` cuando existe una asignación. La búsqueda limita el
+responsable a la institución del titular y no expone su UUID en la respuesta
+personal. P06 muestra el nombre o indica que aún no hay responsable. El detalle
+operativo también filtra la consulta del nombre por institución y conserva en
+el selector el responsable actual al recargar.
+
+OpenAPI y tipos web se regeneraron desde NestJS. Las compilaciones de API y web
+pasaron. No se añadieron ni ejecutaron pruebas en este corte, no hubo cambios de
+esquema ni migraciones y no se accedió a Supabase PostgreSQL. Siguen pendientes
+el ajuste manual de categoría/servicio, el acuerdo del mecanismo de actualización
+por eventos y la revisión integral de P06–P08. Adjuntos e IA permanecen aplazados.
+
+## Resumen personal y filtros de incidencias — 20 de noviembre
+
+En `gestion-incidencias`, P02 consulta los conteos propios de tickets por estado
+desde `GET /tickets/summary`; P05 presenta filtros Todas/Activas/Resueltas y el
+filtro Activas agrupa registros pendientes y en atención. El resumen se limita
+al titular e institución autenticados. Se actualizó OpenAPI, tipos web y los
+contratos de tickets; no se modificó Prisma ni se generó una migración.
+
+Compilaron API y web y `git diff --check` pasó. No se ejecutaron pruebas
+automatizadas ni se conectó a Supabase PostgreSQL. La validación visual y de
+datos en la base local sigue pendiente mientras Supabase Auth esté pausado.
+La tarjeta de constancia reciente depende de la entrega de Jasmine y no se
+simuló con datos ficticios.
+
+## Corrección manual y seguimiento P06 — 20 de noviembre
+
+En `gestion-incidencias`, TI puede corregir el servicio de una incidencia
+abierta mediante una acción versionada con motivo. El catálogo proviene del
+mismo módulo usado por P03; la corrección queda en `TicketChange` y no altera
+urgencia, puntaje ni plazos. API y web compilaron. La cuenta de estudiante
+disponible mostró correctamente acceso denegado a la vista de TI; la acción
+operativa queda pendiente de comprobación visual con una cuenta autorizada.
+
+P06 consulta las etiquetas del servicio para mostrar su nombre legible y
+presenta la prioridad junto al estado cuando ya existe una evaluación. Se
+reconstruyó la web con `compose.local.yml` y se comprobó en el navegador un
+ticket propio registrado, con servicio «Equipo de cómputo», contexto pendiente
+y plazos aún no definidos. No se generaron ni ejecutaron migraciones.

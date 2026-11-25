@@ -1,4 +1,5 @@
 const { test, expect } = require('@playwright/test');
+test.beforeEach(async ({ page }) => require('./notifications-fixture.cjs')(page));
 const path = require('node:path');
 
 const permissions = {
@@ -52,7 +53,7 @@ test('Direcciones privadas sin sesión vuelven al acceso antes de consultar dato
     await expect(page).toHaveURL(/\/login$/);
     await expect(page.locator('.app-shell')).toHaveCount(0);
   }
-  expect(state.calls.every(call => call.startsWith('auth/'))).toBe(true);
+  expect(state.calls.every(call => (call.startsWith('auth/') || call.startsWith('notifications')))).toBe(true);
 });
 
 for (const role of Object.keys(permissions)) {
@@ -78,7 +79,7 @@ for (const role of Object.keys(permissions)) {
     await expect(home.getByRole('link', { name: /^Cola de TI/ })).toHaveCount(role === 'administrador' ? 1 : 0);
     await expect(nav.getByText('Reportes', { exact: true })).toHaveCount(['administrador', 'ti_supervisor'].includes(role) ? 1 : 0);
     await expect(nav.locator('.sidebar__secondary')).toHaveCount(role === 'administrador' ? 1 : 0);
-    expect(state.calls.every(call => call.startsWith('auth/') || (['estudiante','docente'].includes(role) && (call.startsWith('tickets') || call.startsWith('academic/me/'))))).toBe(true);
+    expect(state.calls.every(call => (call.startsWith('auth/') || call.startsWith('notifications')) || (['estudiante','docente'].includes(role) && (call.startsWith('tickets') || call.startsWith('academic/me/'))))).toBe(true);
   });
 }
 
@@ -90,7 +91,7 @@ test('Alumno: escribir la dirección administrativa o de TI no monta pantallas n
     await expect(page.getByRole('button', { name: 'Validar y guardar' })).toHaveCount(0);
     await expect(page.getByText('Cola de atención TI', { exact: true })).toHaveCount(0);
   }
-  expect(state.calls.every(call => call.startsWith('auth/'))).toBe(true);
+  expect(state.calls.every(call => (call.startsWith('auth/') || call.startsWith('notifications')))).toBe(true);
 });
 
 test('El menú y las rutas usan permisos efectivos, no solo la etiqueta del rol', async ({ page }) => {
@@ -153,7 +154,7 @@ test('Alumno en móvil: el menú solo contiene sus módulos y permite cerrarlo',
   await page.getByRole('button', { name: 'Abrir menú' }).click();
   const nav = page.getByRole('navigation', { name: 'Navegación principal' });
   await expect(nav).toBeVisible();
-  await expect(nav.getByRole('link')).toHaveText(['Dashboard', 'Tickets', 'Calendario académico']);
+  await expect(nav.getByRole('link')).toHaveText(['Dashboard', 'Notificaciones', 'Mis incidencias', 'Constancias', 'Calendario académico', 'Privacidad']);
   await expect(nav.getByRole('link', { name: 'Calendario académico', exact: true })).toBeInViewport();
   await page.screenshot({ path: path.join(screenshots, 'alumno-menu-movil-fixture.png'), fullPage: true, animations: 'disabled' });
   await page.keyboard.press('Escape');
@@ -182,12 +183,14 @@ test('Dashboard del administrador: recarga, login ya autenticado y capturas de e
   await expect(page).toHaveURL(/\/admin\/calendario$/);
 });
 
-test('Dashboard sin capacidades asignadas: explica el estado y solo ofrece el inicio', async ({ page }) => {
+test('Dashboard sin capacidades asignadas: conserva privacidad sin ofrecer módulos protegidos', async ({ page }) => {
   const session = sessionFor('estudiante');
   session.user.permissions = [];
-  await fixture(page, session);
+  const state = await fixture(page, session);
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: 'Todavía no tienes herramientas asignadas' })).toBeVisible();
-  await expect(page.locator('.home-module')).toHaveCount(0);
-  await expect(page.getByRole('navigation', { name: 'Navegación principal' }).getByRole('link')).toHaveText(['Dashboard']);
+  await expect(page.locator('.home-module')).toHaveCount(2);
+  await expect(page.locator('.home-module[href="/admin/privacidad"]')).toHaveCount(1);
+  await expect(page.locator('.home-module[href="/notificaciones"]')).toHaveCount(1);
+  await expect(page.getByRole('navigation', { name: 'Navegación principal' }).getByRole('link')).toHaveText(['Dashboard', 'Notificaciones', 'Privacidad']);
+  expect(state.calls.every(call => (call.startsWith('auth/') || call.startsWith('notifications')))).toBe(true);
 });

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth, roleLabels } from '../features/auth/AuthContext'
 import { Button } from './ui'
+import { useNotificationCount } from '../features/notifications/NotificationsPage'
 import {
   Bell,
   CaretDown,
@@ -20,6 +21,7 @@ export function AppHeader({
   onToggleMenu: () => void
 }) {
   const { user, logout, loading } = useAuth()
+  const notificationCount = useNotificationCount()
   const [error, setError] = useState(''), [closing, setClosing] = useState(false)
   async function closeSession() {
     setClosing(true); setError('')
@@ -70,13 +72,14 @@ export function AppHeader({
           <Users size={23} aria-hidden="true" />
           {user ? roleLabels[user.role] : 'CampusITSM'}
         </span>
-        <button
+        <Link
           className="icon-button notification-button"
-          disabled
-          aria-label="Notificaciones no disponibles"
+          to="/notificaciones"
+          aria-label={`Notificaciones, ${notificationCount} sin leer`}
         >
           <Bell size={25} />
-        </button>
+          {notificationCount > 0 && <span className="notification-count">{notificationCount > 99 ? '99+' : notificationCount}</span>}
+        </Link>
         <span className="topbar__divider" />
         <details className="header-dropdown">
           <summary className="profile-button" aria-label={`Opciones de cuenta, ${user?.displayName || 'sin sesión'}`}>

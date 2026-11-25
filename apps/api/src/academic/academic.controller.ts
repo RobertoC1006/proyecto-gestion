@@ -15,6 +15,10 @@ import { CourseDto, CourseInputDto, CoursePageDto, DeletedDto, EventDeleteDto, E
 @Controller('academic')
 export class AcademicController {
   constructor(@Inject(AcademicService) private readonly academic: AcademicService) {}
+  @Post('imports/preview')
+  previewCsv(@Req() r: AcademicRequest, @Body() b: unknown) { return this.academic.importCsv(r.academicPrincipal!, b, false); }
+  @Post('imports/confirm')
+  confirmCsv(@Req() r: AcademicRequest, @Body() b: unknown) { return this.academic.importCsv(r.academicPrincipal!, b, true); }
   @Get('courses') @ApiOkResponse({ type: CoursePageDto })
   courses(@Req() r: AcademicRequest, @Query() q: PageQueryDto) { return this.academic.listCourses(r.academicPrincipal!, q); }
   @Post('courses') @ApiCreatedResponse({ type: CourseDto })

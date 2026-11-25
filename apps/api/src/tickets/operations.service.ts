@@ -1,5 +1,5 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Prisma, TicketService } from '@prisma/client';
 import { PrismaService } from '../database/prisma.service';
 import { AcademicService } from '../academic/academic.service';
 import { CampusPrincipal, requirePermission } from '../auth/auth.policy';
@@ -8,6 +8,7 @@ import { invalid, object, positive, reason, text, uuid } from '../academic/acade
 import { calculate, defaultRules, policyInput, Rule } from './priority';
 import { ticketResponse } from './tickets.service';
 import { ticketsQuery } from './tickets.validation';
+import { publishNotification } from '../notifications/notification.events';
 
 const json = (v: unknown): Prisma.InputJsonValue => JSON.parse(JSON.stringify(v));
 const conflict = () => new ConflictException({ code: 'CONFLICT', message: 'El ticket cambió. Actualiza antes de continuar.' });
@@ -41,7 +42,7 @@ export class OperationsService {
  async queue(actor: CampusPrincipal, input: unknown) {
   this.read(actor); const q = object(input), { page, pageSize, status, search } = ticketsQuery(q);
   const order = q.order ?? 'context'; if (!['context','technical','arrival'].includes(String(order))) invalid('order','Orden no válido.');
-  const where: Prisma.TicketWhereInput = { institutionId: actor.institutionId, ...(status ? { status } : { status: { not: 'resuelto' } }), ...(search ? { OR: [{ code: { contains: search, mode: 'insensitive' } }, { description: { contains: search, mode: 'insensitive' } }] } : {}) };
+  const where: Prisma.TicketWhereInput = { institutionId: actor.institutionId, ...(status && status !== 'active' ? { status } : { status: { not: 'resuelto' } }), ...(search ? { OR: [{ code: { contains: search, mode: 'insensitive' } }, { description: { contains: search, mode: 'insensitive' } }] } : {}) };
   const orderBy: Prisma.TicketOrderByWithRelationInput[] = order === 'arrival' ? [{ createdAt: 'asc' }, { id: 'asc' }] : [{ [order === 'technical' ? 'technicalScore' : 'score']: { sort: 'desc', nulls: 'last' } }, { createdAt: 'asc' }, { id: 'asc' }];
   const [items,total,summary] = await this.db.$transaction([
    this.db.ticket.findMany({ where, orderBy, skip:(page-1)*pageSize, take:pageSize, include:{ owner:{ select:{ displayName:true } }, course:{ select:{ name:true } } } }),
@@ -53,12 +54,12 @@ export class OperationsService {
   this.read(actor); const id = uuid(rawId,'id');
   const row = await this.db.ticket.findFirst({ where:{ id,institutionId:actor.institutionId }, include:{owner:{select:{displayName:true}},course:{select:{name:true}},changes:{orderBy:[{createdAt:'asc'},{id:'asc'}]} } });
   if (!row) throw new NotFoundException({ code:'NOT_FOUND',message:'No se encontró la incidencia.' });
-  const assignee = row.assigneeId ? await this.db.appUser.findUnique({where:{id:row.assigneeId},select:{displayName:true}}) : null;
+  const assignee = row.assigneeId ? await this.db.appUser.findFirst({where:{id:row.assigneeId,institutionId:actor.institutionId},select:{displayName:true}}) : null;
   return {...ticketResponse(row,true),ownerName:row.owner.displayName,courseName:row.course?.name,assigneeName:assignee?.displayName,changes:row.changes.map(c=>({id:c.id,action:c.action,note:c.note,createdAt:c.createdAt.toISOString()}))};
  }
  async action(actor: CampusPrincipal, rawId: string, input: unknown) {
   requirePermission(actor,'tickets:work:institution'); const id=uuid(rawId,'id'), b=object(input), version=positive(b.expectedVersion,'expectedVersion'), note=text(b.note,'note',2000,5);
-  if (!['evaluate','start','note','resolve','assign'].includes(String(b.action))) invalid('action','Acción no válida.');
+  if (!['evaluate','start','note','resolve','assign','reclassify'].includes(String(b.action))) invalid('action','Acción no válida.');
   return this.db.$transaction(async tx=>{
    await this.fresh(actor,tx,'tickets:work:institution');
    await tx.$queryRaw`SELECT "id" FROM "Ticket" WHERE "id"=${id}::uuid AND "institutionId"=${actor.institutionId}::uuid FOR UPDATE`;
@@ -76,6 +77,10 @@ export class OperationsService {
     const assigneeId=uuid(b.assigneeId,'assigneeId'); const user=await tx.appUser.findFirst({where:{id:assigneeId,institutionId:actor.institutionId,active:true}});
     if (!user || !(await this.permissions.effective(actor.institutionId,user.role,tx)).includes('tickets:work:institution')) invalid('assigneeId','Selecciona un encargado de TI activo de esta institución.');
     patch.assigneeId=assigneeId;
+   } else if (b.action==='reclassify') {
+    if (typeof b.service!=='string' || !Object.values(TicketService).includes(b.service as TicketService)) invalid('service','Selecciona un servicio válido.');
+    if (b.service===before.service) invalid('service','Selecciona un servicio distinto para registrar la corrección.');
+    patch={...patch,service:b.service as TicketService,reportedService:before.reportedService??before.service,classificationStatus:'manual'};
    } else if (b.action==='start') {
     if (!before.priority || before.status!=='registrado') invalid('action','Evalúa la prioridad antes de iniciar la atención.');
     patch={...patch,status:'en_atencion',assigneeId:actor.id,firstResponseAt:before.firstResponseAt??now};
@@ -89,6 +94,12 @@ export class OperationsService {
    const result=await tx.ticket.updateMany({where:{id,institutionId:actor.institutionId,version},data:patch}); if (result.count!==1) throw conflict();
    const after=await tx.ticket.findUniqueOrThrow({where:{id}});
    await tx.ticketChange.create({data:{ticketId:id,institutionId:actor.institutionId,actorId:actor.id,action:String(b.action),note,before:json(ticketResponse(before,true)),after:json(ticketResponse(after,true))}});
+   if(b.action==='assign'||b.action==='start'||b.action==='resolve'){
+    const recipientId=b.action==='assign'?after.assigneeId!:after.ownerId;
+    await publishNotification(tx,{id:`ticket:${after.id}:${after.version}:${b.action}`,institutionId:after.institutionId,recipientId,
+     type:b.action==='resolve'?'resolution':'assignment',title:b.action==='resolve'?'Incidencia resuelta':b.action==='assign'?'Nueva incidencia asignada':'Atención de tu incidencia iniciada',
+     body:`Incidencia ${after.code}. Consulta el seguimiento para revisar el detalle.`,href:b.action==='assign'?`/ti/tickets/${after.id}`:`/incidencias/${after.id}`,isDemo:after.isDemo});
+   }
    return ticketResponse(after,true);
   });
  }

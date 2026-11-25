@@ -1,5 +1,20 @@
 # Calendario manual — contrato de rama v1
 
+## Extensión CSV — 25 de noviembre de 2026
+
+`POST /academic/imports/preview` y `POST /academic/imports/confirm` reciben
+`{csv,reason}` mediante la sesión/CSRF comunes y permiso efectivo academic:manage.
+CSV UTF-8 (BOM opcional), comas y comillas RFC4180, hasta 48 KiB y 500 eventos.
+Cabecera exacta: `title,type,scope,courseCode,sectionCode,startsAt,endsAt`.
+Fechas ISO con offset obligatorio; Lima usa -05:00. Cursos/secciones se resuelven
+por código dentro de la institución. No se crean catálogos implícitos.
+Vista previa: `{valid,rows:[{row,title,duplicate,error?}],duplicates,imported:0}`.
+Confirmación vuelve a validar y serializa importaciones; un error cancela todas
+las filas. Eventos idénticos existentes o repetidos en el archivo se omiten,
+incluidos reintentos concurrentes. Los eventos siguen siendo calendario manual;
+AcademicChange.source identifica `csv`, actor y motivo. No se modificó SQL histórico.
+Prueba aislada: `test/calendar-csv.test.cjs`, 2 pruebas aprobadas.
+
 Rama `calendario-academico`, derivada de `196a2144aae253ca672eeeaf721c62204516245a`.
 Entrega aprobada para integrar mediante PR #2. Semana 1: calendario manual P17/P18; CSV, configuración de
 factores/SLA y cálculo del factor corresponden a semana 2.

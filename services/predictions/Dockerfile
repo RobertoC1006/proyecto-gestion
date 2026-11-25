@@ -2,6 +2,9 @@ FROM python:3.13-slim-bookworm@sha256:a5a7017efc5969e00ae2b91c8eb0631049a569652a
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 MODELS_DIR=/models
 WORKDIR /app
 RUN groupadd --gid 10001 campus && useradd --uid 10001 --gid campus --no-create-home campus && mkdir /models && chown campus:campus /models
-COPY services/predictions/app.py services/predictions/requirements.txt ./
+COPY services/predictions/requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+COPY services/predictions/*.py ./
+ENV OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1
 USER campus
 CMD ["python", "app.py"]

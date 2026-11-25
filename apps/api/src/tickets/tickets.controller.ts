@@ -2,7 +2,7 @@ import { Body, Controller, Get, Headers, Param, Post, Query, Req, Res, UseGuards
 import { ApiBadRequestResponse, ApiConflictResponse, ApiCookieAuth, ApiCreatedResponse, ApiForbiddenResponse, ApiHeader, ApiNotFoundResponse, ApiOkResponse, ApiServiceUnavailableResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { AuthRequest } from '../auth/auth.service';
 import { CampusSessionGuard, RequirePermissions } from '../auth/auth.guard';
-import { CreateTicketDto, TicketDto, TicketPageDto, TicketServiceDto, TicketsQueryDto } from './tickets.dto';
+import { CreateTicketDto, TicketDto, TicketPageDto, TicketServiceDto, TicketSummaryDto, TicketsQueryDto } from './tickets.dto';
 import { TicketsService } from './tickets.service';
 
 @ApiTags('Incidencias — Semana 1')
@@ -32,6 +32,12 @@ export class TicketsController {
   @RequirePermissions('tickets:create')
   @ApiOkResponse({ type: [TicketServiceDto] })
   services() { return this.tickets.services(); }
+  @Get('summary')
+  @RequirePermissions('tickets:read:self')
+  @ApiOkResponse({ type: TicketSummaryDto })
+  summary(@Req() request: AuthRequest) {
+    return this.tickets.summary(request.campusPrincipal!);
+  }
   @Get()
   @RequirePermissions('tickets:read:self')
   @ApiOkResponse({ type: TicketPageDto })

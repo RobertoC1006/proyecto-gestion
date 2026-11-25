@@ -463,6 +463,74 @@
         ]
       }
     },
+    "/api/v1/academic/imports/preview": {
+      "post": {
+        "operationId": "AcademicController_previewCsv",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "400": {
+            "description": "VALIDATION_ERROR; fields contiene el error de cada campo."
+          },
+          "401": {
+            "description": "Sesión no disponible o inválida."
+          },
+          "403": {
+            "description": "Requiere administrador y protección de escritura."
+          },
+          "404": {
+            "description": "Objeto no visible en la institución."
+          },
+          "409": {
+            "description": "Código duplicado o versión desactualizada."
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Calendario académico — administración"
+        ]
+      }
+    },
+    "/api/v1/academic/imports/confirm": {
+      "post": {
+        "operationId": "AcademicController_confirmCsv",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "400": {
+            "description": "VALIDATION_ERROR; fields contiene el error de cada campo."
+          },
+          "401": {
+            "description": "Sesión no disponible o inválida."
+          },
+          "403": {
+            "description": "Requiere administrador y protección de escritura."
+          },
+          "404": {
+            "description": "Objeto no visible en la institución."
+          },
+          "409": {
+            "description": "Código duplicado o versión desactualizada."
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Calendario académico — administración"
+        ]
+      }
+    },
     "/api/v1/academic/courses": {
       "get": {
         "operationId": "AcademicController_courses",
@@ -1546,7 +1614,8 @@
               "enum": [
                 "registrado",
                 "en_atencion",
-                "resuelto"
+                "resuelto",
+                "active"
               ]
             }
           },
@@ -1605,6 +1674,41 @@
                   "items": {
                     "$ref": "#/components/schemas/TicketServiceDto"
                   }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "VALIDATION_ERROR"
+          },
+          "401": {
+            "description": "SESSION_REQUIRED"
+          },
+          "403": {
+            "description": "FORBIDDEN o WRITE_PROTECTION_REQUIRED"
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Incidencias — Semana 1"
+        ]
+      }
+    },
+    "/api/v1/tickets/summary": {
+      "get": {
+        "operationId": "TicketsController_summary",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketSummaryDto"
                 }
               }
             }
@@ -1750,6 +1854,35 @@
         ]
       }
     },
+    "/api/v1/operations/services": {
+      "get": {
+        "operationId": "OperationsController_services",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TicketServiceDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Atención y prioridad contextual"
+        ]
+      }
+    },
     "/api/v1/operations/tickets/{id}": {
       "get": {
         "operationId": "OperationsController_detail",
@@ -1765,7 +1898,14 @@
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketDto"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -1789,9 +1929,26 @@
             }
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OperationTicketActionDto"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketDto"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -1801,6 +1958,282 @@
         ],
         "tags": [
           "Atención y prioridad contextual"
+        ]
+      }
+    },
+    "/api/v1/certificates": {
+      "get": {
+        "operationId": "CertificatesController_mine",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CertificatesPageDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Constancias"
+        ]
+      }
+    },
+    "/api/v1/certificates/audit": {
+      "get": {
+        "operationId": "CertificatesController_audit",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CertificateAuditPageDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Constancias"
+        ]
+      }
+    },
+    "/api/v1/certificates/{ticketId}/issue": {
+      "post": {
+        "operationId": "CertificatesController_issue",
+        "parameters": [
+          {
+            "name": "ticketId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CertificateDto"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "CERTIFICATE_FILE_UNAVAILABLE: el PDF original no está disponible; la emisión y su huella se conservan."
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Constancias"
+        ]
+      }
+    },
+    "/api/v1/certificates/{id}": {
+      "get": {
+        "operationId": "CertificatesController_detail",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CertificateDto"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "CERTIFICATE_FILE_UNAVAILABLE: el PDF original no está disponible; la emisión y su huella se conservan."
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Constancias"
+        ]
+      }
+    },
+    "/api/v1/certificates/{id}/download": {
+      "get": {
+        "operationId": "CertificatesController_download",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/pdf": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            },
+            "description": ""
+          },
+          "503": {
+            "description": "CERTIFICATE_FILE_UNAVAILABLE: el PDF original no está disponible; la emisión y su huella se conservan."
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Constancias"
+        ]
+      }
+    },
+    "/api/v1/certificates/public/{code}": {
+      "get": {
+        "operationId": "PublicCertificatesController_lookup",
+        "parameters": [
+          {
+            "name": "code",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Verificación pública"
+        ]
+      }
+    },
+    "/api/v1/certificates/public/{code}/verify": {
+      "post": {
+        "operationId": "PublicCertificatesController_verify",
+        "parameters": [
+          {
+            "name": "code",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "file": {
+                        "type": "string",
+                        "format": "binary"
+                      }
+                    },
+                    "required": [
+                      "file"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "pdfBase64": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "pdfBase64"
+                    ]
+                  }
+                ]
+              }
+            },
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "file": {
+                        "type": "string",
+                        "format": "binary"
+                      }
+                    },
+                    "required": [
+                      "file"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "pdfBase64": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "pdfBase64"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Verificación pública"
         ]
       }
     },
@@ -2043,6 +2476,598 @@
         ],
         "tags": [
           "Usuarios — administración"
+        ]
+      }
+    },
+    "/api/v1/consent/current": {
+      "get": {
+        "operationId": "ConsentController_current",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/ConsentVersionDto"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sesión no disponible o inválida."
+          },
+          "403": {
+            "description": "La cuenta no puede aceptar consentimiento."
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Consentimiento"
+        ]
+      }
+    },
+    "/api/v1/consent/me": {
+      "get": {
+        "operationId": "ConsentController_me",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConsentMeDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sesión no disponible o inválida."
+          },
+          "403": {
+            "description": "La cuenta no puede aceptar consentimiento."
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Consentimiento"
+        ]
+      }
+    },
+    "/api/v1/consent/accept": {
+      "post": {
+        "operationId": "ConsentController_accept",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConsentAcceptDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConsentAcceptanceDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sesión no disponible o inválida."
+          },
+          "403": {
+            "description": "La cuenta no puede aceptar consentimiento."
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Consentimiento"
+        ]
+      }
+    },
+    "/api/v1/consent/acceptances": {
+      "get": {
+        "operationId": "ConsentController_acceptances",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConsentAcceptancePageDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sesión no disponible o inválida."
+          },
+          "403": {
+            "description": "La cuenta no puede aceptar consentimiento."
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Consentimiento"
+        ]
+      }
+    },
+    "/api/v1/audit": {
+      "get": {
+        "operationId": "AuditController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuditPageDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Sesión no disponible o inválida."
+          },
+          "403": {
+            "description": "Requiere audit:read:institution."
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Auditoría"
+        ]
+      }
+    },
+    "/api/v1/audit/export": {
+      "get": {
+        "operationId": "AuditController_export",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Sesión no disponible o inválida."
+          },
+          "403": {
+            "description": "Requiere audit:read:institution."
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Auditoría"
+        ]
+      }
+    },
+    "/api/v1/reports": {
+      "get": {
+        "operationId": "ReportsController_report",
+        "parameters": [
+          {
+            "name": "from",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            }
+          },
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "day",
+                "week",
+                "month"
+              ]
+            }
+          },
+          {
+            "name": "service",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "registrado",
+                "en_atencion",
+                "resuelto"
+              ]
+            }
+          },
+          {
+            "name": "scope",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "institution",
+                "team"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportsDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Reportes operativos P15"
+        ]
+      }
+    },
+    "/api/v1/reports/export": {
+      "get": {
+        "operationId": "ReportsController_export",
+        "parameters": [
+          {
+            "name": "from",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            }
+          },
+          {
+            "name": "period",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "day",
+                "week",
+                "month"
+              ]
+            }
+          },
+          {
+            "name": "service",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "registrado",
+                "en_atencion",
+                "resuelto"
+              ]
+            }
+          },
+          {
+            "name": "scope",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "institution",
+                "team"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Reportes operativos P15"
+        ]
+      }
+    },
+    "/api/v1/demand": {
+      "get": {
+        "operationId": "DemandController_snapshot",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Demanda y evaluación"
+        ]
+      }
+    },
+    "/api/v1/demand/config": {
+      "get": {
+        "operationId": "DemandController_config",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Demanda y evaluación"
+        ]
+      },
+      "patch": {
+        "operationId": "DemandController_save",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Demanda y evaluación"
+        ]
+      }
+    },
+    "/api/v1/demand/runs": {
+      "post": {
+        "operationId": "DemandController_run",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Demanda y evaluación"
+        ]
+      }
+    },
+    "/api/v1/notifications": {
+      "get": {
+        "operationId": "NotificationsController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Notificaciones personales"
+        ]
+      }
+    },
+    "/api/v1/notifications/{id}/read": {
+      "patch": {
+        "operationId": "NotificationsController_read",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Notificaciones personales"
+        ]
+      }
+    },
+    "/api/v1/notifications/events": {
+      "get": {
+        "operationId": "NotificationsController_events",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Notificaciones personales"
+        ]
+      }
+    },
+    "/api/v1/alerts": {
+      "get": {
+        "operationId": "AlertsController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Alertas de demanda"
+        ]
+      }
+    },
+    "/api/v1/alerts/{id}": {
+      "get": {
+        "operationId": "AlertsController_detail",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Alertas de demanda"
+        ]
+      }
+    },
+    "/api/v1/alerts/{id}/review": {
+      "patch": {
+        "operationId": "AlertsController_review",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Alertas de demanda"
         ]
       }
     }
@@ -3037,6 +4062,22 @@
               "otro"
             ]
           },
+          "reportedService": {
+            "type": "string",
+            "enum": [
+              "aula_virtual",
+              "wifi_red",
+              "correo",
+              "equipos",
+              "impresoras",
+              "cuentas_accesos",
+              "videoconferencia",
+              "sistemas_institucionales",
+              "almacenamiento_nube",
+              "software_licencias",
+              "otro"
+            ]
+          },
           "scope": {
             "type": "string",
             "enum": [
@@ -3066,8 +4107,15 @@
             "type": "string",
             "enum": [
               "pendiente",
+              "ia",
+              "revision_manual",
               "manual"
             ]
+          },
+          "aiExplanation": {
+            "type": "string",
+            "nullable": true,
+            "description": "Explicación de la propuesta, visible para TI."
           },
           "priority": {
             "type": "string",
@@ -3107,6 +4155,10 @@
           "failureConfirmed": {
             "type": "boolean"
           },
+          "assigneeName": {
+            "type": "string",
+            "nullable": true
+          },
           "isDemo": {
             "type": "boolean"
           },
@@ -3124,11 +4176,13 @@
           "code",
           "description",
           "service",
+          "reportedService",
           "scope",
           "courseId",
           "sectionId",
           "status",
           "classificationStatus",
+          "aiExplanation",
           "priority",
           "version",
           "academicContext",
@@ -3172,6 +4226,29 @@
           "label"
         ]
       },
+      "TicketSummaryDto": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "number"
+          },
+          "registered": {
+            "type": "number"
+          },
+          "inAttention": {
+            "type": "number"
+          },
+          "resolved": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "total",
+          "registered",
+          "inAttention",
+          "resolved"
+        ]
+      },
       "TicketPageDto": {
         "type": "object",
         "properties": {
@@ -3179,6 +4256,287 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/TicketDto"
+            }
+          },
+          "total": {
+            "type": "number"
+          },
+          "page": {
+            "type": "number"
+          },
+          "pageSize": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "page",
+          "pageSize"
+        ]
+      },
+      "OperationTicketActionDto": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "evaluate",
+              "start",
+              "note",
+              "resolve",
+              "assign",
+              "reclassify"
+            ]
+          },
+          "expectedVersion": {
+            "type": "number",
+            "minimum": 1
+          },
+          "note": {
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 2000
+          },
+          "urgency": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 3
+          },
+          "impact": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 3
+          },
+          "service": {
+            "type": "string",
+            "enum": [
+              "aula_virtual",
+              "wifi_red",
+              "correo",
+              "equipos",
+              "impresoras",
+              "cuentas_accesos",
+              "videoconferencia",
+              "sistemas_institucionales",
+              "almacenamiento_nube",
+              "software_licencias",
+              "otro"
+            ],
+            "description": "Requerido cuando action=reclassify."
+          },
+          "assigneeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "solution": {
+            "type": "string",
+            "maxLength": 5000
+          },
+          "failureConfirmed": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "action",
+          "expectedVersion",
+          "note"
+        ]
+      },
+      "CertificateDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "code": {
+            "type": "string"
+          },
+          "ticketId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ticketCode": {
+            "type": "string"
+          },
+          "service": {
+            "type": "string",
+            "enum": [
+              "aula_virtual",
+              "wifi_red",
+              "correo",
+              "equipos",
+              "impresoras",
+              "cuentas_accesos",
+              "videoconferencia",
+              "sistemas_institucionales",
+              "almacenamiento_nube",
+              "software_licencias",
+              "otro"
+            ]
+          },
+          "resolvedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "issuedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "sha256": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "emitida"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "ticketId",
+          "ticketCode",
+          "service",
+          "resolvedAt",
+          "issuedAt",
+          "sha256",
+          "status"
+        ]
+      },
+      "CertificateEligibilityDto": {
+        "type": "object",
+        "properties": {
+          "ticketId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ticketCode": {
+            "type": "string"
+          },
+          "service": {
+            "type": "string",
+            "enum": [
+              "aula_virtual",
+              "wifi_red",
+              "correo",
+              "equipos",
+              "impresoras",
+              "cuentas_accesos",
+              "videoconferencia",
+              "sistemas_institucionales",
+              "almacenamiento_nube",
+              "software_licencias",
+              "otro"
+            ]
+          },
+          "resolvedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "eligible": {
+            "type": "boolean"
+          },
+          "certificate": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CertificateDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "ticketId",
+          "ticketCode",
+          "service",
+          "resolvedAt",
+          "eligible",
+          "certificate"
+        ]
+      },
+      "CertificatesPageDto": {
+        "type": "object",
+        "properties": {
+          "eligible": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CertificateEligibilityDto"
+            }
+          },
+          "issued": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CertificateDto"
+            }
+          }
+        },
+        "required": [
+          "eligible",
+          "issued"
+        ]
+      },
+      "CertificateAuditItemDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "code": {
+            "type": "string"
+          },
+          "certificateId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "ticketCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "actorId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "emitida",
+              "descargada",
+              "consultada",
+              "valida",
+              "inexistente",
+              "alterado",
+              "archivo_no_verificable"
+            ]
+          },
+          "occurredAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "certificateId",
+          "ticketCode",
+          "actorId",
+          "action",
+          "occurredAt"
+        ]
+      },
+      "CertificateAuditPageDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CertificateAuditItemDto"
             }
           },
           "total": {
@@ -3371,6 +4729,369 @@
           "teamId",
           "reason",
           "expectedVersion"
+        ]
+      },
+      "ConsentVersionDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "version": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "effectiveAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "version",
+          "title",
+          "summary",
+          "effectiveAt"
+        ]
+      },
+      "ConsentAcceptanceDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "acceptedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "userId",
+          "displayName",
+          "version",
+          "acceptedAt"
+        ]
+      },
+      "ConsentMeDto": {
+        "type": "object",
+        "properties": {
+          "current": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ConsentVersionDto"
+              }
+            ]
+          },
+          "acceptance": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ConsentAcceptanceDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "current",
+          "acceptance"
+        ]
+      },
+      "ConsentAcceptDto": {
+        "type": "object",
+        "properties": {
+          "expectedVersionId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Identificador de la versión que el usuario vio."
+          }
+        },
+        "required": [
+          "expectedVersionId"
+        ]
+      },
+      "ConsentAcceptancePageDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ConsentAcceptanceDto"
+            }
+          },
+          "total": {
+            "type": "number"
+          },
+          "page": {
+            "type": "number"
+          },
+          "pageSize": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "page",
+          "pageSize"
+        ]
+      },
+      "AuditItemDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "occurredAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "actorId": {
+            "type": "string",
+            "nullable": true,
+            "format": "uuid"
+          },
+          "actor": {
+            "type": "string"
+          },
+          "action": {
+            "type": "string"
+          },
+          "objectType": {
+            "type": "string"
+          },
+          "objectId": {
+            "type": "object",
+            "nullable": true,
+            "format": "uuid"
+          },
+          "reason": {
+            "type": "object",
+            "nullable": true
+          },
+          "before": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": true
+          },
+          "after": {
+            "type": "object",
+            "nullable": true,
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "id",
+          "occurredAt",
+          "actorId",
+          "actor",
+          "action",
+          "objectType",
+          "objectId",
+          "reason",
+          "before",
+          "after"
+        ]
+      },
+      "AuditPageDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AuditItemDto"
+            }
+          },
+          "total": {
+            "type": "number"
+          },
+          "page": {
+            "type": "number"
+          },
+          "pageSize": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "page",
+          "pageSize"
+        ]
+      },
+      "ReportSeriesDto": {
+        "type": "object",
+        "properties": {
+          "period": {
+            "type": "string"
+          },
+          "observed": {
+            "type": "number"
+          },
+          "forecast": {
+            "type": "number",
+            "nullable": true
+          }
+        },
+        "required": [
+          "period",
+          "observed",
+          "forecast"
+        ]
+      },
+      "ReportCategoryDto": {
+        "type": "object",
+        "properties": {
+          "service": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "count": {
+            "type": "number"
+          },
+          "percentage": {
+            "type": "object",
+            "nullable": true
+          }
+        },
+        "required": [
+          "service",
+          "label",
+          "count",
+          "percentage"
+        ]
+      },
+      "ReportFiltersDto": {
+        "type": "object",
+        "properties": {
+          "from": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "to": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "period": {
+            "type": "string",
+            "enum": [
+              "day",
+              "week",
+              "month"
+            ]
+          },
+          "service": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "registrado",
+              "en_atencion",
+              "resuelto"
+            ]
+          },
+          "scope": {
+            "type": "string",
+            "enum": [
+              "institution",
+              "team"
+            ]
+          }
+        }
+      },
+      "ReportsDto": {
+        "type": "object",
+        "properties": {
+          "series": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReportSeriesDto"
+            }
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReportCategoryDto"
+            }
+          },
+          "total": {
+            "type": "number"
+          },
+          "registered": {
+            "type": "number"
+          },
+          "inAttention": {
+            "type": "number"
+          },
+          "resolved": {
+            "type": "number"
+          },
+          "resolutionRate": {
+            "type": "object",
+            "nullable": true
+          },
+          "resolvedWithinSlaRate": {
+            "type": "object",
+            "nullable": true
+          },
+          "source": {
+            "type": "string"
+          },
+          "synthetic": {
+            "type": "boolean",
+            "description": "True when the filtered population includes demonstration tickets."
+          },
+          "forecastStatus": {
+            "type": "string",
+            "enum": [
+              "unavailable"
+            ]
+          },
+          "forecastMessage": {
+            "type": "string"
+          },
+          "filters": {
+            "$ref": "#/components/schemas/ReportFiltersDto"
+          }
+        },
+        "required": [
+          "series",
+          "categories",
+          "total",
+          "registered",
+          "inAttention",
+          "resolved",
+          "resolutionRate",
+          "resolvedWithinSlaRate",
+          "source",
+          "synthetic",
+          "forecastStatus",
+          "forecastMessage",
+          "filters"
         ]
       }
     }

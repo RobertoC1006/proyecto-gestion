@@ -26,14 +26,16 @@ def main():
             '--tmpfs','/var/lib/postgresql/data','-e','POSTGRES_USER=campusitsm',
             '-e',f'POSTGRES_PASSWORD={password}','-e','POSTGRES_DB=workflow_test','postgres:17-alpine')
         for _ in range(40):
-            if subprocess.run(['docker','exec',database,'pg_isready','-U','campusitsm','-d','workflow_test'],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL).returncode == 0:
+            if subprocess.run(['docker','exec',database,'pg_isready','-h','127.0.0.1','-U','campusitsm','-d','workflow_test'],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL).returncode == 0:
                 break
             time.sleep(1)
         base = ['docker','run','--rm','--network',network,'-e',f'DATABASE_URL={connection}',
-                '-e','APP_ORIGIN=http://localhost:8080','-e','SUPABASE_URL=https://test.supabase.co',
+                '-e','CAMPUS_JOBS_ENABLED=0','-e','APP_ORIGIN=http://localhost:8080','-e','SUPABASE_URL=https://test.supabase.co',
                 '-e','SUPABASE_PUBLISHABLE_KEY=sb_publishable_test_only',
                 '-e','AUTH_ENCRYPTION_KEY=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=',
                 '-e','AUTH_INSTITUTION_CODE=AUTH-TEST','campusitsm-workflow-test:local']
+        # El esquema de colas es explícito; producción ya posee campusitsm.
+        run('docker','exec',database,'psql','-U','campusitsm','-d','workflow_test','-c','CREATE SCHEMA campusitsm')
         run(*base,'node','prisma/deploy.cjs')
         result = run(*base,'node','--test','--test-concurrency=1',*tests,check=False)
         if result.returncode:

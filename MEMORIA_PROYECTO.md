@@ -1,5 +1,125 @@
 # Memoria de CampusITSM
 
+## Cierre del bloque de Roberto — 25 de noviembre de 2026
+
+Encargo vigente: terminar su parte completa, sin depender de nuevos desarrollos
+de Johan/Jasmine. Código validado `d8d0a37`, sobre la integración del equipo.
+CSV atómico en el calendario existente; demanda P13, alertas P14, evaluación P16
+y notificaciones P24 conectadas a Nest/Prisma/Python. No se creó otro login,
+catálogo académico ni motor de prioridad. Contratos analítico y de avisos en docs.
+
+SARIMAX semanal frente a referencia semanal, tres cortes temporales de 14 días,
+selección por MAE y MAPE con ceros excluidos. Dataset reproducible de 24 meses y
+43 000 registros solo en models_data, separado de Ticket. Datos operativos sin
+cobertura suficiente responden unavailable; no se inventa eficacia real.
+pg-boss 12.39.0, SQL manual, diario 06:00 y domingo 02:00 America/Lima; recuperación,
+reintentos y último resultado válido. Corregida la adaptación de resultados SQL
+multisentencia del mantenimiento, comprobada también contra el destino habitual.
+
+18 migraciones finalizadas/checksums idénticos. Las tres nuevas se aplicaron
+manualmente con campusitsm_migrator y TLS el 25/11 a las 20:25 UTC; ver registro BD.
+Volúmenes/sesiones conservados y base/archivos/modelos respaldados/restaurados
+solo en PostgreSQL temporal. 149 pruebas API, 62 navegador y 5 Python aprobadas.
+Prueba aparte de 500 consultas concurrentes aisladas: cero errores/cruces,
+p95 501 ms. No mide 500 sesiones de Supabase Auth ni disponibilidad productiva.
+
+La sesión real del administrador se conservó al reconstruir localhost:8080.
+Se ejecutaron pronóstico/evaluación sintéticos, alerta revisada con motivo DEMO,
+lectura personal de avisos y detalle de la revisión en Auditoría. El login
+pendiente del registro anterior queda resuelto para administrador. No se
+atribuye a esta sesión un recorrido real de estudiante/constancia: aún pendiente
+para la aceptación conjunta. Las pruebas de PDF actuales sí están en la regresión.
+
+Johan: configurar Groq privadamente (sin clave en esta instalación al comprobar),
+prueba real del proveedor, evaluación etiquetada y evidencia de CU01. Su texto
+completo no sale al proveedor y su historial conserva las correcciones.
+Jasmine: conectar P15 con CONTRATO_ANALITICA, cerrar preparación analítica de
+privacidad/consentimiento y aceptación CU02. La migración aplicada de constancias
+se conservó; no volver a sustituirla por su versión reescrita.
+
+Publicación en main autorizada por Roberto; comprobar siempre el SHA remoto.
+Ramas/worktrees activos del equipo y outputs existentes conservados.
+
+## Reanudación vigente — 25 de noviembre de 2026
+
+Durante el intento de login real se detectó un fallo del parser: el middleware
+JSON específico de PDFs impedía el registro automático del parser general de
+Nest. Corregido con parser normal explícito de 100 KiB tras el específico.
+Regresión que reproduce el fallo antes del cambio y 139 tests API aprobados.
+Sin cambios de credenciales/cuentas ni migraciones nuevas por esta corrección.
+
+Roberto pidió integrar todo corregido en main y confirmó Groq como proveedor.
+Merge funcional preparado `9a3eaf4`, con 138 pruebas API y 56 recorridos de
+navegador en una ejecución conjunta final, sin fallos/omisiones. La aplicación
+sirve ese código; el índice coincide con dist. Falta login personal para la
+comprobación real, antes de main/push ya autorizados.
+Se incorporaron Johan `786154d` y Jasmine `c218cf4` en integracion-avances-equipo,
+preservando historia y ramas. Conflictos resueltos conservando las correcciones
+previas. Groq recibe señales técnicas de vocabulario cerrado; no texto libre.
+Clasificación/fallback guardan antes/después atómicos con actor automático nulo.
+Constancias incorpora auditoría de emisiones/descargas/consultas/verificaciones
+y multipart con compatibilidad JSON. No se regenera el original ni su huella.
+
+Quince migraciones aplicadas y verificadas. Las doce anteriores están intactas;
+no se aceptó la reescritura de SQL aplicado de Jasmine. Actualización con datos
+existentes validada en PostgreSQL aislado, 138 pruebas API y 56 recorridos de
+navegador distintos aprobados. Instalación habitual saludable en localhost:8080.
+Groq confirmado pero falta clave local privada; funciona revisión manual.
+
+Pendiente: login personal de Roberto para recorrido administrador/estudiante,
+PDF original/alterado, auditoría/reportes. La pestaña actual está en login.
+Después del recorrido satisfactorio, merge/push ya autorizados: publicar main,
+verificar SHA remoto y reconstruir desde main. Main aún conserva d8ef0ca.
+Detalle y evidencia: [entrega del 25](docs/entregas/roberto-integracion-equipo-20261125.md).
+Las secciones siguientes conservan el contexto histórico.
+
+## Reanudación vigente — integración de equipo, 24 de noviembre de 2026
+
+Roberto autorizó corregir, validar, integrar y publicar los avances de Johan y
+Jasmine en main cuando termine la validación. Bundle verificado/importado:
+`integracion-avances-equipo@fb3cd26827ae7a335729f3ca7fd32bc7f76afb98`;
+el parche `CampusITSM_correcciones_9294147.patch` ya estaba incluido y no se reaplicó.
+Fetch/ls-remote actuales: main local/remoto `d8ef0ca`, sin avances posteriores
+en las entregas `622c43b`, `7becc12`, `4ae4b6b`, `750bf86`; todas son ancestros
+del candidato, al igual que Usuarios `7ab1ed7`. Worktrees y ramas ajenas conservados.
+
+Corrección funcional `00eb7a2`: Auditoría incorpora emisión y verificación de
+constancias, identificando la verificación como pública sin atribuirla al titular;
+reportes filtran y agrupan en fecha de Lima y exportan la misma selección.
+OpenAPI/tipos actualizados y Effect fijado en 3.22.1. Validación actual de ese
+código: 120 pruebas API en PostgreSQL aislado y 54 recorridos Playwright aprobados;
+npm audit sin avisos. Los recorridos automatizados usan identidades/respuestas
+de prueba y no sustituyen las sesiones reales.
+
+Aplicadas únicamente `20261112000100_consent` y `20261120000100_certificates`
+con el comando migrador documentado, tras comprobar que faltaban. Doce huellas
+coincidentes, rol/esquema/TLS y RLS/privilegios comprobados; consultar el registro BD.
+La única instalación campusitsm sirve el candidato en localhost:8080 y está
+saludable; volumen PostgreSQL histórico conservado y contenedor detenido.
+No se modificaron roles, cuentas ni claves para probar. Hay cuatro tickets DEMO,
+uno resuelto con falla confirmada, cero constancias y cero políticas publicadas.
+
+**Pendiente para publicar:** recorrido real administrador → estudiante →
+administrador, emisión/descarga y validación pública del original y copia alterada.
+Roberto inicia/cambia las cuentas personalmente. El control de pantalla de esta
+sesión se interrumpió al no poder verificar la URL de una ventana Windows.
+Main conserva `d8ef0ca`; no está publicada esta integración. La autorización de
+publicación sigue vigente para después del recorrido satisfactorio. Detalle y
+comandos en [la entrega actual](docs/entregas/roberto-integracion-equipo-20261124.md).
+Los apartados siguientes conservan su fecha y alcance histórico.
+
+## Reanudación — revisión de entregas del equipo, 24 de noviembre de 2026
+
+El flujo del caso práctico ya se integró en main mediante el merge `eccd465`.
+La publicación documental termina en `d8ef0ca`. Los avances del 20 de noviembre
+de Johan y Jasmine están reunidos en el candidato local `9294147`, con historia
+y correcciones previas. La revisión del 24 registra sus hallazgos, las correcciones
+adicionales y las pruebas disponibles. Consultar
+[estado del equipo](docs/ESTADO_EQUIPO.md) y
+[revisión de integración](docs/entregas/roberto-revision-equipo-20261124.md).
+La validación en la instalación habitual y el estado remoto de las dos nuevas
+migraciones siguen pendientes de comprobación.
+
 ## Encargo vigente — flujo del caso práctico y tres perfiles visibles
 
 12 de noviembre de 2026. Roberto autorizó implementar el recorrido profesor →
@@ -13,8 +133,8 @@ Profesor solo programa en sus cursos/secciones asignados. No es un aula virtual.
 Dos migraciones aplicadas a la base compartida por autorización específica;
 diez migraciones con checksums coincidentes. Ver REGISTRO_CAMBIOS_BD y
 CONTRATO_FLUJO_CASO_PRACTICO. 58 pruebas aisladas aprobadas y API/web compiladas.
-Instalación campusitsm activa en localhost:8080, volúmenes conservados. No se
-integra main. Profesor con sesión real se aplaza por decisión de Roberto; la
+En esa entrega se verificó campusitsm en localhost:8080 y se conservaron los volúmenes.
+Más tarde se integró en main con `eccd465`. Profesor con sesión real se aplaza por decisión de Roberto; la
 autorización se prueba con cuentas descartables. No duplicar Auth ni perfiles.
 IA, pronóstico, PDF/QR, adjuntos y consentimiento/auditoría global siguen fuera
 de este bloque. Revisar ESTADO_EQUIPO para los recorridos visuales completados.

@@ -22,7 +22,7 @@ test('Flujo HTTP con PostgreSQL aislado: calendario, contexto, cola y resolució
  assert.match(process.env.DATABASE_URL??'',/@db:5432\/workflow_test(?:\?|$)/);
  const institutionId=randomUUID(),other=randomUUID();
  const principal=(role,institution=institutionId)=>({id:randomUUID(),institutionId:institution,email:'fixture@example.test',displayName:role,role,active:true,teamId:null,accessVersion:1,csrfVerified:true,permissions:rolePermissions[role]});
- const users={admin:principal('administrador'),student:principal('estudiante'),stranger:principal('estudiante'),professor:principal('docente'),other:principal('administrador',other)};
+ const users={admin:principal('administrador'),student:principal('estudiante'),stranger:principal('estudiante'),professor:principal('docente'),other:principal('administrador',other),external:principal('estudiante',other),reader:{...principal('ti_supervisor'),permissions:['tickets:read:institution']}};
  const builder=Test.createTestingModule({imports:[AppModule]});
  const module=await builder.overrideProvider(AuthService).useValue({resolve:async r=>users[r.headers['x-test-session']]??null})
  .overrideProvider(AcademicIdentity).useValue({resolve:async r=>users[r.headers['x-test-session']]??null}).compile();
@@ -85,6 +85,145 @@ test('Flujo HTTP con PostgreSQL aislado: calendario, contexto, cola y resolució
    assert.equal((await call('operations/policy','admin','PATCH',{expectedVersion:before.version,rules:[...defaultRules].reverse(),reason:'Configuración inválida.'})).status,400);
    const valid=await call('operations/policy','admin','PATCH',{expectedVersion:before.version,rules:defaultRules,reason:'Configurar los plazos del caso.'});assert.equal(valid.status,200);
    assert.equal((await call('operations/policy','admin','PATCH',{expectedVersion:before.version,rules:defaultRules,reason:'Versión desactualizada.'})).status,409);
+  });
+  await t.test('Filtros activos/resueltos y resumen personal aíslan titular e institución', async () => {
+   const report = {description:'Incidencia general para comprobar aislamiento de conteos.',service:'correo',scope:'general',courseId:null,sectionId:null};
+   const foreignTickets = [];
+   for (const session of ['stranger', 'external']) {
+    const created = await call('tickets', session, 'POST', report, {'Idempotency-Key':randomUUID()});
+    assert.equal(created.status, 201, JSON.stringify(created.body));
+    foreignTickets.push(created.body);
+    assert.deepEqual(await call('tickets/summary', session), {status:200, body:{total:1,registered:1,inAttention:0,resolved:0}});
+    const list = await call('tickets?status=active', session);
+    assert.equal(list.status, 200);
+    assert.deepEqual(list.body, {items:[created.body],total:1,page:1,pageSize:20});
+   }
+   const started = await call(`operations/tickets/${tickets[1].id}`, 'admin', 'PATCH', {
+    action:'start',expectedVersion:tickets[1].version,note:'Atención para comprobar el filtro de incidencias activas.'});
+   assert.equal(started.status, 200, JSON.stringify(started.body));
+   const all = await call('tickets', 'student');
+   assert.equal(all.status, 200);
+   assert.equal(all.body.total, 5);
+   assert.equal(all.body.items.length, 5);
+   assert.equal(all.body.page, 1);
+   assert.equal(all.body.pageSize, 20);
+   assert.ok(all.body.items.every(item => !foreignTickets.some(foreign => foreign.id === item.id)));
+   const summary = {status:200,body:{total:5,registered:3,inAttention:1,resolved:1}};
+   assert.deepEqual(await call('tickets/summary', 'student'), summary);
+   // Same subject in another tenant context must not recover the original tenant's data.
+   users.otherContext = {...users.student, institutionId:other};
+   assert.deepEqual(await call('tickets/summary', 'otherContext'), {
+    status:200,body:{total:0,registered:0,inAttention:0,resolved:0}});
+   assert.deepEqual(await call('tickets?status=active', 'otherContext'), {
+    status:200,body:{items:[],total:0,page:1,pageSize:20}});
+   assert.deepEqual(await call(`tickets/${first.id}`, 'otherContext'), {
+    status:404,body:{code:'NOT_FOUND',message:'No se encontró el ticket.'}});
+   for (const [status, expected] of [
+    ['active', all.body.items.filter(item => item.status !== 'resuelto')],
+    ['resuelto', all.body.items.filter(item => item.status === 'resuelto')],
+    ['registrado', all.body.items.filter(item => item.status === 'registrado')],
+    ['en_atencion', all.body.items.filter(item => item.status === 'en_atencion')],
+   ]) {
+    assert.deepEqual(await call(`tickets?status=${status}`, 'student'), {
+     status:200,body:{items:expected,total:expected.length,page:1,pageSize:20}});
+    assert.deepEqual(await call('tickets/summary', 'student'), summary);
+   }
+   const searched = all.body.items[0];
+   assert.deepEqual(await call(`tickets?search=${searched.code}&pageSize=1`, 'student'), {
+    status:200,body:{items:[searched],total:1,page:1,pageSize:1}});
+   assert.deepEqual(await call(`tickets?search=${foreignTickets[0].code}`, 'student'), {
+    status:200,body:{items:[],total:0,page:1,pageSize:20}});
+   assert.deepEqual(await call('tickets/summary', 'missing'), {
+    status:401,body:{code:'SESSION_REQUIRED',message:'Necesitas una sesión válida.'}});
+   assert.deepEqual(await call('tickets/summary', 'reader'), {
+    status:403,body:{code:'FORBIDDEN',message:'No tienes permiso para realizar esta operación.'}});
+  });
+  await t.test('Responsable visible o nulo sin UUID interno ni asignación ajena', async () => {
+   const id = tickets[2].id;
+   const before = await call(`tickets/${id}`, 'student');
+   assert.equal(before.status, 200);
+   assert.equal(before.body.assigneeName, null);
+   assert.equal(Object.hasOwn(before.body, 'assigneeId'), false);
+   const assigned = await call(`operations/tickets/${id}`, 'admin', 'PATCH', {
+    action:'assign',expectedVersion:before.body.version,assigneeId:users.admin.id,note:'Asignación al responsable de esta institución.'});
+   assert.equal(assigned.status, 200, JSON.stringify(assigned.body));
+   assert.equal(assigned.body.assigneeId, users.admin.id);
+   const own = await call(`tickets/${id}`, 'student');
+   assert.equal(own.status, 200);
+   assert.equal(own.body.assigneeName, users.admin.displayName);
+   assert.equal(Object.hasOwn(own.body, 'assigneeId'), false);
+   assert.equal(JSON.stringify(own.body).includes(users.admin.id), false);
+   const detail = await call(`operations/tickets/${id}`);
+   assert.equal(detail.status, 200);
+   assert.equal(detail.body.assigneeName, users.admin.displayName);
+   assert.deepEqual(await call(`operations/tickets/${id}`, 'admin', 'PATCH', {
+    action:'assign',expectedVersion:assigned.body.version,assigneeId:users.other.id,note:'No permitir responsables de otra institución.'}), {
+    status:400,body:{code:'VALIDATION_ERROR',message:'Revisa los campos indicados.',fields:{assigneeId:'Selecciona un encargado de TI activo de esta institución.'}}});
+   assert.deepEqual(await call(`operations/tickets/${id}`), detail);
+   assert.deepEqual(await call(`tickets/${id}`, 'student'), own);
+   const notFound = {status:404,body:{code:'NOT_FOUND',message:'No se encontró el ticket.'}};
+   assert.deepEqual(await call(`tickets/${id}`, 'stranger'), notFound);
+   assert.deepEqual(await call(`tickets/${id}`, 'external'), notFound);
+   assert.deepEqual(await call(`tickets/${randomUUID()}`, 'student'), notFound);
+  });
+  await t.test('Corrección manual autorizada conserva prioridad/SLA y audita una sola vez', async () => {
+   const id = tickets[2].id;
+   const snapshot = async (ticketId = id) => {
+    const detail = await call(`operations/tickets/${ticketId}`);
+    const own = await call(`tickets/${ticketId}`, 'student');
+    const queue = await call('operations/tickets');
+    const summary = await call('tickets/summary', 'student');
+    const list = await call('tickets', 'student');
+    for (const result of [detail, own, queue, summary, list]) assert.equal(result.status, 200);
+    return {detail:detail.body,own:own.body,queue:queue.body,summary:summary.body,list:list.body};
+   };
+   const before = await snapshot();
+   assert.ok(before.detail.priority);
+   assert.ok(before.detail.responseDueAt);
+   assert.ok(before.detail.resolutionDueAt);
+   const catalog = await call('operations/services');
+   assert.equal(catalog.status, 200);
+   assert.deepEqual(await call('tickets/services', 'student'), catalog);
+   const target = catalog.body.find(service => service.id !== before.detail.service).id;
+   const note = 'Corrección manual del servicio sin recalcular prioridad ni reiniciar plazos.';
+   const action = {action:'reclassify',expectedVersion:before.detail.version,service:target,note};
+   const validation = (field, message) => ({status:400,body:{code:'VALIDATION_ERROR',message:'Revisa los campos indicados.',fields:{[field]:message}}});
+   for (const [session, body, expected] of [
+    ['student',action,{status:403,body:{code:'FORBIDDEN',message:'No tienes permiso para realizar esta operación.'}}],
+    ['reader',action,{status:403,body:{code:'FORBIDDEN',message:'No tienes permiso para realizar esta operación.'}}],
+    ['other',action,{status:404,body:{message:'Not Found',statusCode:404}}],
+    ['admin',{...action,service:'inexistente'},validation('service','Selecciona un servicio válido.')],
+    ['admin',{...action,service:before.detail.service},validation('service','Selecciona un servicio distinto para registrar la corrección.')],
+    ['admin',{...action,note:'cort'},validation('note','Usa entre 5 y 2000 caracteres.')],
+   ]) {
+    assert.deepEqual(await call(`operations/tickets/${id}`, session, 'PATCH', body), expected);
+    assert.deepEqual(await snapshot(), before, `La solicitud rechazada de ${session} no cambia datos, conteos ni historial`);
+   }
+   const corrected = await call(`operations/tickets/${id}`, 'admin', 'PATCH', action);
+   assert.equal(corrected.status, 200, JSON.stringify(corrected.body));
+   const {ownerName,courseName,assigneeName,changes,...previous} = before.detail;
+   assert.deepEqual(corrected.body, {...previous,service:target,classificationStatus:'manual',version:previous.version+1,updatedAt:corrected.body.updatedAt});
+   assert.ok(Date.parse(corrected.body.updatedAt) >= Date.parse(previous.updatedAt));
+   const after = await snapshot();
+   assert.equal(after.detail.service, target);
+   assert.equal(after.detail.version, previous.version+1);
+   assert.equal(after.detail.changes.length, changes.length+1);
+   for (const change of changes) assert.deepEqual(after.detail.changes.find(item => item.id === change.id), change);
+   const added = after.detail.changes.filter(item => !changes.some(old => old.id === item.id));
+   assert.equal(added.length, 1);
+   assert.deepEqual(added[0], {id:added[0].id,action:'reclassify',note,createdAt:added[0].createdAt});
+   assert.match(added[0].id, /^[0-9a-f-]{36}$/);
+   assert.ok(Number.isFinite(Date.parse(added[0].createdAt)));
+   assert.equal(after.own.service, target);
+   assert.deepEqual(after.own.changes, after.detail.changes);
+   assert.deepEqual(after.summary, before.summary);
+   assert.deepEqual(await call(`operations/tickets/${id}`, 'admin', 'PATCH', {...action,service:previous.service}), {
+    status:409,body:{code:'CONFLICT',message:'El ticket cambió. Actualiza antes de continuar.'}});
+   assert.deepEqual(await snapshot(), after);
+   const resolved = await snapshot(first.id);
+   assert.deepEqual(await call(`operations/tickets/${first.id}`, 'admin', 'PATCH', {...action,expectedVersion:resolved.detail.version}),
+    validation('action','La incidencia ya está resuelta.'));
+   assert.deepEqual(await snapshot(first.id), resolved);
   });
  }finally{await app.close()}
 });
