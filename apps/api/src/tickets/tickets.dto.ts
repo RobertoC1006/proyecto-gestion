@@ -25,11 +25,13 @@ export class TicketDto {
   @ApiProperty() code!: string;
   @ApiProperty() description!: string;
   @ApiProperty({ enum: TicketService }) service!: TicketService;
+  @ApiProperty({ enum: TicketService }) reportedService!: TicketService;
   @ApiProperty({ enum: TicketScope }) scope!: TicketScope;
   @ApiProperty({ type: String, format: 'uuid', nullable: true }) courseId!: string | null;
   @ApiProperty({ type: String, format: 'uuid', nullable: true }) sectionId!: string | null;
   @ApiProperty({ enum: TicketStatus }) status!: TicketStatus;
-  @ApiProperty({ enum: ['pendiente','manual'] }) classificationStatus!: 'pendiente' | 'manual';
+  @ApiProperty({ enum: ['pendiente','ia','revision_manual','manual'] }) classificationStatus!: 'pendiente' | 'ia' | 'revision_manual' | 'manual';
+  @ApiProperty({ type: String, nullable: true, description: 'Explicación de la propuesta, visible para TI.' }) aiExplanation!: string | null;
   @ApiProperty({ type: String, nullable: true }) priority!: string | null;
   @ApiProperty() version!: number;
   @ApiProperty({ type: Object, nullable: true }) academicContext!: unknown;

@@ -6,6 +6,7 @@ import { Module } from '@nestjs/common';
 import { AuthModule } from '../auth/auth.module';
 import { TicketsController } from './tickets.controller';
 import { TicketsService } from './tickets.service';
+import { TicketAiService } from './ticket-ai.service';
 
-@Module({ imports: [AuthModule, AcademicModule], controllers: [TicketsController, OperationsController], providers: [TicketsService, OperationsService, DemoService] })
+@Module({ imports: [AuthModule, AcademicModule], controllers: [TicketsController, OperationsController], providers: [TicketsService, OperationsService, TicketAiService, DemoService] })
 export class TicketsModule {}

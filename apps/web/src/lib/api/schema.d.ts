@@ -1078,6 +1078,8 @@ export interface components {
             /** @enum {string} */
             service: "aula_virtual" | "wifi_red" | "correo" | "equipos" | "impresoras" | "cuentas_accesos" | "videoconferencia" | "sistemas_institucionales" | "almacenamiento_nube" | "software_licencias" | "otro";
             /** @enum {string} */
+            reportedService: "aula_virtual" | "wifi_red" | "correo" | "equipos" | "impresoras" | "cuentas_accesos" | "videoconferencia" | "sistemas_institucionales" | "almacenamiento_nube" | "software_licencias" | "otro";
+            /** @enum {string} */
             scope: "general" | "curso";
             /** Format: uuid */
             courseId: string | null;
@@ -1086,7 +1088,9 @@ export interface components {
             /** @enum {string} */
             status: "registrado" | "en_atencion" | "resuelto";
             /** @enum {string} */
-            classificationStatus: "pendiente" | "manual";
+            classificationStatus: "pendiente" | "ia" | "revision_manual" | "manual";
+            /** @description Explicación de la propuesta, visible para TI. */
+            aiExplanation: string | null;
             priority: string | null;
             version: number;
             academicContext: Record<string, never> | null;

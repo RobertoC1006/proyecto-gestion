@@ -3690,6 +3690,22 @@
               "otro"
             ]
           },
+          "reportedService": {
+            "type": "string",
+            "enum": [
+              "aula_virtual",
+              "wifi_red",
+              "correo",
+              "equipos",
+              "impresoras",
+              "cuentas_accesos",
+              "videoconferencia",
+              "sistemas_institucionales",
+              "almacenamiento_nube",
+              "software_licencias",
+              "otro"
+            ]
+          },
           "scope": {
             "type": "string",
             "enum": [
@@ -3719,8 +3735,15 @@
             "type": "string",
             "enum": [
               "pendiente",
+              "ia",
+              "revision_manual",
               "manual"
             ]
+          },
+          "aiExplanation": {
+            "type": "string",
+            "nullable": true,
+            "description": "Explicación de la propuesta, visible para TI."
           },
           "priority": {
             "type": "string",
@@ -3781,11 +3804,13 @@
           "code",
           "description",
           "service",
+          "reportedService",
           "scope",
           "courseId",
           "sectionId",
           "status",
           "classificationStatus",
+          "aiExplanation",
           "priority",
           "version",
           "academicContext",

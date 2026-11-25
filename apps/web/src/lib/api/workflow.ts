@@ -13,3 +13,4 @@ export const workflowApi={
  demo:(body:unknown)=>request<{message:string;count:number}>('operations/demo',{method:'POST',body:JSON.stringify(body)}),
 }
 export const statusLabels:Record<string,string>={registrado:'Registrada',en_atencion:'En atención',resuelto:'Resuelta'}
+export const classificationLabels:Record<string,string>={pendiente:'Clasificación pendiente',ia:'Propuesta por IA',revision_manual:'Revisión manual requerida',manual:'Evaluada por TI'}
