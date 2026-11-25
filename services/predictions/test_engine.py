@@ -31,6 +31,7 @@ class DemandTests(unittest.TestCase):
             r=run(data,Path(folder)); self.assertEqual(len(r['forecast']),14); self.assertEqual(len(r['evaluation']['folds']),3)
             for f in r['evaluation']['folds']:self.assertLess(f['trainThrough'],f['testFrom'])
             self.assertEqual(r['evaluation']['metrics']['weekly_naive']['samples'],42)
+            self.assertEqual(r['evaluation']['provenance']['datasetHash'],r['datasetHash'])
             if r['model']=='weekly_naive':self.assertTrue(all(p['lower'] is None for p in r['forecast']))
             path=Path(folder)/r['artifact']['key'];self.assertTrue(path.is_file())
             import hashlib

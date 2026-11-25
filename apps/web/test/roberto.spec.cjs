@@ -39,3 +39,15 @@ test('Notificaciones filtra y marca una lectura personal',async({page})=>{
 test('Permiso revocado bloquea demanda y alerta por URL directa',async({page})=>{
  await setup(page,[]);for(const route of ['/demanda','/alertas/'+uid]){await page.goto(route);await expect(page.getByText('No tienes permiso para acceder a este módulo.',{exact:true})).toBeVisible();}
 });
+test('CSV del calendario: vista previa y confirmación visible sin segunda importación',async({page})=>{
+ await setup(page);let writes=0;
+ await page.route('**/api/v1/academic/**',route=>{
+  const url=route.request().url();if(url.includes('/imports/')){const confirm=url.includes('/confirm');if(confirm)writes++;return route.fulfill({json:{valid:true,imported:confirm?1:0,duplicates:0,rows:[{row:2,title:'Parcial de demostración',duplicate:false}]}})}
+  return route.fulfill({json:{items:[],total:0,page:1,pageSize:100}})
+ });
+ await page.goto('/admin/calendario');await page.getByRole('button',{name:'Importar CSV'}).click();
+ await page.getByLabel('Archivo CSV').setInputFiles({name:'calendario.csv',mimeType:'text/csv',buffer:Buffer.from('title,type,scope,courseCode,sectionCode,startsAt,endsAt\nParcial de demostración,examen,institution,,,2026-12-01T09:00:00-05:00,2026-12-01T11:00:00-05:00')});
+ await page.getByLabel('Motivo de la importación').fill('Programación ficticia para prueba.');await page.getByRole('button',{name:'Ver vista previa'}).click();expect(writes).toBe(0);
+ await page.getByRole('button',{name:'Confirmar importación'}).click();await expect(page.getByText('1 eventos importados.',{exact:false})).toBeVisible();expect(writes).toBe(1);await expect(page.getByRole('button',{name:'Confirmar importación'})).toHaveCount(0);
+ await page.screenshot({path:path.resolve(__dirname,'../../../.local/roberto-csv-fixture.png'),fullPage:true});
+});

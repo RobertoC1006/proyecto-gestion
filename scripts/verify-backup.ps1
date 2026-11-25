@@ -22,6 +22,19 @@ try {
   $result = 'SET search_path=campusitsm,public; SELECT count(*) FROM information_schema.tables WHERE table_schema IN (''campusitsm'',''public''); SELECT count(*) FROM "AppUser"; SELECT count(*) FROM "AcademicEvent";' | & docker exec -i $container psql -v ON_ERROR_STOP=1 -U postgres -At
   if ($LASTEXITCODE -ne 0) { throw 'Falló la comprobación del respaldo restaurado.' }
   $result | Set-Content -LiteralPath (Join-Path $folder 'restore-check.txt')
+  $manifestFile = Join-Path $folder 'manifest.json'
+  if (Test-Path -LiteralPath $manifestFile) {
+    $manifest = Get-Content -Raw -LiteralPath $manifestFile | ConvertFrom-Json
+    foreach ($asset in @('files','models')) {
+      $archive = Join-Path $folder ($asset + '.tar.gz')
+      if ((Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash.ToLower() -ne $manifest.hashes.($asset + '.tar.gz')) { throw 'El archivo no coincide con su huella.' }
+      & docker cp $archive "${container}:/tmp/$asset.tar.gz"
+      if ($LASTEXITCODE -ne 0) { throw 'No se pudo copiar el archivo de respaldo.' }
+      & docker exec $container sh -c "mkdir -p /verify-$asset && tar -xzf /tmp/$asset.tar.gz -C /verify-$asset && find /verify-$asset -type f -exec sha256sum {} +"
+      if ($LASTEXITCODE -ne 0) { throw 'Falló la recuperación aislada de archivos/modelos.' }
+    }
+    'Base, archivos y modelos recuperados exclusivamente en contenedor temporal; huellas de archivos comprimidos verificadas.' | Add-Content -LiteralPath (Join-Path $folder 'restore-check.txt')
+  }
   Write-Output 'Respaldo restaurado correctamente en PostgreSQL aislado, sin puertos ni volúmenes persistentes.'
 } finally {
   # Nombre aleatorio creado por esta ejecución; jamás campusitsm ni sus volúmenes.

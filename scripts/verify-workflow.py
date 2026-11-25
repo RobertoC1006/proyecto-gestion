@@ -26,7 +26,7 @@ def main():
             '--tmpfs','/var/lib/postgresql/data','-e','POSTGRES_USER=campusitsm',
             '-e',f'POSTGRES_PASSWORD={password}','-e','POSTGRES_DB=workflow_test','postgres:17-alpine')
         for _ in range(40):
-            if subprocess.run(['docker','exec',database,'pg_isready','-U','campusitsm','-d','workflow_test'],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL).returncode == 0:
+            if subprocess.run(['docker','exec',database,'pg_isready','-h','127.0.0.1','-U','campusitsm','-d','workflow_test'],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL).returncode == 0:
                 break
             time.sleep(1)
         base = ['docker','run','--rm','--network',network,'-e',f'DATABASE_URL={connection}',

@@ -97,7 +97,11 @@ def run(data, root: Path):
                   'from': rows[0]['date'] if rows else None, 'through': rows[-1]['date'] if rows else None, 'origin': data['origin']}
     if len(rows) < 126: return {**provenance, 'status': 'unavailable', 'reason': 'Se necesitan al menos 126 días completos y consecutivos observados.', 'observed': rows, 'forecast': [], 'evaluation': None}
     days = pd.to_datetime(dates); previous = data.get('evaluation')
-    evaluation = evaluate(values, days, events) if data['kind'] == 'evaluate' or not previous else previous
+    if data['kind'] == 'evaluate' or not previous:
+        evaluation = evaluate(values, days, events)
+        evaluation['provenance'] = {'runId': data['runId'], 'origin': data['origin'], 'datasetHash': fingerprint, 'engineVersion': VERSION}
+    else:
+        evaluation = previous
     selected = evaluation['selectedModel']; fitted = None; bounds = None
     if selected == 'sarimax': estimate, bounds, fitted = candidate(values, days, events, (origin - timedelta(days=1)).isoformat())
     else: estimate = baseline(values)
