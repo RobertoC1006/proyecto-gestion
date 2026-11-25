@@ -11,6 +11,6 @@ export class DemandController {
  constructor(private readonly demand:DemandService,private readonly jobs:DemandJobs){}
  @Get() snapshot(@Req()r:AuthRequest,@Query()q:unknown){return this.demand.snapshot(r.campusPrincipal!,q)}
  @Get('config') config(@Req()r:AuthRequest){return this.demand.config(r.campusPrincipal!)}
- @Patch('config') save(@Req()r:AuthRequest,@Body()b:unknown){return this.demand.saveConfig(r.campusPrincipal!,b)}
+ @Patch('config') async save(@Req()r:AuthRequest,@Body()b:unknown){const config=await this.demand.saveConfig(r.campusPrincipal!,b);await this.jobs.refreshAlerts(r.campusPrincipal!.institutionId);return config}
  @Post('runs') async run(@Req()r:AuthRequest,@Body()b:unknown){const run=await this.demand.queue(r.campusPrincipal!,b);await this.jobs.dispatch();return {id:run.id,status:run.status}}
 }

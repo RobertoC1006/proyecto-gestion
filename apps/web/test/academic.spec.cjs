@@ -1,4 +1,5 @@
 const { test, expect } = require('@playwright/test');
+test.beforeEach(async ({ page }) => require('./notifications-fixture.cjs')(page));
 const fs = require('node:fs');
 const path = require('node:path');
 const screenshots = path.resolve(__dirname, '../../../docs/entregas/capturas/calendario');

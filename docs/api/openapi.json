@@ -463,6 +463,74 @@
         ]
       }
     },
+    "/api/v1/academic/imports/preview": {
+      "post": {
+        "operationId": "AcademicController_previewCsv",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "400": {
+            "description": "VALIDATION_ERROR; fields contiene el error de cada campo."
+          },
+          "401": {
+            "description": "Sesión no disponible o inválida."
+          },
+          "403": {
+            "description": "Requiere administrador y protección de escritura."
+          },
+          "404": {
+            "description": "Objeto no visible en la institución."
+          },
+          "409": {
+            "description": "Código duplicado o versión desactualizada."
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Calendario académico — administración"
+        ]
+      }
+    },
+    "/api/v1/academic/imports/confirm": {
+      "post": {
+        "operationId": "AcademicController_confirmCsv",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "400": {
+            "description": "VALIDATION_ERROR; fields contiene el error de cada campo."
+          },
+          "401": {
+            "description": "Sesión no disponible o inválida."
+          },
+          "403": {
+            "description": "Requiere administrador y protección de escritura."
+          },
+          "404": {
+            "description": "Objeto no visible en la institución."
+          },
+          "409": {
+            "description": "Código duplicado o versión desactualizada."
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Calendario académico — administración"
+        ]
+      }
+    },
     "/api/v1/academic/courses": {
       "get": {
         "operationId": "AcademicController_courses",
@@ -2785,6 +2853,221 @@
         ],
         "tags": [
           "Reportes operativos P15"
+        ]
+      }
+    },
+    "/api/v1/demand": {
+      "get": {
+        "operationId": "DemandController_snapshot",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Demanda y evaluación"
+        ]
+      }
+    },
+    "/api/v1/demand/config": {
+      "get": {
+        "operationId": "DemandController_config",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Demanda y evaluación"
+        ]
+      },
+      "patch": {
+        "operationId": "DemandController_save",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Demanda y evaluación"
+        ]
+      }
+    },
+    "/api/v1/demand/runs": {
+      "post": {
+        "operationId": "DemandController_run",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Demanda y evaluación"
+        ]
+      }
+    },
+    "/api/v1/notifications": {
+      "get": {
+        "operationId": "NotificationsController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Notificaciones personales"
+        ]
+      }
+    },
+    "/api/v1/notifications/{id}/read": {
+      "patch": {
+        "operationId": "NotificationsController_read",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Notificaciones personales"
+        ]
+      }
+    },
+    "/api/v1/notifications/events": {
+      "get": {
+        "operationId": "NotificationsController_events",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Notificaciones personales"
+        ]
+      }
+    },
+    "/api/v1/alerts": {
+      "get": {
+        "operationId": "AlertsController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Alertas de demanda"
+        ]
+      }
+    },
+    "/api/v1/alerts/{id}": {
+      "get": {
+        "operationId": "AlertsController_detail",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Alertas de demanda"
+        ]
+      }
+    },
+    "/api/v1/alerts/{id}/review": {
+      "patch": {
+        "operationId": "AlertsController_review",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Alertas de demanda"
         ]
       }
     }

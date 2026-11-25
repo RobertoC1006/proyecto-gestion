@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Area, CartesianGrid, ComposedChart, Legend, Line, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { CalendarDots, ChartLine, Flask, Gauge, Warning } from '@phosphor-icons/react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { Button, Card, CardHeading, EmptyState, Field, Notice, PageHeading, Select } from '../../components/ui'
 import { request } from '../../lib/api/http'
 import { useAuth } from '../auth/AuthContext'
@@ -25,7 +25,7 @@ export function DemandChart({data}:{data:DemandData}){
  return <div className="demand-chart" role="img" aria-label="Demanda observada y pronóstico en tickets por día"><ResponsiveContainer width="100%" height="100%"><ComposedChart data={[...observed,...forecast]} margin={{top:20,right:20,bottom:8,left:0}}><CartesianGrid strokeDasharray="3 3" vertical={false}/><XAxis dataKey="date" tickFormatter={dateLabel} minTickGap={42}/><YAxis width={42}/><Tooltip labelFormatter={v=>dateLabel(String(v))}/><Legend/><ReferenceLine x={result.origin} stroke="#657686" label="Pronóstico"/><Area dataKey="band" name="Intervalo del modelo (95 %)" fill="#b9edda" stroke="none" connectNulls={false}/><Line dataKey="observed" name="Observado" stroke="#008b55" dot={false} strokeWidth={2}/><Line dataKey="predicted" name="Pronóstico" stroke="#0584a8" strokeWidth={2} strokeDasharray="5 4" dot={false}/></ComposedChart></ResponsiveContainer></div>
 }
 export default function DemandPage({evaluation=false}:{evaluation?:boolean}){
- const [source,setSource]=useState('operational'),[message,setMessage]=useState(''),client=useQueryClient(),{user}=useAuth()
+ const [params,setParams]=useSearchParams(),source=params.get('source')==='synthetic'?'synthetic':'operational',setSource=(value:string)=>setParams({source:value}),[message,setMessage]=useState(''),client=useQueryClient(),{user}=useAuth()
  const query=useQuery({queryKey:['demand',source],queryFn:()=>request<DemandData>(`demand?source=${source}`),refetchInterval:5000})
  const data=query.data,result=data?.result,canManage=user?.permissions.includes('configuration:manage')
  const action=useMutation({mutationFn:()=>request('demand/runs',{method:'POST',body:JSON.stringify({source,kind:evaluation?'evaluate':'forecast'})}),onSuccess:()=>{setMessage('Tarea registrada. Los resultados aparecerán al terminar. Repetir no duplica la corrida del día.');void client.invalidateQueries({queryKey:['demand']})},onError:(e:Error)=>setMessage(e.message)})

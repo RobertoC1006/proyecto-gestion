@@ -29,6 +29,7 @@ test('Constancias: emisión reutilizable, huella e integridad', async t => {
       create: async ({ data }) => (stored = { id: certificateId, ...data }),
     },
     certificateVerification: { create: async () => ({ id: randomUUID() }) },
+    notificationEvent: { createMany: async () => ({ count: 1 }) },
   };
   db.$transaction = async callback => callback(db);
   const service = new CertificatesService(db);

@@ -1,4 +1,5 @@
 const { test, expect } = require('@playwright/test');
+test.beforeEach(async ({ page }) => require('./notifications-fixture.cjs')(page));
 
 const actorId = '11111111-1111-4111-8111-111111111111';
 const user = {

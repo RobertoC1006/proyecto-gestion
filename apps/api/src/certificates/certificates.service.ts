@@ -7,6 +7,7 @@ import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import QRCode from 'qrcode';
 import { CampusPrincipal, requirePermission } from '../auth/auth.policy';
 import { PrismaService } from '../database/prisma.service';
+import { publishNotification } from '../notifications/notification.events';
 import { date, invalid, object, positive, text, uuid } from '../academic/academic.validation';
 
 export const certificateServiceLabels: Record<TicketService, string> = {
@@ -172,6 +173,7 @@ export class CertificatesService {
         await tx.certificateVerification.create({
           data: { institutionId: actor.institutionId, certificateId: certificate.id, actorId: actor.id, code, result: 'emitida' },
         });
+        await publishNotification(tx,{id:`certificate:${certificate.id}`,institutionId:actor.institutionId,recipientId:actor.id,type:'certificate',title:'Tu constancia está disponible',body:`Constancia de la incidencia ${ticket.code}. Puedes descargar el PDF original.`,href:'/constancias',isDemo:ticket.isDemo});
         return certificate;
       });
       return this.response(row);

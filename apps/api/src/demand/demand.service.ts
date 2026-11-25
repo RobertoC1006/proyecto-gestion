@@ -76,7 +76,7 @@ export class DemandService {
   try {
    const origin=run.origin.toISOString().slice(0,10),source=demandSource(run.source);
    const data=source==='operational'?await this.observed(run.institutionId,origin):{observed:[],events:[]};
-   const previous=await this.db.forecastRun.findFirst({where:{institutionId:run.institutionId,source,kind:'evaluate',status:'completed'},orderBy:{finishedAt:'desc'}});
+   const previous=await this.db.forecastRun.findFirst({where:{institutionId:run.institutionId,source,kind:'evaluate',status:'completed',origin:{lte:run.origin}},orderBy:{finishedAt:'desc'}});
    const response=await fetch(`${process.env.PREDICTIONS_URL||'http://predictions:8000'}/v1/run`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({runId:id,source,kind:run.kind,origin,...data,evaluation:(previous?.result as unknown as DemandResult|null)?.evaluation}),signal:AbortSignal.timeout(180000)});
    if(!response.ok)throw new Error('PYTHON_UNAVAILABLE');
    const result=await response.json() as DemandResult;

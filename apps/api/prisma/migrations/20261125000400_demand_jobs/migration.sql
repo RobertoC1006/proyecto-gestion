@@ -3,7 +3,7 @@
     SET LOCAL lock_timeout = 30000;
     SET LOCAL idle_in_transaction_session_timeout = 30000;
     SELECT pg_advisory_xact_lock(('x' || encode(sha224((current_database() || '.pgboss.campusitsm')::bytea), 'hex'))::bit(64)::bigint);
-CREATE SCHEMA IF NOT EXISTS campusitsm;
+-- El esquema campusitsm ya existe; el rol migrador no necesita CREATE DATABASE.
 
     CREATE TYPE campusitsm.job_state AS ENUM (
       'created',

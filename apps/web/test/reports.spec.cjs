@@ -1,4 +1,5 @@
 const { test, expect } = require('@playwright/test');
+test.beforeEach(async ({ page }) => require('./notifications-fixture.cjs')(page));
 
 for (const synthetic of [false, true]) {
   test(`P15 renders selected origin: ${synthetic}`, async ({ page }) => {

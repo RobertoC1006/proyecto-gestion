@@ -284,6 +284,8 @@ test('Constancias: HTTP con persistencia real aislada', async t => {
       assert.equal(result.body.ownerId, undefined);
     });
   } finally {
+    await db.notification.deleteMany({ where: { institutionId } });
+    await db.notificationEvent.deleteMany({ where: { institutionId } });
     await db.certificateVerification.deleteMany({ where: { institutionId } });
     await db.certificate.deleteMany({ where: { institutionId } });
     await db.ticket.deleteMany({ where: { institutionId } });

@@ -6,11 +6,12 @@ import { join } from 'node:path';
 import { PrismaService } from '../database/prisma.service';
 import { DemandService } from './demand.service';
 import { addDays, limaDay, Source } from './demand.types';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class DemandJobs implements OnApplicationBootstrap,OnModuleDestroy {
  private boss?: PgBoss; private pool?: Pool; private timer?: NodeJS.Timeout; private sweeping=false;
- constructor(private readonly db:PrismaService,private readonly demand:DemandService){}
+ constructor(private readonly db:PrismaService,private readonly demand:DemandService,private readonly notifications:NotificationsService){}
  async onApplicationBootstrap(){
   if(process.env.CAMPUS_JOBS_ENABLED==='0'||!process.env.DATABASE_URL)return;
   const url=new URL(process.env.DATABASE_URL!);
@@ -22,12 +23,15 @@ export class DemandJobs implements OnApplicationBootstrap,OnModuleDestroy {
   this.boss.on('error',()=>console.error('CAMPUS_JOBS_RETRY: tarea persistente pendiente; no se imprimen credenciales.'));
   await this.boss.start();
   await this.boss.work<{runId:string}>('campus-demand',{batchSize:1,pollingIntervalSeconds:2},async jobs=>{
-   for(const job of jobs)await this.demand.execute(job.data.runId);
+   for(const job of jobs){await this.demand.execute(job.data.runId);await this.notifications.updateAlerts(job.data.runId);await this.notifications.process()}
   });
   await this.boss.work('campus-daily',async()=>{await this.scheduleDue('forecast')});
   await this.boss.work('campus-weekly',async()=>{await this.scheduleDue('evaluate')});
+  await this.boss.work('campus-notices',async()=>{await this.notifications.scanSla();await this.notifications.process()});
   await this.boss.schedule('campus-daily','0 6 * * *',{}, {tz:'America/Lima',missed:'once'});
   await this.boss.schedule('campus-weekly','0 2 * * 0',{}, {tz:'America/Lima',missed:'once'});
+  await this.boss.schedule('campus-notices','* * * * *',{}, {tz:'America/Lima',missed:'once'});
+  await this.boss.send('campus-notices',{}, {singletonKey:'initial'});
   await this.catchUp();
   this.timer=setInterval(()=>{void this.catchUp().catch(()=>console.error('CAMPUS_JOBS_SWEEP_RETRY'))},30000);this.timer.unref();
  }
@@ -54,5 +58,12 @@ export class DemandJobs implements OnApplicationBootstrap,OnModuleDestroy {
   }finally{this.sweeping=false}
  }
  async dispatch(){await this.catchUp()}
+ async refreshAlerts(institutionId:string){
+  for(const source of ['operational','synthetic']){
+   const run=await this.db.forecastRun.findFirst({where:{institutionId,source,status:'completed'},orderBy:[{origin:'desc'},{finishedAt:'desc'}]});
+   if(run)await this.notifications.updateAlerts(run.id);
+  }
+  await this.notifications.process();
+ }
  async onModuleDestroy(){if(this.timer)clearInterval(this.timer);await this.boss?.stop({graceful:true,timeout:10000});await this.pool?.end()}
 }

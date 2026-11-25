@@ -44,8 +44,9 @@ def main():
         VALUES ('{certificate}','{institution}','{ticket}','{owner}','{code}','INC-UPGRADE','correo','2026-11-24T10:00:00Z','{digest}','certificates/{institution}/{ticket}.pdf');''')
         before = sql(f'''SELECT row_to_json(c)::text FROM "Certificate" c WHERE id='{certificate}';''')
         all_paths = sorted((ROOT/'apps/api/prisma/migrations').glob('*/migration.sql'))
+        sql('CREATE SCHEMA campusitsm;')
         pending = [path for path in all_paths if path.relative_to(ROOT).as_posix() not in old]
-        assert len(pending) == 3
+        assert len(pending) == 6
         for path in pending:
             sql(path.read_text(encoding='utf-8'))
         assert sql(f'''SELECT row_to_json(c)::text FROM "Certificate" c WHERE id='{certificate}';''') == before
@@ -53,7 +54,7 @@ def main():
         assert sql(f'''SELECT count(*) FROM "CertificateVerification" WHERE "certificateId"='{certificate}' AND result='emitida' AND "actorId"='{owner}';''').strip() == '1'
         assert sql('''SELECT has_table_privilege('campusitsm_api','"Certificate"','UPDATE') OR has_table_privilege('campusitsm_api','"Certificate"','DELETE');''').strip() == 'f'
         assert sql('''SELECT is_nullable FROM information_schema.columns WHERE table_name='TicketChange' AND column_name='actorId';''').strip() == 'YES'
-        print('OK: doce SQL originales intactos; tres migraciones aditivas; constancia original idéntica; evento histórico recuperado; privilegios inmutables y actor automático comprobados.')
+        print('OK: doce SQL originales intactos; seis migraciones aditivas; constancia original idéntica; evento histórico recuperado; privilegios inmutables y actor automático comprobados.')
     finally:
         subprocess.run(['docker','rm','-f',container],cwd=ROOT,check=False,capture_output=True)
 

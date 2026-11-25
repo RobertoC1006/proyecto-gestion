@@ -459,3 +459,50 @@ model ForecastRun {
   @@unique([institutionId, source, kind, slot])
   @@index([institutionId, source, status, createdAt(sort: Desc)])
 }
+
+model DemandAlert {
+ id String @id @default(uuid()) @db.Uuid
+ institutionId String @db.Uuid
+ source String @db.VarChar(20)
+ weekStart DateTime @db.Date
+ runId String @db.Uuid
+ expected Float
+ capacity Int
+ active Boolean @default(true)
+ reviewedAt DateTime? @db.Timestamptz(3)
+ reviewedById String? @db.Uuid
+ reviewReason String? @db.VarChar(500)
+ updatedAt DateTime @updatedAt @db.Timestamptz(3)
+ @@unique([institutionId,source,weekStart])
+}
+
+model Notification {
+ id String @id @default(uuid()) @db.Uuid
+ institutionId String @db.Uuid
+ recipientId String @db.Uuid
+ eventKey String @db.VarChar(180)
+ type String @db.VarChar(32)
+ title String @db.VarChar(160)
+ body String @db.VarChar(500)
+ href String @db.VarChar(200)
+ isDemo Boolean @default(false)
+ readAt DateTime? @db.Timestamptz(3)
+ createdAt DateTime @default(now()) @db.Timestamptz(3)
+ @@unique([recipientId,eventKey])
+ @@index([institutionId,recipientId,createdAt(sort: Desc)])
+}
+
+// Outbox transaccional: los módulos publican en la misma transacción que el cambio.
+model NotificationEvent {
+ id String @id @db.VarChar(180)
+ institutionId String @db.Uuid
+ recipientId String @db.Uuid
+ type String @db.VarChar(32)
+ title String @db.VarChar(160)
+ body String @db.VarChar(500)
+ href String @db.VarChar(200)
+ isDemo Boolean @default(false)
+ createdAt DateTime @default(now()) @db.Timestamptz(3)
+ processedAt DateTime? @db.Timestamptz(3)
+ @@index([processedAt,createdAt])
+}

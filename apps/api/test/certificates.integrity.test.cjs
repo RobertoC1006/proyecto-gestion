@@ -63,6 +63,7 @@ async function fixture(t, sentinel = false) {
       const result = await callback({
         $queryRaw: async () => [],
         certificateVerification: db.certificateVerification,
+        notificationEvent: { createMany: async () => ({ count: 1 }) },
         ticket: { findFirst: async ({ where }) => matches(ticket, where) ? { ...ticket } : null },
         institution: { findUnique: async () => ({ name: 'Institución original' }) },
         certificate: {

@@ -34,6 +34,8 @@ def main():
                 '-e','SUPABASE_PUBLISHABLE_KEY=sb_publishable_test_only',
                 '-e','AUTH_ENCRYPTION_KEY=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=',
                 '-e','AUTH_INSTITUTION_CODE=AUTH-TEST','campusitsm-workflow-test:local']
+        # El esquema de colas es explícito; producción ya posee campusitsm.
+        run('docker','exec',database,'psql','-U','campusitsm','-d','workflow_test','-c','CREATE SCHEMA campusitsm')
         run(*base,'node','prisma/deploy.cjs')
         result = run(*base,'node','--test','--test-concurrency=1',*tests,check=False)
         if result.returncode:

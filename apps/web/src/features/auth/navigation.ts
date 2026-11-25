@@ -1,4 +1,4 @@
-import { BookOpen, CalendarDots, ChartBar, ClipboardText, Gear, House, Key, ShieldCheck, Users, type Icon } from '@phosphor-icons/react'
+import { Bell, BookOpen, CalendarDots, ChartBar, ClipboardText, Gear, House, Key, ShieldCheck, Users, type Icon } from '@phosphor-icons/react'
 import type { CurrentUser } from './AuthContext'
 import { access, hasAccess } from './access'
 
@@ -12,6 +12,8 @@ export type NavigationItem = {
 
 const dashboard: NavigationItem = { label: 'Dashboard', description: 'Tu espacio de trabajo en CampusITSM.', icon: House, to: '/', permissions: [] }
 const navigation: NavigationItem[] = [
+  { label: 'Notificaciones', description: 'Consulta tus avisos personales.', icon: Bell, to: '/notificaciones', permissions: [] },
+  { label: 'Alertas', description: 'Revisa las alertas de capacidad.', icon: Bell, to: '/alertas', permissions: ['reports:read:institution'] },
   { label: 'Demanda', description: 'Consulta el pronóstico de demanda.', icon: ChartBar, to: '/demanda', permissions: ['reports:read:institution'] },
   { label: 'Modelos', description: 'Compara la evaluación temporal de los modelos.', icon: ChartBar, to: '/modelos', permissions: ['reports:read:institution'] },
   { label: 'Mis incidencias', description: 'Consulta tus incidencias y su seguimiento.', icon: ClipboardText, to: '/incidencias', permissions: access.personalTickets },

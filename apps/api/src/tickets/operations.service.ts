@@ -8,6 +8,7 @@ import { invalid, object, positive, reason, text, uuid } from '../academic/acade
 import { calculate, defaultRules, policyInput, Rule } from './priority';
 import { ticketResponse } from './tickets.service';
 import { ticketsQuery } from './tickets.validation';
+import { publishNotification } from '../notifications/notification.events';
 
 const json = (v: unknown): Prisma.InputJsonValue => JSON.parse(JSON.stringify(v));
 const conflict = () => new ConflictException({ code: 'CONFLICT', message: 'El ticket cambió. Actualiza antes de continuar.' });
@@ -93,6 +94,12 @@ export class OperationsService {
    const result=await tx.ticket.updateMany({where:{id,institutionId:actor.institutionId,version},data:patch}); if (result.count!==1) throw conflict();
    const after=await tx.ticket.findUniqueOrThrow({where:{id}});
    await tx.ticketChange.create({data:{ticketId:id,institutionId:actor.institutionId,actorId:actor.id,action:String(b.action),note,before:json(ticketResponse(before,true)),after:json(ticketResponse(after,true))}});
+   if(b.action==='assign'||b.action==='start'||b.action==='resolve'){
+    const recipientId=b.action==='assign'?after.assigneeId!:after.ownerId;
+    await publishNotification(tx,{id:`ticket:${after.id}:${after.version}:${b.action}`,institutionId:after.institutionId,recipientId,
+     type:b.action==='resolve'?'resolution':'assignment',title:b.action==='resolve'?'Incidencia resuelta':b.action==='assign'?'Nueva incidencia asignada':'Atención de tu incidencia iniciada',
+     body:`Incidencia ${after.code}. Consulta el seguimiento para revisar el detalle.`,href:b.action==='assign'?`/ti/tickets/${after.id}`:`/incidencias/${after.id}`,isDemo:after.isDemo});
+   }
    return ticketResponse(after,true);
   });
  }

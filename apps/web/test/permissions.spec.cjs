@@ -1,4 +1,5 @@
 const { test, expect } = require('@playwright/test');
+test.beforeEach(async ({ page }) => require('./notifications-fixture.cjs')(page));
 const path = require('node:path');
 const original = require('./fixtures/role-matrix.json');
 const screenshots = path.resolve(__dirname, '../../../.local/verification/roles-permisos');

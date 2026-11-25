@@ -1,5 +1,5 @@
 import CoursesPage from './features/academic/CoursesPage'
-import { StrictMode } from 'react'
+import { lazy, StrictMode, Suspense } from 'react'
 import { createRoot } from 'react-dom/client'
 import RootLayout from './app/layout'
 import HomePage from './app/page'
@@ -22,7 +22,9 @@ import RolePermissionsPage from './features/permissions/RolePermissionsPage'
 import UsersPage from './features/users/UsersPage'
 import PrivacyPage from './features/privacy/PrivacyPage'
 import ReportsPage from './features/reports/ReportsPage'
-import DemandPage from './features/demand/DemandPage'
+import NotificationsPage from './features/notifications/NotificationsPage'
+const DemandPage = lazy(() => import('./features/demand/DemandPage'))
+const AlertsPage = lazy(() => import('./features/demand/AlertsPage'))
 import { AuthProvider } from './features/auth/AuthContext'
 import { SessionBoundary, PermissionBoundary } from './features/auth/AccessBoundary'
 import { access } from './features/auth/access'
@@ -49,6 +51,7 @@ function App() {
   return (
     <SessionBoundary>
     <RootLayout>
+      <Suspense fallback={<Notice>Cargando la pantalla…</Notice>}>
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/admin/permisos" element={<PermissionBoundary permissions={access.permissions}><RolePermissionsPage /></PermissionBoundary>} />
@@ -56,6 +59,9 @@ function App() {
         <Route path="/reportes" element={<PermissionBoundary permissions={access.reports}><ReportsPage /></PermissionBoundary>} />
         <Route path="/demanda" element={<PermissionBoundary permissions={['reports:read:institution']}><DemandPage /></PermissionBoundary>} />
         <Route path="/modelos" element={<PermissionBoundary permissions={['reports:read:institution']}><DemandPage evaluation /></PermissionBoundary>} />
+        <Route path="/alertas" element={<PermissionBoundary permissions={['reports:read:institution']}><AlertsPage /></PermissionBoundary>} />
+        <Route path="/alertas/:id" element={<PermissionBoundary permissions={['reports:read:institution']}><AlertsPage /></PermissionBoundary>} />
+        <Route path="/notificaciones" element={<NotificationsPage />} />
         <Route path="/profesor/calendario/nuevo" element={<PermissionBoundary permissions={["academic:teach"]}><EventForm /></PermissionBoundary>} />
         <Route path="/profesor/calendario/:id/editar" element={<PermissionBoundary permissions={["academic:teach"]}><EventForm /></PermissionBoundary>} />
         <Route path="/admin/configuracion" element={<PermissionBoundary permissions={access.configuration}><PolicyPage /></PermissionBoundary>} />
@@ -76,6 +82,7 @@ function App() {
         <Route path="/ti/tickets/:id" element={<PermissionBoundary permissions={access.teamTickets}><WorkflowDetail operational /></PermissionBoundary>} />
         <Route path="*" element={<Notice tone="amber" role="alert">Esta página no está disponible.</Notice>} />
       </Routes>
+      </Suspense>
     </RootLayout>
     </SessionBoundary>
   )

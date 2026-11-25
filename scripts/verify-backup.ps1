@@ -16,9 +16,10 @@ try {
   }
   & docker cp $dump "${container}:/tmp/backup.dump"
   if ($LASTEXITCODE -ne 0) { throw 'No se pudo copiar el respaldo.' }
+  'CREATE ROLE campusitsm_api NOLOGIN; CREATE ROLE campusitsm_migrator NOLOGIN; CREATE ROLE anon NOLOGIN; CREATE ROLE authenticated NOLOGIN;' | & docker exec -i $container psql -v ON_ERROR_STOP=1 -U postgres | Out-Null
   & docker exec $container pg_restore --exit-on-error --no-owner --no-privileges -U postgres -d postgres /tmp/backup.dump
   if ($LASTEXITCODE -ne 0) { throw 'Falló la restauración.' }
-  $result = 'SELECT count(*) FROM information_schema.tables WHERE table_schema=''public''; SELECT count(*) FROM "AppUser"; SELECT count(*) FROM "AcademicEvent";' | & docker exec -i $container psql -v ON_ERROR_STOP=1 -U postgres -At
+  $result = 'SET search_path=campusitsm,public; SELECT count(*) FROM information_schema.tables WHERE table_schema IN (''campusitsm'',''public''); SELECT count(*) FROM "AppUser"; SELECT count(*) FROM "AcademicEvent";' | & docker exec -i $container psql -v ON_ERROR_STOP=1 -U postgres -At
   if ($LASTEXITCODE -ne 0) { throw 'Falló la comprobación del respaldo restaurado.' }
   $result | Set-Content -LiteralPath (Join-Path $folder 'restore-check.txt')
   Write-Output 'Respaldo restaurado correctamente en PostgreSQL aislado, sin puertos ni volúmenes persistentes.'

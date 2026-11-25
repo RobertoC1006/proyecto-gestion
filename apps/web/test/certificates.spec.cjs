@@ -1,4 +1,5 @@
 const { test, expect } = require('@playwright/test');
+test.beforeEach(async ({ page }) => require('./notifications-fixture.cjs')(page));
 const code = 'CITS-' + 'A'.repeat(20);
 const other = 'CITS-' + 'B'.repeat(20);
 const result = { code, holder: 'Y***', service: 'Equipo de cómputo', resolvedAt: '2026-11-20T10:00:00Z', issuedAt: '2026-11-20T11:00:00Z', status: 'valida' };

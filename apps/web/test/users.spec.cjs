@@ -1,4 +1,5 @@
 const { test, expect } = require('@playwright/test');
+test.beforeEach(async ({ page }) => require('./notifications-fixture.cjs')(page));
 const path = require('node:path');
 const fs = require('node:fs');
 const initialUsers = [
