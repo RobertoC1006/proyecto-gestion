@@ -24,7 +24,7 @@ test('IA: proyección privada, cambios atómicos auditados y respuesta tardía p
       sent = JSON.parse(options.body);
       return { ok: true, json: async () => ({ choices: [{ message: { content: JSON.stringify({service:'aula_virtual',urgency:3,impact:2,explanation:'Propuesta ficticia de aula virtual.'}) } }] }) };
     };
-    const create = () => db.ticket.create({data:{institutionId,ownerId,code:randomUUID(),description,service:'correo',scope:'general',idempotencyKey:randomUUID(),requestHash:'a'.repeat(64)}});
+    const create = (ticketDescription = description) => db.ticket.create({data:{institutionId,ownerId,code:randomUUID(),description:ticketDescription,service:'correo',scope:'general',idempotencyKey:randomUUID(),requestHash:'a'.repeat(64)}});
     const academic = {context:async()=>({factor:1,reason:'Sin contexto académico aplicable'})};
     const service = new TicketAiService(db, academic);
     const original = await create(), classified = await service.classify(original);
@@ -40,6 +40,12 @@ test('IA: proyección privada, cambios atómicos auditados y respuesta tardía p
     assert.equal(audit.items[0].actor,'Sistema de clasificación');
     await service.classify(original);
     assert.equal(await db.ticketChange.count({where:{ticketId:original.id}}),1);
+    const ambiguous = await create('No es la impresora; falla el wifi del salón.');
+    const manual = await service.classify(ambiguous);
+    assert.equal(manual.classificationStatus, 'revision_manual');
+    assert.equal(manual.aiFailureCode, 'ambiguous_signals');
+    assert.equal(manual.service, 'correo');
+    assert.equal((await db.ticketChange.findFirst({where:{ticketId:ambiguous.id}})).action, 'ai.fallback');
     delete process.env.GROQ_API_KEY;
     const fallback = await create();
     assert.equal((await service.classify(fallback)).classificationStatus,'revision_manual');
