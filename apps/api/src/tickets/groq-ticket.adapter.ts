@@ -1,6 +1,6 @@
 import { TicketService } from '@prisma/client';
 
-export const GROQ_ADAPTER_VERSION = '4';
+export const GROQ_ADAPTER_VERSION = '5';
 export const GROQ_MODEL = process.env.GROQ_MODEL || 'openai/gpt-oss-20b';
 export type TicketProposal = { service: TicketService; urgency: number; impact: number; explanation: string };
 export type AiFailureCode = 'not_configured' | 'rate_limited' | 'timeout' | 'unavailable' | 'invalid_response' | 'insufficient_signals' | 'ambiguous_signals';
@@ -26,7 +26,7 @@ function signalsFor(description: string) {
   // "mi cuenta" también puede referirse al correo, Moodle o Drive.
   if (!matched.length && /cuenta|acceso|sesion|contrasena|login/.test(normalized)) matched.push('cuenta y acceso');
   const conditions: [RegExp, string][] = [
-    [/no puedo|no permite|no funciona|no enciende|imposible|bloque|rebota/, 'servicio bloqueado'],
+    [/no puedo|no permite|no funciona|\bno\s+(?:prende|enciende|abre|envia|carga|arranca|responde)\b|imposible|bloque|rebota/, 'servicio bloqueado'],
     [/lento|tard|demora|intermiten/, 'lentitud o intermitencia'],
     [/congela|por momentos/, 'intermitencia'], [/error|falla|fallo/, 'error tecnico'],
     [/mancha pequena|aviso molesto/, 'molestia menor'],
@@ -36,8 +36,13 @@ function signalsFor(description: string) {
     [/examen|evaluacion/, 'evaluacion academica'],
     [/entrega|tarea|trabajo/, 'entrega academica'],
   ];
-  const conditionsMatched = conditions.filter(([pattern]) => pattern.test(normalized)).map(([, label]) => label);
-  if (!conditionsMatched.some(label => label.startsWith('afecta a')) && /\bmi\b|\bme\b/.test(normalized)) {
+  const matchedConditions = conditions.filter(([pattern]) => pattern.test(normalized)).map(([, label]) => label);
+  // Una sola señal de alcance: "todo el grupo de mi curso" no son tres impactos.
+  const impact = ['afecta a varias personas', 'afecta a un grupo o curso', 'afecta a una persona']
+    .find(label => matchedConditions.includes(label));
+  const conditionsMatched = matchedConditions.filter(label => !label.startsWith('afecta a'));
+  if (impact) conditionsMatched.push(impact);
+  else if (/\bmi\b|\bme\b/.test(normalized)) {
     conditionsMatched.push('afecta a una persona');
   }
   return { services: matched, conditions: conditionsMatched };

@@ -63,3 +63,24 @@ test('La respuesta tardía no modifica un ticket corregido por TI', async () => 
   const result = await new TicketAiService(db, {}).classify(ticket);
   assert.equal(result, corrected);
 });
+
+test('Las frases de bloqueo conservan su significado sin enviar la descripción original', () => {
+  for (const description of [
+    'Mi computadora no prende y soy la única persona afectada.',
+    'El correo institucional no envía mensajes para todo el grupo.',
+    'Moodle no abre para todo el grupo durante una evaluación.',
+  ]) {
+    const projection = technicalDescription(description);
+    assert.match(projection, /servicio bloqueado/, description);
+    assert.ok(!projection.includes(description));
+  }
+});
+
+test('El impacto colectivo no se degrada con señales de grupo o individuales simultáneas', () => {
+  const collective = technicalDescription('Moodle no abre para todo el grupo de mi curso.');
+  assert.match(collective, /afecta a varias personas/);
+  assert.doesNotMatch(collective, /afecta a un grupo o curso|afecta a una persona/);
+  const group = technicalDescription('El proyector del aula no enciende para todo el curso.');
+  assert.match(group, /afecta a un grupo o curso/);
+  assert.doesNotMatch(group, /afecta a varias personas|afecta a una persona/);
+});

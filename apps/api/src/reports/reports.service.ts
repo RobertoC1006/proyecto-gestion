@@ -174,7 +174,7 @@ export class ReportsService {
       source: 'tickets-operational' as const,
       synthetic: rows.some(row => row.isDemo),
       forecastStatus: 'unavailable' as const,
-      forecastMessage: 'El servicio de pronóstico de Roberto no está publicado en esta versión; no hay datos pronosticados disponibles.',
+      forecastMessage: 'Este reporte muestra el histórico operativo filtrado. El pronóstico institucional se consulta por separado en Demanda y Modelos; todavía no se combina con estos filtros.',
       filters: {
         from: q.from.toISOString(),
         to: q.to.toISOString(),
