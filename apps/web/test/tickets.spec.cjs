@@ -2,8 +2,17 @@ const { test, expect } = require('@playwright/test');
 test.beforeEach(async ({ page }) => require('./notifications-fixture.cjs')(page));
 const path = require('node:path');
 const fs = require('node:fs');
-const shots = fs.mkdtempSync(path.join(require('node:os').tmpdir(), 'campusitsm-tickets-'));
-test.afterAll(() => fs.rmSync(shots, { recursive: true, force: true }));
+const shots = process.env.TICKET_VISUAL_SHOTS
+  ? path.resolve(process.env.TICKET_VISUAL_SHOTS)
+  : fs.mkdtempSync(path.join(require('node:os').tmpdir(), 'campusitsm-tickets-'));
+fs.mkdirSync(shots, { recursive: true });
+test.afterAll(() => { if (!process.env.TICKET_VISUAL_SHOTS) fs.rmSync(shots, { recursive: true, force: true }); });
+async function mobileCapture(page, filename) {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(page.locator('.sidebar')).toBeHidden();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.screenshot({ path: path.join(shots, filename), fullPage: true, animations: 'disabled' });
+}
 if (process.env.PLAYWRIGHT_CHROME_PATH) test.use({ launchOptions: { executablePath: process.env.PLAYWRIGHT_CHROME_PATH } });
 
 const user = { id: '11111111-1111-4111-8111-111111111111', institutionId: '22222222-2222-4222-8222-222222222222',
@@ -44,6 +53,9 @@ test('General no consulta cursos y envía los campos académicos nulos', async (
   await page.goto('/incidencias/nueva');
   await page.getByRole('textbox', { name: /Descripción del problema/ }).fill(ticket.description);
   await page.getByRole('combobox', { name: /Servicio afectado/ }).selectOption('correo');
+  await page.screenshot({ path: path.join(shots, 'p03-desktop-fixture.png'), fullPage: true });
+  await mobileCapture(page, 'p03-mobile-fixture.png');
+  await page.setViewportSize({ width: 1440, height: 900 });
   await page.getByRole('button', { name: 'Enviar incidencia' }).click();
   await expect(page).toHaveURL(new RegExp(`/incidencias/registrada/${id}$`));
   expect(courseLookups).toBe(0);
@@ -99,6 +111,8 @@ test('P02–P05 muestran un ticket real, sin prioridad ni clasificación inventa
   await expect(page.getByText('Clasificación pendiente', { exact: true })).toBeVisible();
   await expect(page.getByText('Aún no calculada')).toBeVisible();
   await page.screenshot({ path: path.join(shots, 'p04-desktop.png'), fullPage: true });
+  await mobileCapture(page, 'p04-mobile-fixture.png');
+  await page.setViewportSize({ width: 1440, height: 900 });
   expect(calls).toBe(1);
   await page.goto('/incidencias');
   await expect(page.getByText(ticket.code)).toBeVisible();
@@ -129,13 +143,19 @@ test('P02–P05 muestran un ticket real, sin prioridad ni clasificación inventa
     }
   }
   await page.screenshot({ path: path.join(shots, 'p05-desktop.png'), fullPage: true });
+  await mobileCapture(page, 'p05-mobile-fixture.png');
+  await page.setViewportSize({ width: 1440, height: 900 });
   await page.getByText(ticket.code).click();
   await expect(page.getByRole('heading', { name: 'Seguimiento de incidencia' })).toBeVisible();
+  await page.screenshot({ path: path.join(shots, 'ticket-detail-desktop-fixture.png'), fullPage: true });
+  await mobileCapture(page, 'ticket-detail-mobile-fixture.png');
   await page.goto('/');
   await expect(page.getByText(ticket.code)).toBeVisible();
-  await page.setViewportSize({ width: 390, height: 844 });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.screenshot({ path: path.join(shots, 'p02-mobile.png'), fullPage: true });
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await expect(page.locator('.sidebar')).toBeVisible();
+  await page.screenshot({ path: path.join(shots, 'p02-desktop-fixture.png'), animations: 'disabled' });
 });
 
 test('P05 refreshes personal counts when another session resolves a ticket', async ({ page }) => {

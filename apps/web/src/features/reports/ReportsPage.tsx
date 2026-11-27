@@ -3,6 +3,8 @@ import { useQuery } from '@tanstack/react-query'
 import { ChartLine, Download, Funnel, Info } from '@phosphor-icons/react'
 import { Button, Card, EmptyState, Field, Notice, PageHeading, Select } from '../../components/ui'
 import { request } from '../../lib/api/http'
+import { Link } from 'react-router-dom'
+import { useAuth } from '../auth/AuthContext'
 import { ticketServices } from '../../lib/api/tickets'
 import './reports.css'
 
@@ -28,6 +30,7 @@ const toInputDate = (value: Date) => new Intl.DateTimeFormat('en-CA', { timeZone
 
 
 export default function ReportsPage() {
+  const { user } = useAuth()
   const now = new Date()
   const [draft, setDraft] = useState({
     from: toInputDate(new Date(now.getTime() - 42 * 86400000)),
@@ -110,7 +113,7 @@ export default function ReportsPage() {
         <div className="reports-grid">
           <Card className="reports-chart-card">
             <h2>Demanda observada</h2>
-            <p className="body-muted">Tickets creados por periodo. El pronóstico no está disponible.</p>
+            <p className="body-muted">Tickets creados por periodo, con los filtros del reporte.</p>
             <div className="reports-chart" role="img" aria-label="Gráfico de demanda observada por periodo">
               {data.series.map(item => <div className="reports-bar" key={item.period}>
                 <span className="reports-bar__value">{item.observed}</span>
@@ -131,7 +134,8 @@ export default function ReportsPage() {
       )}
 
       <Notice tone="amber" icon={Info} role="status">
-        <strong>Pronóstico no disponible.</strong> {data.forecastMessage} Fuente: `Tickets operativos`; Incluye tickets de demostración: {data.synthetic ? 'Sí' : 'No'}.
+        <strong>Histórico operativo filtrado.</strong> {data.forecastMessage} Fuente: `Tickets operativos`; Incluye tickets de demostración: {data.synthetic ? 'Sí' : 'No'}.
+        {user?.permissions.includes('reports:read:institution') && <p><Link className="text-link" to="/demanda">Consultar demanda institucional</Link> · <Link className="text-link" to="/modelos">Evaluación del modelo</Link></p>}
       </Notice>
     </>}
   </section>

@@ -1,5 +1,16 @@
 # Coordinación de cambios en la base compartida
 
+## Verificación del cierre de integración — 27 de noviembre de 2026
+
+La integración de Johan `5833298` y la corrección del adaptador Groq a v5 no
+cambian Prisma ni SQL. No se ejecutó el comando remoto de migración. Lectura
+actual desde la API: proyecto CampusITSM, rol campusitsm_api, esquema campusitsm,
+TLS activo y 18 entradas finalizadas/checksums exactos contra el repositorio.
+La validación de 153 pruebas API se ejecutó únicamente en PostgreSQL temporal,
+con las 18 migraciones, sin leer .env ni escribir pruebas sobre la base común.
+Docker normal reconstruyó la instalación sin reset, db push, seed ni borrado
+de volúmenes. No confundir esta verificación con una nueva aplicación de SQL.
+
 ## Demanda, tareas y notificaciones — 25 de noviembre de 2026
 
 Autorización: «termina mi parte» y autorización previa de correcciones, migraciones
