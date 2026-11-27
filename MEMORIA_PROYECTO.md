@@ -1,5 +1,42 @@
 # Memoria de CampusITSM
 
+## Cierre de integración de Roberto — 27 de noviembre de 2026
+
+Roberto encargó cerrar y subir su parte. Sus módulos ya estaban en main
+`d80171f`; esta entrega termina la integración nueva de Johan `5833298`,
+conservando su commit como ancestro y sus evidencias de clasificación/CU01.
+Las ramas publicadas de Jasmine no presentaron cambios respecto del corte anterior.
+
+Adaptador Groq v5: conserva señales de bloqueo para «no prende», «no envía» y
+«no abre» y emite un solo alcance de impacto, evitando señales contradictorias.
+Dos regresiones reprodujeron los defectos en v4 y pasan tras la corrección.
+Se mantienen proyección de etiquetas cerradas, fallback sin servicio/por
+ambigüedad, validación de respuesta, historial atómico y revisión de TI.
+No se cambió el proveedor ni se envían descripciones completas.
+
+Reportes ya no afirma que el pronóstico de Roberto no está publicado. Muestra
+su histórico filtrado y ofrece enlaces a Demanda/Modelos solo con permiso
+institucional. Esto no combina un pronóstico global con filtros de categoría,
+estado o equipo: la comparación integrada en P15 sigue con Jasmine.
+
+Validación actual: API/web compilan, 153 pruebas API con PostgreSQL temporal y
+64 de navegador aprobadas. Única instalación campusitsm reconstruida y saludable
+en localhost:8080. Lectura real: campusitsm_api, esquema campusitsm, TLS y 18
+checksums aplicados coincidentes. Sin migraciones nuevas, reset, db push ni seed
+compartido; sesiones, credenciales, volúmenes y outputs existentes conservados.
+
+Johan documentó la prueba real de Groq y CU01 sobre v4 y dos reservas sintéticas
+con resultados por caso. Esas métricas permanecen históricas: no corresponden a
+v5. Esta instalación continúa sin GROQ_API_KEY; v5 se comprobó funcionalmente
+con dobles/aislamiento y no se atribuye una nueva exactitud real al proveedor.
+Ampliar/repetir evaluación independiente corresponde al cierre de calidad de IA.
+
+La implementación e integración de Roberto quedan cerradas en esta entrega.
+Siguen pendientes del equipo: P15 integrado, aceptación de privacidad/consentimiento
+y el recorrido real completo de CU02 con PDF original/alterado. Adjuntos y
+publicación pública siguen fuera de este cierre. Comprobar el SHA remoto al
+retomar, sin confundir los registros históricos que siguen con el estado vigente.
+
 ## Cierre del bloque de Roberto — 25 de noviembre de 2026
 
 Encargo vigente: terminar su parte completa, sin depender de nuevos desarrollos

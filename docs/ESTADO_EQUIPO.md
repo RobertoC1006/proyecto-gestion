@@ -1,4 +1,28 @@
-# Estado del equipo — actualización del 25 de noviembre de 2026
+# Estado del equipo — actualización del 27 de noviembre de 2026
+
+## Cierre vigente de implementación e integración de Roberto
+
+Entrega nueva de Johan `5833298` incorporada con historia conservada. Corrección
+de integración: adaptador v5 conserva bloqueo y unifica impacto, sin enviar texto
+libre a Groq. API/web compilan; 153 pruebas API y 64 de navegador aprobadas sobre
+el candidato. localhost:8080 reconstruido, tres servicios saludables y 18
+checksums reales coincidentes. No se aplicaron migraciones ni se alteraron volúmenes.
+
+| Responsable | Estado vigente | Pendiente fuera del cierre de Roberto |
+| --- | --- | --- |
+| Roberto | Calendario/CSV, contexto/SLA, pronóstico/evaluación, alertas/avisos e integración de la última entrega de Johan completados | Coordinar aceptación conjunta; no falta otro módulo propio por desarrollar. |
+| Johan | Clasificación y CU01 entregados con evaluación y evidencia autenticada v4; correcciones v5 de integración probadas | Reevaluar precisión de v5 con una reserva independiente. No reutilizar 7/11 de urgencia u otros resultados v4 como medición de v5. |
+| Jasmine | Módulos ya integrados sin nuevos commits en sus ramas al revisar el 27/11 | P15 observado/pronosticado con el contrato común, privacidad/consentimiento y aceptación CU02 con PDF propio. |
+
+Reportes indica correctamente que Demanda/Modelos contienen el pronóstico
+institucional y ofrece acceso según permisos. El reporte filtrado mantiene
+forecast=null: no hay una predicción por equipo/categoría/estado inventada.
+La clave privada de Groq no está configurada en esta instalación; el proveedor
+real fue probado en la entrega documentada de Johan, no durante esta regresión.
+No se volvió a ejecutar un recorrido autenticado hoy; se conservan las evidencias
+previas con sus versiones. Adjuntos y despliegue público continúan aplazados.
+
+Los apartados fechados el 25/11 que siguen se conservan como antecedentes.
 
 ## Bloque de Roberto completado y validado
 
