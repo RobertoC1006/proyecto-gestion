@@ -84,3 +84,12 @@ test('El impacto colectivo no se degrada con señales de grupo o individuales si
   assert.match(group, /afecta a un grupo o curso/);
   assert.doesNotMatch(group, /afecta a varias personas|afecta a una persona/);
 });
+
+test('El curso Redes y el correo de contacto no generan otra categoría de servicio', () => {
+  const course = technicalDescription('El aula virtual no carga para los alumnos de la clase de Redes.');
+  assert.match(course, /aula virtual/);
+  assert.doesNotMatch(course, /red e internet/);
+  const contact = technicalDescription('Mi correo de contacto es falso@example.test; la impresora no responde.');
+  assert.match(contact, /impresora/);
+  assert.doesNotMatch(contact, /correo institucional|falso@example\.test/);
+});

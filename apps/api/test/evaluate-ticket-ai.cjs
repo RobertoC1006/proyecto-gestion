@@ -4,7 +4,7 @@ const { join } = require('node:path');
 const { classifyWithGroq, technicalDescription, GROQ_MODEL, GROQ_ADAPTER_VERSION } = require('../dist/tickets/groq-ticket.adapter');
 const dataset = JSON.parse(readFileSync(join(__dirname, 'fixtures/ticket-ai-evaluation.json'), 'utf8'));
 const split = process.argv[2] || 'holdout';
-if (!['development', 'holdout', 'holdout2'].includes(split)) throw Error('Usa development, holdout o holdout2.');
+if (!['development', 'holdout', 'holdout2', 'holdout3', 'holdout4'].includes(split)) throw Error('Usa development, holdout, holdout2, holdout3 o holdout4.');
 if (!process.env.GROQ_API_KEY) throw Error('Falta GROQ_API_KEY; no se ejecutó la evaluación.');
 
 (async () => {

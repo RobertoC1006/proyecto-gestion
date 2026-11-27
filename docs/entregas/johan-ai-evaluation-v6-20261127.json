@@ -1,0 +1,242 @@
+{
+  "split": "holdout4",
+  "cases": 15,
+  "categories": [
+    "aula_virtual",
+    "wifi_red",
+    "correo",
+    "equipos",
+    "impresoras",
+    "cuentas_accesos",
+    "videoconferencia",
+    "sistemas_institucionales",
+    "almacenamiento_nube",
+    "software_licencias"
+  ],
+  "provider": "groq",
+  "model": "openai/gpt-oss-20b",
+  "adapterVersion": "6",
+  "measuredAt": "2026-11-27T21:38:42.704Z",
+  "rubric": "Servicio: categoría del componente averiado, no del evento académico. Urgencia: 3 bloqueo total, 2 degradación, 1 molestia menor. Impacto: 3 varias personas, 2 grupo/curso, 1 una persona. null exige revisión manual por falta de señales o ambigüedad.",
+  "serviceCorrectAll": 14,
+  "serviceCorrectClassifiable": 11,
+  "classifiableCases": 12,
+  "urgencyCorrectAll": 14,
+  "urgencyCorrectClassifiable": 11,
+  "impactCorrectAll": 13,
+  "impactCorrectClassifiable": 10,
+  "validResponses": 11,
+  "failureCodes": {
+    "unavailable": 1,
+    "insufficient_signals": 1,
+    "ambiguous_signals": 2
+  },
+  "reviewExpected": 3,
+  "reviewActual": 4,
+  "p50LatencyMs": 827,
+  "p95LatencyMs": 1112,
+  "p50ValidLatencyMs": 971,
+  "p95ValidLatencyMs": 1112,
+  "matrix": {
+    "aula_virtual": {
+      "aula_virtual": 1
+    },
+    "wifi_red": {
+      "revision_manual": 1
+    },
+    "correo": {
+      "correo": 1
+    },
+    "equipos": {
+      "equipos": 2
+    },
+    "impresoras": {
+      "impresoras": 2
+    },
+    "cuentas_accesos": {
+      "cuentas_accesos": 1
+    },
+    "videoconferencia": {
+      "videoconferencia": 1
+    },
+    "sistemas_institucionales": {
+      "sistemas_institucionales": 1
+    },
+    "almacenamiento_nube": {
+      "almacenamiento_nube": 1
+    },
+    "software_licencias": {
+      "software_licencias": 1
+    },
+    "revision_manual": {
+      "revision_manual": 3
+    }
+  },
+  "rows": [
+    {
+      "id": "X01",
+      "expected": "aula_virtual",
+      "actual": "aula_virtual",
+      "urgencyExpected": 3,
+      "urgencyActual": 3,
+      "impactExpected": 2,
+      "impactActual": 2,
+      "latencyMs": 1112,
+      "outcome": "valid"
+    },
+    {
+      "id": "X02",
+      "expected": "wifi_red",
+      "actual": null,
+      "urgencyExpected": 2,
+      "urgencyActual": null,
+      "impactExpected": 1,
+      "impactActual": null,
+      "latencyMs": 827,
+      "outcome": "unavailable"
+    },
+    {
+      "id": "X03",
+      "expected": "correo",
+      "actual": "correo",
+      "urgencyExpected": 1,
+      "urgencyActual": 1,
+      "impactExpected": 1,
+      "impactActual": 1,
+      "latencyMs": 1310,
+      "outcome": "valid"
+    },
+    {
+      "id": "X04",
+      "expected": "equipos",
+      "actual": "equipos",
+      "urgencyExpected": 3,
+      "urgencyActual": 3,
+      "impactExpected": 2,
+      "impactActual": 2,
+      "latencyMs": 1034,
+      "outcome": "valid"
+    },
+    {
+      "id": "X05",
+      "expected": "impresoras",
+      "actual": "impresoras",
+      "urgencyExpected": 2,
+      "urgencyActual": 2,
+      "impactExpected": 3,
+      "impactActual": 3,
+      "latencyMs": 923,
+      "outcome": "valid"
+    },
+    {
+      "id": "X06",
+      "expected": "cuentas_accesos",
+      "actual": "cuentas_accesos",
+      "urgencyExpected": 3,
+      "urgencyActual": 3,
+      "impactExpected": 1,
+      "impactActual": 1,
+      "latencyMs": 598,
+      "outcome": "valid"
+    },
+    {
+      "id": "X07",
+      "expected": "videoconferencia",
+      "actual": "videoconferencia",
+      "urgencyExpected": 2,
+      "urgencyActual": 2,
+      "impactExpected": 2,
+      "impactActual": 3,
+      "latencyMs": 827,
+      "outcome": "valid"
+    },
+    {
+      "id": "X08",
+      "expected": "sistemas_institucionales",
+      "actual": "sistemas_institucionales",
+      "urgencyExpected": 3,
+      "urgencyActual": 3,
+      "impactExpected": 3,
+      "impactActual": 3,
+      "latencyMs": 820,
+      "outcome": "valid"
+    },
+    {
+      "id": "X09",
+      "expected": "almacenamiento_nube",
+      "actual": "almacenamiento_nube",
+      "urgencyExpected": 3,
+      "urgencyActual": 3,
+      "impactExpected": 1,
+      "impactActual": 1,
+      "latencyMs": 627,
+      "outcome": "valid"
+    },
+    {
+      "id": "X10",
+      "expected": "software_licencias",
+      "actual": "software_licencias",
+      "urgencyExpected": 1,
+      "urgencyActual": 1,
+      "impactExpected": 1,
+      "impactActual": 1,
+      "latencyMs": 971,
+      "outcome": "valid"
+    },
+    {
+      "id": "X11",
+      "expected": null,
+      "actual": null,
+      "urgencyExpected": null,
+      "urgencyActual": null,
+      "impactExpected": null,
+      "impactActual": null,
+      "latencyMs": 0,
+      "outcome": "insufficient_signals"
+    },
+    {
+      "id": "X12",
+      "expected": null,
+      "actual": null,
+      "urgencyExpected": null,
+      "urgencyActual": null,
+      "impactExpected": null,
+      "impactActual": null,
+      "latencyMs": 0,
+      "outcome": "ambiguous_signals"
+    },
+    {
+      "id": "X13",
+      "expected": "impresoras",
+      "actual": "impresoras",
+      "urgencyExpected": 3,
+      "urgencyActual": 3,
+      "impactExpected": 2,
+      "impactActual": 2,
+      "latencyMs": 1048,
+      "outcome": "valid"
+    },
+    {
+      "id": "X14",
+      "expected": "equipos",
+      "actual": "equipos",
+      "urgencyExpected": 2,
+      "urgencyActual": 2,
+      "impactExpected": 1,
+      "impactActual": 1,
+      "latencyMs": 1003,
+      "outcome": "valid"
+    },
+    {
+      "id": "X15",
+      "expected": null,
+      "actual": null,
+      "urgencyExpected": null,
+      "urgencyActual": null,
+      "impactExpected": null,
+      "impactActual": null,
+      "latencyMs": 0,
+      "outcome": "ambiguous_signals"
+    }
+  ]
+}

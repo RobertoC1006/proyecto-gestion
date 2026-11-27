@@ -1,6 +1,6 @@
 import { TicketService } from '@prisma/client';
 
-export const GROQ_ADAPTER_VERSION = '5';
+export const GROQ_ADAPTER_VERSION = '6';
 export const GROQ_MODEL = process.env.GROQ_MODEL || 'openai/gpt-oss-20b';
 export type TicketProposal = { service: TicketService; urgency: number; impact: number; explanation: string };
 export type AiFailureCode = 'not_configured' | 'rate_limited' | 'timeout' | 'unavailable' | 'invalid_response' | 'insufficient_signals' | 'ambiguous_signals';
@@ -13,10 +13,10 @@ export class AiClassificationError extends Error {
 function signalsFor(description: string) {
   const normalized = description.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase()
     // Etiquetas de datos de contacto no describen necesariamente el servicio averiado.
-    .replace(/\bcorreo\s+[^\s@]+@[^\s]+/g, ' ')
+    .replace(/\bcorreo(?:\s+de\s+contacto)?\s+(?:es\s+)?[^\s@]+@[^\s]+/g, ' ')
     .replace(/\b[^\s@]+@[^\s]+\b/g, ' ');
   const services: [RegExp, string][] = [
-    [/aula virtual|moodle|campus virtual/, 'aula virtual'], [/wifi|wi-fi|internet|red|conexion/, 'red e internet'],
+    [/aula virtual|moodle|campus virtual/, 'aula virtual'], [/wifi|wi-fi|internet|\bred\b|conexion/, 'red e internet'],
     [/correo|email|e-mail|outlook/, 'correo institucional'], [/impres|imprimir/, 'impresora'],
     [/comput|laptop|proyector|pantalla|teclado/, 'equipo de computo'],
     [/zoom|teams|videoconferencia|reunion/, 'videoconferencia'], [/almacen|nube|drive/, 'almacenamiento'],
