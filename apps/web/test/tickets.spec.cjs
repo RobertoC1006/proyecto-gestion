@@ -45,6 +45,41 @@ async function fixture(page, onCreate = async route => json(route, ticket, 201))
   });
 }
 
+test('P03 conserva el ticket si falla la evidencia y permite reintentar sin otro POST', async ({ page }) => {
+  await fixture(page);
+  const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/aQAAAABJRU5ErkJggg==', 'base64');
+  let posts = 0, uploads = 0, saved = false;
+  await page.route('**/api/v1/tickets', route => {
+    if (route.request().method() === 'POST') { posts++; return json(route, ticket, 201); }
+    return route.fallback();
+  });
+  await page.route('**/api/v1/tickets/attachment-status', route => json(route, { configured: true }));
+  await page.route(`**/api/v1/tickets/${id}/attachment`, route => {
+    if (route.request().method() === 'GET') return saved
+      ? json(route, { id: '55555555-5555-4555-8555-555555555555', ticketId: id, originalName: 'captura.png', mimeType: 'image/png', sizeBytes: png.length, sha256: 'a'.repeat(64), createdAt: ticket.createdAt })
+      : json(route, { code: 'ATTACHMENT_NOT_FOUND' }, 404);
+    uploads++;
+    const body = route.request().postDataJSON();
+    expect(body.originalName).toBe('captura.png');
+    expect(Buffer.from(body.contentBase64, 'base64')).toEqual(png);
+    if (uploads === 1) return json(route, { code: 'DEPENDENCY_UNAVAILABLE', message: 'Storage temporalmente no disponible.' }, 503);
+    saved = true;
+    return json(route, { ticketId: id }, 201);
+  });
+  await page.goto('/incidencias/nueva');
+  await page.getByRole('textbox', { name: /Descripción del problema/ }).fill(ticket.description);
+  await page.getByRole('combobox', { name: /Servicio afectado/ }).selectOption('correo');
+  await page.getByLabel('Evidencia opcional').setInputFiles({ name: 'captura.png', mimeType: 'image/png', buffer: png });
+  await page.getByRole('button', { name: 'Enviar incidencia' }).click();
+  await expect(page.getByText(ticket.code)).toBeVisible();
+  await expect(page.getByText('Storage temporalmente no disponible.')).toBeVisible();
+  await page.getByRole('button', { name: 'Reintentar evidencia' }).click();
+  await expect(page).toHaveURL(new RegExp(`/incidencias/registrada/${id}$`));
+  await expect(page.getByText('captura.png')).toBeVisible();
+  expect(posts).toBe(1);
+  expect(uploads).toBe(2);
+});
+
 test('General no consulta cursos y envía los campos académicos nulos', async ({ page }) => {
   let courseLookups = 0;
   let body;

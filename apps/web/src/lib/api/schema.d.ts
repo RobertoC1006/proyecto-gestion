@@ -420,6 +420,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/tickets/attachment-status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["TicketsController_attachmentStatus"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/tickets/summary": {
         parameters: {
             query?: never;
@@ -530,6 +546,38 @@ export interface paths {
         options?: never;
         head?: never;
         patch: operations["OperationsController_action"];
+        trace?: never;
+    };
+    "/api/v1/tickets/{ticketId}/attachment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["TicketAttachmentController_metadata"];
+        put: operations["TicketAttachmentController_attach"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/tickets/{ticketId}/attachment/content": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["TicketAttachmentController_download"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/v1/certificates": {
@@ -1333,6 +1381,25 @@ export interface components {
             assigneeId?: string;
             solution?: string;
             failureConfirmed?: boolean;
+        };
+        TicketAttachmentInputDto: {
+            originalName: string;
+            /** @enum {string} */
+            mimeType: "image/png" | "image/jpeg" | "application/pdf";
+            /** @description Base64 canónico, sin prefijo data:, máximo 6990508 caracteres. */
+            contentBase64: string;
+        };
+        TicketAttachmentDto: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            ticketId: string;
+            originalName: string;
+            mimeType: string;
+            sizeBytes: number;
+            sha256: string;
+            /** Format: date-time */
+            createdAt: string;
         };
         CertificateDto: {
             /** Format: uuid */
@@ -3228,6 +3295,45 @@ export interface operations {
             };
         };
     };
+    TicketsController_attachmentStatus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Indica si la credencial privada de Storage está configurada en esta instalación. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description VALIDATION_ERROR */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description SESSION_REQUIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description FORBIDDEN o WRITE_PROTECTION_REQUIRED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     TicketsController_summary: {
         parameters: {
             query?: never;
@@ -3447,6 +3553,80 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["TicketDto"];
                 };
+            };
+        };
+    };
+    TicketAttachmentController_metadata: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ticketId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TicketAttachmentDto"];
+                };
+            };
+        };
+    };
+    TicketAttachmentController_attach: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ticketId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TicketAttachmentInputDto"];
+            };
+        };
+        responses: {
+            /** @description Reintento idéntico. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TicketAttachmentDto"];
+                };
+            };
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TicketAttachmentDto"];
+                };
+            };
+        };
+    };
+    TicketAttachmentController_download: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ticketId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

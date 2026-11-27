@@ -15,6 +15,9 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
       SELECT migration_name, checksum FROM "_prisma_migrations"
       WHERE finished_at IS NOT NULL AND rolled_back_at IS NULL`;
     for (const folder of readdirSync(join(process.cwd(), 'prisma/migrations'), { withFileTypes: true }).filter(d => d.isDirectory())) {
+      // La evidencia opcional permanece desactivada hasta que Roberto habilite Storage.
+      // Con clave configurada, su migración vuelve a ser obligatoria antes de arrancar.
+      if (folder.name === '20261127000100_ticket_attachment_limits' && !process.env.SUPABASE_STORAGE_SECRET_KEY) continue;
       const checksum = createHash('sha256').update(readFileSync(join(process.cwd(), 'prisma/migrations', folder.name, 'migration.sql'))).digest('hex');
       if (!applied.some(m => m.migration_name === folder.name && m.checksum === checksum)) {
         throw new Error(`Esquema pendiente o migración modificada: ${folder.name}. Coordina y aplica el comando manual de migración antes de arrancar.`);

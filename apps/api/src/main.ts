@@ -3,9 +3,11 @@ import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { registerCertificateVerificationBodyParser } from './certificates/certificates.upload';
+import { registerTicketAttachmentBodyParser } from './tickets/ticket-attachment.parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  registerTicketAttachmentBodyParser(app);
   registerCertificateVerificationBodyParser(app);
   app.setGlobalPrefix('api/v1');
   app.enableShutdownHooks();

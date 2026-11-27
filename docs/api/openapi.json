@@ -1698,6 +1698,34 @@
         ]
       }
     },
+    "/api/v1/tickets/attachment-status": {
+      "get": {
+        "operationId": "TicketsController_attachmentStatus",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Indica si la credencial privada de Storage está configurada en esta instalación."
+          },
+          "400": {
+            "description": "VALIDATION_ERROR"
+          },
+          "401": {
+            "description": "SESSION_REQUIRED"
+          },
+          "403": {
+            "description": "FORBIDDEN o WRITE_PROTECTION_REQUIRED"
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Incidencias — Semana 1"
+        ]
+      }
+    },
     "/api/v1/tickets/summary": {
       "get": {
         "operationId": "TicketsController_summary",
@@ -1958,6 +1986,122 @@
         ],
         "tags": [
           "Atención y prioridad contextual"
+        ]
+      }
+    },
+    "/api/v1/tickets/{ticketId}/attachment": {
+      "put": {
+        "operationId": "TicketAttachmentController_attach",
+        "parameters": [
+          {
+            "name": "ticketId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TicketAttachmentInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Reintento idéntico.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketAttachmentDto"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketAttachmentDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Evidencias de incidencias"
+        ]
+      },
+      "get": {
+        "operationId": "TicketAttachmentController_metadata",
+        "parameters": [
+          {
+            "name": "ticketId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TicketAttachmentDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Evidencias de incidencias"
+        ]
+      }
+    },
+    "/api/v1/tickets/{ticketId}/attachment/content": {
+      "get": {
+        "operationId": "TicketAttachmentController_download",
+        "parameters": [
+          {
+            "name": "ticketId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "campus_session": []
+          }
+        ],
+        "tags": [
+          "Evidencias de incidencias"
         ]
       }
     },
@@ -4341,6 +4485,70 @@
           "action",
           "expectedVersion",
           "note"
+        ]
+      },
+      "TicketAttachmentInputDto": {
+        "type": "object",
+        "properties": {
+          "originalName": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "mimeType": {
+            "type": "string",
+            "enum": [
+              "image/png",
+              "image/jpeg",
+              "application/pdf"
+            ]
+          },
+          "contentBase64": {
+            "type": "string",
+            "description": "Base64 canónico, sin prefijo data:, máximo 6990508 caracteres."
+          }
+        },
+        "required": [
+          "originalName",
+          "mimeType",
+          "contentBase64"
+        ]
+      },
+      "TicketAttachmentDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ticketId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "originalName": {
+            "type": "string"
+          },
+          "mimeType": {
+            "type": "string"
+          },
+          "sizeBytes": {
+            "type": "number"
+          },
+          "sha256": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "ticketId",
+          "originalName",
+          "mimeType",
+          "sizeBytes",
+          "sha256",
+          "createdAt"
         ]
       },
       "CertificateDto": {

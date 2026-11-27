@@ -32,6 +32,10 @@ export class TicketsController {
   @RequirePermissions('tickets:create')
   @ApiOkResponse({ type: [TicketServiceDto] })
   services() { return this.tickets.services(); }
+  @Get('attachment-status')
+  @RequirePermissions('tickets:create')
+  @ApiOkResponse({ description: 'Indica si la credencial privada de Storage está configurada en esta instalación.' })
+  attachmentStatus() { return { configured: !!process.env.SUPABASE_STORAGE_SECRET_KEY }; }
   @Get('summary')
   @RequirePermissions('tickets:read:self')
   @ApiOkResponse({ type: TicketSummaryDto })

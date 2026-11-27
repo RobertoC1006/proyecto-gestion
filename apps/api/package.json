@@ -8,6 +8,7 @@
     "dev": "node --watch --require ts-node/register src/main.ts",
     "prisma:generate": "prisma generate",
     "db:deploy": "node prisma/deploy.cjs",
+    "db:evidence-reconcile": "node prisma/reconcile-ticket-attachments.cjs",
     "db:seed": "node prisma/seed.cjs",
     "test:academic": "node --test test/academic.test.cjs",
     "test:auth": "node --test --test-concurrency=1 test/auth.test.cjs test/auth.provider.test.cjs test/role-permissions.test.cjs",
@@ -32,7 +33,8 @@
     "pg-boss": "12.39.0",
     "qrcode": "^1.5.4",
     "reflect-metadata": "0.2.2",
-    "rxjs": "7.8.2"
+    "rxjs": "7.8.2",
+    "sharp": "0.35.5"
   },
   "devDependencies": {
     "@nestjs/testing": "11.2.8",
